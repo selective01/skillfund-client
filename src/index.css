@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0d1117;
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  border-radius: 3px;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-dark-600 hover:bg-dark-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 border border-dark-400;
+}
+
+.input-field {
+  @apply w-full bg-dark-600 border border-dark-400 rounded-xl px-4 py-3 text-white placeholder-dark-200 focus:outline-none focus:border-primary-500 transition-colors;
+}
+
+.card {
+  @apply bg-dark-600 rounded-2xl p-6 border border-dark-400;
+}
