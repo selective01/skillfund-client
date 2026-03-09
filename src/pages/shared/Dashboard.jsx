@@ -1,14 +1,74 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Layout from "../../components/layout/Layout";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  TrendingUp,
-  Users,
-  Wallet,
-  Activity,
-} from "lucide-react";
+  faArrowTrendUp, faUsers, faWallet, faHeartPulse,
+  faArrowRight, faCircleCheck, faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
+
+function StatCard({ label, value, icon, colorClass, loading }) {
+  const colorMap = {
+    green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.15)",  card: "linear-gradient(135deg,#0f2e10,#091e09)" },
+    blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.15)", card: "linear-gradient(135deg,#0f2244,#091830)" },
+    purple: { text: "#a855f7", bg: "rgba(168,85,247,0.1)",  border: "rgba(168,85,247,0.15)", card: "linear-gradient(135deg,#220f44,#180930)" },
+    amber:  { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.15)", card: "linear-gradient(135deg,#3d2200,#2a1600)" },
+  };
+  const c = colorMap[colorClass] || colorMap.green;
+  if (loading) {
+    return (
+      <div className="rounded-2xl p-5 animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="h-3 rounded-full w-1/2 mb-5" style={{ background: "#1a2e1d" }} />
+        <div className="h-8 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
+      </div>
+    );
+  }
+  return (
+    <div className="group rounded-2xl p-5 transition-all duration-200 hover:-translate-y-1 cursor-default" style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>{label.toUpperCase()}</p>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: c.bg }}>
+          <FontAwesomeIcon icon={icon} style={{ color: c.text, fontSize: "15px" }} />
+        </div>
+      </div>
+      <p className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "2rem", lineHeight: 1 }}>{value}</p>
+    </div>
+  );
+}
+
+function QuickAction({ emoji, label, description, path }) {
+  return (
+    <Link
+      to={path}
+      className="group flex items-center gap-4 p-4 rounded-2xl transition-all duration-200"
+      style={{ background: "#070d08", border: "1px solid #1a2e1d" }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(34,197,94,0.35)"; e.currentTarget.style.background = "#0a1209"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a2e1d"; e.currentTarget.style.background = "#070d08"; }}
+    >
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)" }}>{emoji}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{label}</p>
+        {description && <p className="text-xs truncate mt-0.5" style={{ color: "#4a5568" }}>{description}</p>}
+      </div>
+      <FontAwesomeIcon icon={faArrowRight} className="flex-shrink-0 transition-transform group-hover:translate-x-1" style={{ color: "#2d4a31", fontSize: "13px" }} />
+    </Link>
+  );
+}
+
+function StatusItem({ label, value, last }) {
+  return (
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid #0f1a10" }}>
+      <span className="text-sm" style={{ color: "#6b7280", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+      <div className="flex items-center gap-1.5">
+        {value
+          ? <><FontAwesomeIcon icon={faCircleCheck} style={{ color: "#22c55e", fontSize: "13px" }} /><span className="text-xs font-bold" style={{ color: "#22c55e", fontFamily: "'Syne', sans-serif" }}>Verified</span></>
+          : <><FontAwesomeIcon icon={faCircleXmark} style={{ color: "#ef4444", fontSize: "13px" }} /><span className="text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Syne', sans-serif" }}>Pending</span></>
+        }
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { user } = useAuthStore();
@@ -25,7 +85,7 @@ export default function Dashboard() {
           const res = await api.get("/investments/my-investments");
           setStats(res.data.summary);
         }
-      } catch (error) {
+      } catch {
         console.error("Failed to fetch stats");
       } finally {
         setLoading(false);
@@ -35,209 +95,137 @@ export default function Dashboard() {
   }, [user]);
 
   const creatorStats = [
-    {
-      label: "Total Raised",
-      value: `$${stats?.totalInvested || 0}`,
-      icon: Wallet,
-      color: "text-green-400",
-      bg: "bg-green-400/10",
-    },
-    {
-      label: "Active Investments",
-      value: stats?.activeInvestments || 0,
-      icon: Activity,
-      color: "text-blue-400",
-      bg: "bg-blue-400/10",
-    },
-    {
-      label: "Total Returns",
-      value: `$${stats?.totalReturns || 0}`,
-      icon: TrendingUp,
-      color: "text-purple-400",
-      bg: "bg-purple-400/10",
-    },
-    {
-      label: "Completed",
-      value: stats?.completedInvestments || 0,
-      icon: Users,
-      color: "text-orange-400",
-      bg: "bg-orange-400/10",
-    },
+    { label: "Total Raised",       value: `$${stats?.totalInvested || 0}`,        icon: faWallet,       colorClass: "green"  },
+    { label: "Active Investments", value: stats?.activeInvestments || 0,           icon: faHeartPulse,   colorClass: "blue"   },
+    { label: "Total Returns",      value: `$${stats?.totalReturns || 0}`,          icon: faArrowTrendUp, colorClass: "purple" },
+    { label: "Completed",          value: stats?.completedInvestments || 0,        icon: faUsers,        colorClass: "amber"  },
   ];
 
   const adminStats = [
-    {
-      label: "Total Users",
-      value: stats?.users?.total || 0,
-      icon: Users,
-      color: "text-green-400",
-      bg: "bg-green-400/10",
-    },
-    {
-      label: "Active Investments",
-      value: stats?.investments?.active || 0,
-      icon: Activity,
-      color: "text-blue-400",
-      bg: "bg-blue-400/10",
-    },
-    {
-      label: "Total Invested",
-      value: `$${stats?.investments?.totalInvested || 0}`,
-      icon: TrendingUp,
-      color: "text-purple-400",
-      bg: "bg-purple-400/10",
-    },
-    {
-      label: "Pending Withdrawals",
-      value: stats?.pending?.withdrawals || 0,
-      icon: Wallet,
-      color: "text-orange-400",
-      bg: "bg-orange-400/10",
-    },
+    { label: "Total Users",         value: stats?.users?.total || 0,                     icon: faUsers,        colorClass: "green"  },
+    { label: "Active Investments",  value: stats?.investments?.active || 0,              icon: faHeartPulse,   colorClass: "blue"   },
+    { label: "Total Invested",      value: `$${stats?.investments?.totalInvested || 0}`, icon: faArrowTrendUp, colorClass: "purple" },
+    { label: "Pending Withdrawals", value: stats?.pending?.withdrawals || 0,             icon: faWallet,       colorClass: "amber"  },
   ];
 
   const displayStats = user?.role === "admin" ? adminStats : creatorStats;
 
+  const quickActions = {
+    creator: [
+      { emoji: "📸", label: "Upload Portfolio",  path: "/profile",   description: "Add work samples to attract investors" },
+      { emoji: "💬", label: "View Messages",      path: "/messages",  description: "Respond to investor inquiries" },
+      { emoji: "💰", label: "Report Earnings",    path: "/earnings",  description: "Submit your monthly income report" },
+      { emoji: "🏦", label: "Withdraw Funds",     path: "/withdraw",  description: "Cash out your earnings" },
+    ],
+    investor: [
+      { emoji: "🔍", label: "Browse Creators",    path: "/browse",    description: "Discover new investment opportunities" },
+      { emoji: "💬", label: "View Messages",       path: "/messages",  description: "Chat with your funded creators" },
+      { emoji: "📈", label: "View Portfolio",      path: "/portfolio", description: "Track your active investments" },
+      { emoji: "🏦", label: "Withdraw Funds",      path: "/withdraw",  description: "Cash out your earnings" },
+    ],
+    admin: [
+      { emoji: "👥", label: "Manage Users",           path: "/admin/users",         description: "View and moderate all accounts" },
+      { emoji: "✅", label: "Review Verifications",    path: "/admin/verifications", description: "Approve pending ID submissions" },
+      { emoji: "💸", label: "Approve Withdrawals",     path: "/admin/withdrawals",   description: "Process pending payout requests" },
+      { emoji: "⚖️", label: "Resolve Disputes",        path: "/admin/disputes",      description: "Mediate investor-creator conflicts" },
+    ],
+  };
+
+  const actions = quickActions[user?.role] || [];
+
+  const verifications = [
+    { label: "Email Verified",   value: user?.emailVerified },
+    { label: "Phone Verified",   value: user?.phoneVerified },
+    { label: "ID Verified",      value: user?.idVerified    },
+    { label: "Profile Verified", value: user?.isVerified    },
+  ];
+  const verifiedCount = verifications.filter(v => v.value).length;
+  const verifiedPct   = Math.round((verifiedCount / verifications.length) * 100);
+
   return (
-    <Layout title="Dashboard">
+    <div className="space-y-6">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+        @keyframes dashSlideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .dash-in { animation: dashSlideUp 0.5s ease forwards; }
+        .d1{animation-delay:.05s;opacity:0} .d2{animation-delay:.1s;opacity:0}
+        .d3{animation-delay:.15s;opacity:0} .d4{animation-delay:.2s;opacity:0}
+        .d5{animation-delay:.25s;opacity:0} .d6{animation-delay:.3s;opacity:0}
+      `}</style>
+
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-primary-600/20 to-primary-500/10 border border-primary-500/20 rounded-2xl p-6 mb-6">
-        <h2 className="text-2xl font-bold text-white mb-1">
-          Welcome back, {user?.name}! 👋
-        </h2>
-        <p className="text-dark-200">
-          You are on the{" "}
-          <span className="text-primary-400 font-semibold capitalize">
-            {user?.plan}
-          </span>{" "}
-          plan as a{" "}
-          <span className="text-primary-400 font-semibold capitalize">
-            {user?.role}
-          </span>
-          .{" "}
+      <div className="dash-in d1 rounded-3xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f2e10 0%, #071a0b 60%, #040d06 100%)", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+        <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)", filter: "blur(20px)" }} />
+        <div className="absolute inset-0 pointer-events-none rounded-3xl" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.04) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
+              <span className="text-xs font-bold tracking-widest text-[#22c55e]" style={{ fontFamily: "'Syne', sans-serif" }}>{user?.role?.toUpperCase()} DASHBOARD</span>
+            </div>
+            <h2 className="font-black text-white mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.4rem,2.5vw,1.9rem)" }}>Welcome back, {user?.name} 👋</h2>
+            <p className="text-sm" style={{ color: "#6b7280" }}>
+              You're on the <span className="font-bold capitalize" style={{ color: "#22c55e" }}>{user?.plan}</span> plan
+              {user?.plan === "basic" && <> · <span style={{ color: "#f59e0b" }}>Upgrade to unlock more features</span></>}
+            </p>
+          </div>
           {user?.plan === "basic" && (
-            <span className="text-yellow-400">
-              Upgrade your plan to unlock more features.
-            </span>
+            <Link to="/pricing" className="flex-shrink-0 flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>
+              Upgrade Plan <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
+            </Link>
           )}
-        </p>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="h-4 bg-dark-500 rounded mb-4 w-1/2"></div>
-              <div className="h-8 bg-dark-500 rounded w-1/3"></div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {displayStats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-dark-200 text-sm">{stat.label}</p>
-                  <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                    <Icon size={18} className={stat.color} />
-                  </div>
-                </div>
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {displayStats.map((stat, i) => (
+          <div key={i} className={`dash-in d${i + 2}`}>
+            <StatCard {...stat} loading={loading} />
+          </div>
+        ))}
+      </div>
 
       {/* Bottom Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <div className="card">
-          <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
+        <div className="dash-in d5 rounded-3xl p-6" style={{ background: "linear-gradient(145deg, #070d08, #040806)", border: "1px solid #1a2e1d", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
+            <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Quick Actions</h3>
+          </div>
           <div className="space-y-3">
-            {user?.role === "creator" && (
-              <>
-                <QuickAction emoji="📸" label="Upload Portfolio" path="/profile" />
-                <QuickAction emoji="💬" label="View Messages" path="/messages" />
-                <QuickAction emoji="💰" label="Report Earnings" path="/earnings" />
-                <QuickAction emoji="🏦" label="Withdraw Funds" path="/withdraw" />
-              </>
-            )}
-            {user?.role === "investor" && (
-              <>
-                <QuickAction emoji="🔍" label="Browse Creators" path="/browse" />
-                <QuickAction emoji="💬" label="View Messages" path="/messages" />
-                <QuickAction emoji="📈" label="View Portfolio" path="/portfolio" />
-                <QuickAction emoji="🏦" label="Withdraw Funds" path="/withdraw" />
-              </>
-            )}
-            {user?.role === "admin" && (
-              <>
-                <QuickAction emoji="👥" label="Manage Users" path="/admin/users" />
-                <QuickAction emoji="✅" label="Review Verifications" path="/admin/verifications" />
-                <QuickAction emoji="💸" label="Approve Withdrawals" path="/admin/withdrawals" />
-                <QuickAction emoji="⚖️" label="Resolve Disputes" path="/admin/disputes" />
-              </>
-            )}
+            {actions.map((action, i) => <QuickAction key={i} {...action} />)}
           </div>
         </div>
 
-        {/* Account Status */}
-        <div className="card">
-          <h3 className="text-lg font-bold text-white mb-4">Account Status</h3>
-          <div className="space-y-3">
-            <StatusItem label="Email Verified" value={user?.emailVerified} />
-            <StatusItem label="Phone Verified" value={user?.phoneVerified} />
-            <StatusItem label="ID Verified" value={user?.idVerified} />
-            <StatusItem label="Profile Verified" value={user?.isVerified} />
-            <div className="pt-2 border-t border-dark-500">
-              <div className="flex items-center justify-between">
-                <span className="text-dark-200 text-sm">Current Plan</span>
-                <span className="text-primary-400 font-semibold capitalize bg-primary-500/10 px-3 py-1 rounded-full text-sm">
-                  {user?.plan}
-                </span>
-              </div>
+        <div className="dash-in d6 rounded-3xl p-6" style={{ background: "linear-gradient(145deg, #070d08, #040806)", border: "1px solid #1a2e1d", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
+            <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Account Status</h3>
+          </div>
+          <div className="rounded-2xl p-4 mb-4" style={{ background: "#040806", border: "1px solid #1a2e1d" }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>VERIFICATION PROGRESS</span>
+              <span className="text-xs font-black" style={{ fontFamily: "'Fraunces', serif", color: "#22c55e" }}>{verifiedCount}/{verifications.length}</span>
             </div>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: "#0f1a10" }}>
+              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${verifiedPct}%`, background: "linear-gradient(90deg, #16a34a, #22c55e, #4ade80)" }} />
+            </div>
+            <p className="text-xs mt-1.5" style={{ color: "#2d4a31" }}>
+              {verifiedPct === 100 ? "✓ Fully verified" : `${100 - verifiedPct}% remaining to full trust score`}
+            </p>
+          </div>
+          <div className="px-1">
+            {verifications.map((v, i) => <StatusItem key={i} label={v.label} value={v.value} last={i === verifications.length - 1} />)}
+          </div>
+          <div className="mt-4 flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "#040806", border: "1px solid #1a2e1d" }}>
+            <span className="text-sm font-semibold" style={{ color: "#6b7280" }}>Current Plan</span>
+            <span className="text-xs font-black capitalize px-3 py-1.5 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
+              {user?.plan}
+            </span>
           </div>
         </div>
       </div>
-    </Layout>
-  );
-}
-
-function QuickAction({ emoji, label, path }) {
-  return (
-    <Link
-      to={path}
-      className="flex items-center gap-3 p-3 rounded-xl bg-dark-700 hover:bg-dark-500 transition-all group"
-    >
-      <span className="text-xl">{emoji}</span>
-      <span className="text-dark-100 group-hover:text-white font-medium transition-colors">
-        {label}
-      </span>
-      <span className="ml-auto text-dark-300 group-hover:text-primary-400 transition-colors">
-        →
-      </span>
-    </Link>
-  );
-}
-
-function StatusItem({ label, value }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-dark-200 text-sm">{label}</span>
-      <span
-        className={`text-sm font-medium px-3 py-1 rounded-full ${
-          value
-            ? "text-green-400 bg-green-400/10"
-            : "text-red-400 bg-red-400/10"
-        }`}
-      >
-        {value ? "✓ Verified" : "✗ Pending"}
-      </span>
     </div>
   );
 }

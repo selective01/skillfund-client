@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -29,7 +29,7 @@ module.exports = {
           700: "#111827",
           800: "#0d1117",
           900: "#030712",
-        }
+        },
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

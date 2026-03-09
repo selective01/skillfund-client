@@ -1,19 +1,16 @@
-import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import useThemeStore from "../../store/useThemeStore";
 
 export default function Layout({ children, title = "Dashboard" }) {
+  const { theme } = useThemeStore();
+  const bg = theme === "light" ? "#f4faf5" : "#040806";
+
   return (
-    <div className="min-h-screen bg-dark-800">
-      {/* Sidebar */}
+    <div className="min-h-screen" style={{ background: bg, transition: "background 0.25s ease" }}>
       <Sidebar />
-
-      {/* Main Content */}
       <div className="ml-64">
-        {/* Header */}
         <Header title={title} />
-
-        {/* Page Content */}
         <main className="pt-16 min-h-screen">
           <div className="p-6">
             {children}

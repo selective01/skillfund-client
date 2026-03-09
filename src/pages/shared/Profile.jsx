@@ -21,7 +21,7 @@ const SKILL_CATEGORIES = [
 
 const INDUSTRIES = [
   "fashion", "carpentry", "farming", "photography",
-  "baking", "mechanics", "technology", "hair", "artisan", "other"
+  "baking", "mechanics", "technology", "hair", "artisan", "other",
 ];
 
 const PORTFOLIO_LIMITS = { basic: 2, starter: 5, pro: 20, elite: "∞" };
@@ -63,44 +63,46 @@ export default function Profile() {
   const [portfolioFile, setPortfolioFile] = useState(null);
   const [portfolioPreview, setPortfolioPreview] = useState(null);
 
+  // Fix: define fetchProfile inside useEffect so it's stable and doesn't
+  // need to be listed as a dependency of the effect.
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get("/profiles/me");
+        const p = res.data.profile;
+        setProfile(p);
+        setForm({
+          bio: p.bio || "",
+          location: p.location || "",
+          skill: p.skill || "",
+          skillCategory: p.skillCategory || "other",
+          fundingGoal: p.fundingGoal || "",
+          fundingPurpose: p.fundingPurpose || "",
+          projectedMonthlyIncome: p.projectedMonthlyIncome || "",
+          profitSharePercentage: p.profitSharePercentage || "",
+          profitShareDuration: p.profitShareDuration || "",
+          isAcceptingInvestments: p.isAcceptingInvestments ?? true,
+          investmentBudget: p.investmentBudget || "",
+          industriesOfInterest: p.industriesOfInterest || [],
+          preferredROI: p.preferredROI || "",
+          riskTolerance: p.riskTolerance || "medium",
+          preferredDuration: p.preferredDuration || "",
+          socialLinks: p.socialLinks || {
+            instagram: "",
+            twitter: "",
+            linkedin: "",
+            website: "",
+          },
+        });
+      } catch {
+        // Profile doesn't exist yet — that's fine
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get("/profiles/me");
-      const p = res.data.profile;
-      setProfile(p);
-      setForm({
-        bio: p.bio || "",
-        location: p.location || "",
-        skill: p.skill || "",
-        skillCategory: p.skillCategory || "other",
-        fundingGoal: p.fundingGoal || "",
-        fundingPurpose: p.fundingPurpose || "",
-        projectedMonthlyIncome: p.projectedMonthlyIncome || "",
-        profitSharePercentage: p.profitSharePercentage || "",
-        profitShareDuration: p.profitShareDuration || "",
-        isAcceptingInvestments: p.isAcceptingInvestments ?? true,
-        investmentBudget: p.investmentBudget || "",
-        industriesOfInterest: p.industriesOfInterest || [],
-        preferredROI: p.preferredROI || "",
-        riskTolerance: p.riskTolerance || "medium",
-        preferredDuration: p.preferredDuration || "",
-        socialLinks: p.socialLinks || {
-          instagram: "",
-          twitter: "",
-          linkedin: "",
-          website: "",
-        },
-      });
-    } catch (error) {
-      // Profile doesn't exist yet
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchProfile();
+  }, []); // runs once on mount
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -183,7 +185,7 @@ export default function Profile() {
       const res = await api.delete(`/profiles/portfolio/${itemId}`);
       setProfile((prev) => ({ ...prev, portfolio: res.data.portfolio }));
       toast.success("Portfolio item deleted");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete portfolio item");
     }
   };
@@ -197,23 +199,20 @@ export default function Profile() {
 
     toast.loading("Uploading avatar...");
     try {
-        const res = await api.put("/profiles/avatar", formData, {
+      const res = await api.put("/profiles/avatar", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        });
+      });
 
-        // Update profile state
-        setProfile((prev) => ({ ...prev, avatar: res.data.avatar }));
+      setProfile((prev) => ({ ...prev, avatar: res.data.avatar }));
+      updateUser({ ...user, avatar: res.data.avatar });
 
-        // Update user in store so sidebar avatar updates too
-        updateUser({ ...user, avatar: res.data.avatar });
-
-        toast.dismiss();
-        toast.success("Avatar updated!");
+      toast.dismiss();
+      toast.success("Avatar updated!");
     } catch (error) {
-        toast.dismiss();
-        toast.error(error.response?.data?.message || "Avatar upload failed");
+      toast.dismiss();
+      toast.error(error.response?.data?.message || "Avatar upload failed");
     }
-    };
+  };
 
   if (loading) {
     return (
@@ -225,7 +224,6 @@ export default function Profile() {
     );
   }
 
-  // Build tabs based on role
   const tabs = ["profile"];
   if (user?.role === "creator") tabs.push("portfolio");
   tabs.push("social");
@@ -253,72 +251,69 @@ export default function Profile() {
       {activeTab === "profile" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Avatar Card */}
-            <div className="card text-center">
-            {/* Clickable Avatar */}
+          <div className="card text-center">
             <div className="relative w-24 h-24 mx-auto mb-4">
-                <div className="w-24 h-24 rounded-full bg-primary-500/20 border-2 border-primary-500/30 flex items-center justify-center text-primary-400 font-bold text-3xl overflow-hidden">
+              <div className="w-24 h-24 rounded-full bg-primary-500/20 border-2 border-primary-500/30 flex items-center justify-center text-primary-400 font-bold text-3xl overflow-hidden">
                 {profile?.avatar || user?.avatar ? (
-                    <img
+                  <img
                     src={profile?.avatar || user?.avatar}
                     alt="Avatar"
                     className="w-full h-full object-cover"
-                    />
+                  />
                 ) : (
-                    user?.name?.charAt(0).toUpperCase()
+                  user?.name?.charAt(0).toUpperCase()
                 )}
-                </div>
-                {/* Upload Button Overlay */}
-                <button
+              </div>
+              <button
                 onClick={() => document.getElementById("avatarInput").click()}
                 className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors shadow-lg"
-                >
+              >
                 <Camera size={14} className="text-white" />
-                </button>
-                <input
+              </button>
+              <input
                 id="avatarInput"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={handleAvatarUpload}
                 className="hidden"
-                />
+              />
             </div>
 
-            {/* Upload hint */}
             <p className="text-dark-300 text-xs mb-3">Click camera to change photo</p>
 
             <h3 className="text-white font-bold text-lg">{user?.name}</h3>
             <p className="text-dark-200 text-sm capitalize">{user?.role}</p>
             <div className="mt-3 flex justify-center gap-2 flex-wrap">
-                <span className="text-xs bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full capitalize">
+              <span className="text-xs bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full capitalize">
                 {user?.plan} plan
-                </span>
-                {user?.isVerified && (
+              </span>
+              {user?.isVerified && (
                 <span className="text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full">
-                    ✓ Verified
+                  ✓ Verified
                 </span>
-                )}
+              )}
             </div>
             {profile && (
-                <div className="mt-4 pt-4 border-t border-dark-500 text-left space-y-2">
+              <div className="mt-4 pt-4 border-t border-dark-500 text-left space-y-2">
                 <p className="text-dark-200 text-xs">
-                    📍 {profile.location || "No location set"}
+                  📍 {profile.location || "No location set"}
                 </p>
                 <p className="text-dark-200 text-xs">
-                    👁 {profile.profileViews} profile views
+                  👁 {profile.profileViews} profile views
                 </p>
                 {user?.role === "creator" && (
-                    <p className="text-dark-200 text-xs">
+                  <p className="text-dark-200 text-xs">
                     💰 ${profile.amountRaised} raised
-                    </p>
+                  </p>
                 )}
                 {user?.role === "investor" && (
-                    <p className="text-dark-200 text-xs">
+                  <p className="text-dark-200 text-xs">
                     📊 ${profile.totalInvested} total invested
-                    </p>
+                  </p>
                 )}
-                </div>
+              </div>
             )}
-            </div>
+          </div>
 
           {/* Form */}
           <div className="lg:col-span-2 space-y-6">
@@ -621,13 +616,8 @@ export default function Profile() {
                     />
                   ) : (
                     <div>
-                      <Camera
-                        size={32}
-                        className="text-dark-300 mx-auto mb-2"
-                      />
-                      <p className="text-dark-200 text-sm">
-                        Click to upload image
-                      </p>
+                      <Camera size={32} className="text-dark-300 mx-auto mb-2" />
+                      <p className="text-dark-200 text-sm">Click to upload image</p>
                       <p className="text-dark-300 text-xs mt-1">
                         JPEG, PNG or WebP — max 5MB
                       </p>
@@ -685,10 +675,7 @@ export default function Profile() {
           {profile?.portfolio?.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {profile.portfolio.map((item) => (
-                <div
-                  key={item._id}
-                  className="card p-0 overflow-hidden group"
-                >
+                <div key={item._id} className="card p-0 overflow-hidden group">
                   <div className="relative">
                     <img
                       src={item.imageUrl}
@@ -716,9 +703,7 @@ export default function Profile() {
           ) : (
             <div className="card text-center py-12">
               <Camera size={48} className="text-dark-300 mx-auto mb-4" />
-              <h3 className="text-white font-bold mb-2">
-                No portfolio items yet
-              </h3>
+              <h3 className="text-white font-bold mb-2">No portfolio items yet</h3>
               <p className="text-dark-200 text-sm">
                 Upload your work to attract investors
               </p>
@@ -733,26 +718,10 @@ export default function Profile() {
           <h3 className="text-white font-bold mb-6">Social Links</h3>
           <div className="space-y-4">
             {[
-              {
-                key: "instagram",
-                label: "Instagram",
-                placeholder: "https://instagram.com/yourhandle",
-              },
-              {
-                key: "twitter",
-                label: "Twitter / X",
-                placeholder: "https://twitter.com/yourhandle",
-              },
-              {
-                key: "linkedin",
-                label: "LinkedIn",
-                placeholder: "https://linkedin.com/in/yourname",
-              },
-              {
-                key: "website",
-                label: "Website",
-                placeholder: "https://yourwebsite.com",
-              },
+              { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/yourhandle" },
+              { key: "twitter", label: "Twitter / X", placeholder: "https://twitter.com/yourhandle" },
+              { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/in/yourname" },
+              { key: "website", label: "Website", placeholder: "https://yourwebsite.com" },
             ].map((social) => (
               <div key={social.key}>
                 <label className="block text-dark-100 text-sm font-medium mb-2">
