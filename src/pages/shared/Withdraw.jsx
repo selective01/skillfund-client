@@ -25,23 +25,23 @@ const STATUS_CONFIG = {
 };
 
 function FieldLabel({ children }) {
-  return <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne',sans-serif", color: "#4a5568" }}>{children}</label>;
+  return <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}>{children}</label>;
 }
 function Input({ ...props }) {
   return (
     <input {...props}
-      style={{ background: "#0a1209", border: "1px solid #1a2e1d", color: "#fff", borderRadius: "12px", padding: "11px 14px", width: "100%", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", transition: "border-color .2s", ...props.style }}
+      style={{ background: "var(--bg-input)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: "12px", padding: "11px 14px", width: "100%", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", transition: "border-color .2s", ...props.style }}
       onFocus={e => { e.target.style.borderColor = "rgba(34,197,94,0.4)"; e.target.style.outline = "none"; e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,0.07)"; }}
-      onBlur={e => { e.target.style.borderColor = "#1a2e1d"; e.target.style.boxShadow = "none"; }}
+      onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }}
     />
   );
 }
 function Textarea({ ...props }) {
   return (
     <textarea {...props}
-      style={{ background: "#0a1209", border: "1px solid #1a2e1d", color: "#fff", borderRadius: "12px", padding: "11px 14px", width: "100%", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", transition: "border-color .2s", resize: "none", ...props.style }}
+      style={{ background: "var(--bg-input)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: "12px", padding: "11px 14px", width: "100%", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", transition: "border-color .2s", resize: "none", ...props.style }}
       onFocus={e => { e.target.style.borderColor = "rgba(34,197,94,0.4)"; e.target.style.outline = "none"; e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,0.07)"; }}
-      onBlur={e => { e.target.style.borderColor = "#1a2e1d"; e.target.style.boxShadow = "none"; }}
+      onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }}
     />
   );
 }
@@ -116,7 +116,7 @@ export default function Withdraw() {
       `}</style>
 
       {/* ── Header ── */}
-        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
           <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter: "blur(20px)" }} />
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
           <div className="relative">
@@ -125,40 +125,40 @@ export default function Withdraw() {
               <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#22c55e" }}>WITHDRAW</span>
             </div>
             <h1 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "clamp(1.4rem,2.5vw,1.9rem)" }}>Withdraw Funds</h1>
-            <p style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", marginTop: "4px" }}>Request a withdrawal from your available balance</p>
+            <p style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", marginTop: "4px" }}>Request a withdrawal from your available balance</p>
           </div>
         </div>
 
         {/* ── Stat cards ── */}
-        <div className="wd-in grid grid-cols-1 sm:grid-cols-3 gap-4" style={{ animationDelay: ".06s" }}>
+        <div className="wd-in grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ animationDelay: ".06s" }}>
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-                <div className="h-3 rounded-full w-1/2 mb-4" style={{ background: "#1a2e1d" }} />
-                <div className="h-8 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
+              <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                <div className="h-3 rounded-full w-1/2 mb-4" style={{ background: "var(--border)" }} />
+                <div className="h-8 rounded-full w-1/3" style={{ background: "var(--border)" }} />
               </div>
             ))
           ) : [
-            { label: "Available Balance", value: balance !== null ? `$${Number(balance).toLocaleString()}` : "—", sub: `${plan} plan · ${feePercent}% fee`, icon: faWallet,      iconColor: "#22c55e", bg: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.15)" },
-            { label: "Pending",           value: `$${pendingAmount.toLocaleString()}`,                                 sub: "Being processed",                    icon: faClock,       iconColor: "#f59e0b", bg: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.15)" },
-            { label: "Total Withdrawn",   value: `$${totalWithdrawn.toLocaleString()}`,                                sub: "All time",                           icon: faCircleCheck, iconColor: "#22c55e", bg: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(34,197,94,0.15)" },
+            { label: "Available Balance", value: balance !== null ? `$${Number(balance).toLocaleString()}` : "—", sub: `${plan} plan · ${feePercent}% fee`, icon: faWallet,      iconColor: "#22c55e", bg: "var(--card-green)", border: "rgba(34,197,94,0.15)" },
+            { label: "Pending",           value: `$${pendingAmount.toLocaleString()}`,                                 sub: "Being processed",                    icon: faClock,       iconColor: "#f59e0b", bg: "var(--card-amber)", border: "rgba(245,158,11,0.15)" },
+            { label: "Total Withdrawn",   value: `$${totalWithdrawn.toLocaleString()}`,                                sub: "All time",                           icon: faCircleCheck, iconColor: "#22c55e", bg: "var(--card-blue)", border: "rgba(34,197,94,0.15)" },
           ].map(s => (
-            <div key={s.label} className="rounded-2xl p-5" style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.35)" }}>
+            <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.35)" }}>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#4a5568" }}>{s.label.toUpperCase()}</p>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.iconColor}18` }}>
-                  <FontAwesomeIcon icon={s.icon} style={{ fontSize: "14px", color: s.iconColor }} />
+                <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}>{s.label.toUpperCase()}</p>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `${s.iconColor}18` }}>
+                  <FontAwesomeIcon icon={s.icon} style={{ fontSize: "13px", color: s.iconColor }} />
                 </div>
               </div>
-              <p className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.8rem", lineHeight: 1 }}>{s.value}</p>
-              <p className="text-xs mt-1.5 capitalize" style={{ color: "#4a5568", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{s.sub}</p>
+              <p className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.5rem", lineHeight: 1 }}>{s.value}</p>
+              <p className="text-xs mt-1.5 capitalize" style={{ color: "var(--text-dim)", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{s.sub}</p>
             </div>
           ))}
         </div>
 
         <div className="wd-in grid grid-cols-1 lg:grid-cols-5 gap-6" style={{ animationDelay: ".12s" }}>
           {/* ── Request form ── */}
-          <div className="lg:col-span-3 rounded-2xl p-6 space-y-5" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+          <div className="lg:col-span-3 rounded-2xl p-6 space-y-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
             <div className="flex items-center gap-2">
               <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#22c55e,#16a34a)" }} />
               <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>New Withdrawal Request</h2>
@@ -168,12 +168,12 @@ export default function Withdraw() {
             <div>
               <FieldLabel>AMOUNT (USD) *</FieldLabel>
               <div className="relative">
-                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "13px", pointerEvents: "none" }} />
+                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-dim)", fontSize: "13px", pointerEvents: "none" }} />
                 <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" min={minWithdrawal} style={{ paddingLeft: "2.2rem" }} />
               </div>
               {balance !== null && (
                 <div className="flex items-center justify-between mt-1.5">
-                  <p className="text-xs" style={{ color: "#4a5568", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>Min: ${minWithdrawal}</p>
+                  <p className="text-xs" style={{ color: "var(--text-dim)", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>Min: ${minWithdrawal}</p>
                   <button onClick={() => setAmount(String(balance))} className="text-xs font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: "#22c55e" }}>Use max (${Number(balance).toLocaleString()})</button>
                 </div>
               )}
@@ -186,17 +186,17 @@ export default function Withdraw() {
 
             {/* Fee breakdown */}
             {parsedAmount > 0 && (
-              <div className="rounded-xl p-4 space-y-2 text-sm" style={{ background: "#0a1209", border: "1px solid #1a2e1d" }}>
+              <div className="rounded-xl p-4 space-y-2 text-sm" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
                 {[
-                  { label: "Withdrawal amount", value: `$${parsedAmount.toLocaleString()}`, color: "#9ca3af" },
+                  { label: "Withdrawal amount", value: `$${parsedAmount.toLocaleString()}`, color: "var(--text-secondary)" },
                   { label: `Platform fee (${feePercent}%)`, value: `-$${feeAmount.toFixed(2)}`, color: "#f87171" },
                 ].map(r => (
                   <div key={r.label} className="flex justify-between">
-                    <span style={{ color: "#4a5568", fontFamily: "'DM Sans',sans-serif" }}>{r.label}</span>
+                    <span style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}>{r.label}</span>
                     <span style={{ color: r.color, fontFamily: "'Syne',sans-serif", fontWeight: 700 }}>{r.value}</span>
                   </div>
                 ))}
-                <div className="flex justify-between pt-2" style={{ borderTop: "1px solid #1a2e1d" }}>
+                <div className="flex justify-between pt-2" style={{ borderTop: "1px solid var(--border)" }}>
                   <span className="font-bold text-white" style={{ fontFamily: "'Syne',sans-serif" }}>You receive</span>
                   <span className="font-black" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", color: "#22c55e" }}>${netAmount.toFixed(2)}</span>
                 </div>
@@ -207,7 +207,7 @@ export default function Withdraw() {
             {plan !== "elite" && (
               <div className="flex items-start gap-2.5 rounded-xl p-3.5" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.12)" }}>
                 <FontAwesomeIcon icon={faCircleInfo} style={{ fontSize: "13px", color: "#22c55e", flexShrink: 0, marginTop: "1px" }} />
-                <p className="text-xs" style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif" }}>
+                <p className="text-xs" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif" }}>
                   Upgrade to <span style={{ color: "#22c55e", fontWeight: 700 }}>Elite</span> to reduce your fee to 2%.{" "}
                   {parsedAmount > 0 && <span>Save <span style={{ color: "#22c55e", fontWeight: 700 }}>${((parsedAmount * (feePercent - 2)) / 100).toFixed(2)}</span> on this withdrawal.</span>}
                 </p>
@@ -221,10 +221,10 @@ export default function Withdraw() {
                 {PAYMENT_METHODS.filter(m => !m.investorOnly || isInvestor).map(m => {
                   const isSelected = method === m.key;
                   return (
-                    <button key={m.key} onClick={() => setMethod(m.key)} className="flex flex-col items-center gap-1.5 p-3.5 rounded-xl transition-all text-center" style={{ background: isSelected ? `${m.iconColor}12` : "#0a1209", border: isSelected ? `1px solid ${m.iconColor}35` : "1px solid #1a2e1d" }}>
-                      <FontAwesomeIcon icon={m.faIcon} style={{ fontSize: "18px", color: isSelected ? m.iconColor : "#4a5568" }} />
-                      <span className="text-xs font-bold" style={{ fontFamily: "'Syne',sans-serif", color: isSelected ? m.iconColor : "#9ca3af" }}>{m.label}</span>
-                      <span className="text-xs" style={{ color: "#4a5568", fontFamily: "'DM Sans',sans-serif" }}>{m.desc}</span>
+                    <button key={m.key} onClick={() => setMethod(m.key)} className="flex flex-col items-center gap-1.5 p-3.5 rounded-xl transition-all text-center" style={{ background: isSelected ? `${m.iconColor}12` : "var(--bg-input)", border: isSelected ? `1px solid ${m.iconColor}35` : "1px solid var(--border)" }}>
+                      <FontAwesomeIcon icon={m.faIcon} style={{ fontSize: "18px", color: isSelected ? m.iconColor : "var(--text-dim)" }} />
+                      <span className="text-xs font-bold" style={{ fontFamily: "'Syne',sans-serif", color: isSelected ? m.iconColor : "var(--text-secondary)" }}>{m.label}</span>
+                      <span className="text-xs" style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}>{m.desc}</span>
                     </button>
                   );
                 })}
@@ -247,7 +247,7 @@ export default function Withdraw() {
             {method === "paystack" && (
               <div className="rounded-xl p-3.5 flex items-center gap-2.5" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)" }}>
                 <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "14px", color: "#22c55e" }} />
-                <p className="text-sm" style={{ color: "#9ca3af", fontFamily: "'DM Sans',sans-serif" }}>
+                <p className="text-sm" style={{ color: "var(--text-secondary)", fontFamily: "'DM Sans',sans-serif" }}>
                   Funds sent to <span className="text-white font-bold">{user?.email}</span>
                 </p>
               </div>
@@ -256,7 +256,7 @@ export default function Withdraw() {
               <div>
                 <FieldLabel>USDT WALLET ADDRESS (TRC-20) *</FieldLabel>
                 <Input type="text" value={accountDetails.walletAddress} onChange={e => setAccountDetails(p => ({ ...p, walletAddress: e.target.value }))} placeholder="T..." style={{ fontFamily: "monospace" }} />
-                <p className="text-xs flex items-center gap-1.5 mt-1.5" style={{ color: "#4a5568" }}>
+                <p className="text-xs flex items-center gap-1.5 mt-1.5" style={{ color: "var(--text-dim)" }}>
                   <FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize: "10px" }} /> Only TRC-20 network supported
                 </p>
               </div>
@@ -278,7 +278,7 @@ export default function Withdraw() {
           {/* ── Info sidebar ── */}
           <div className="lg:col-span-2 space-y-4">
             {/* Plan fees */}
-            <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+            <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#22c55e,#16a34a)" }} />
                 <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "0.95rem" }}>Fees by Plan</h3>
@@ -286,16 +286,16 @@ export default function Withdraw() {
               <div className="space-y-2">
                 {Object.entries(PLAN_FEES).map(([p, fee]) => {
                   const isCurrent = p === plan;
-                  const PLAN_COLORS = { basic: "#9ca3af", starter: "#3b82f6", pro: "#a855f7", elite: "#f59e0b" };
+                  const PLAN_COLORS = { basic: "var(--text-secondary)", starter: "#3b82f6", pro: "#a855f7", elite: "#f59e0b" };
                   const c = PLAN_COLORS[p];
                   return (
-                    <div key={p} className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all" style={{ background: isCurrent ? `${c}10` : "#0a1209", border: isCurrent ? `1px solid ${c}25` : "1px solid #1a2e1d" }}>
+                    <div key={p} className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all" style={{ background: isCurrent ? `${c}10` : "var(--bg-input)", border: isCurrent ? `1px solid ${c}25` : "1px solid var(--border)" }}>
                       <div className="flex items-center gap-2">
                         {isCurrent && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "11px", color: c }} />}
-                        <span className="text-sm capitalize font-bold" style={{ fontFamily: "'Syne',sans-serif", color: isCurrent ? c : "#4a5568" }}>{p}</span>
+                        <span className="text-sm capitalize font-bold" style={{ fontFamily: "'Syne',sans-serif", color: isCurrent ? c : "var(--text-dim)" }}>{p}</span>
                         {isCurrent && <span className="text-xs font-bold px-1.5 py-0.5 rounded-full" style={{ fontFamily: "'Syne',sans-serif", background: `${c}18`, color: c }}>Current</span>}
                       </div>
-                      <span className="font-black" style={{ fontFamily: "'Fraunces',serif", color: isCurrent ? c : "#4a5568" }}>{fee}%</span>
+                      <span className="font-black" style={{ fontFamily: "'Fraunces',serif", color: isCurrent ? c : "var(--text-dim)" }}>{fee}%</span>
                     </div>
                   );
                 })}
@@ -303,7 +303,7 @@ export default function Withdraw() {
             </div>
 
             {/* Processing times */}
-            <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+            <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#3b82f6,#2563eb)" }} />
                 <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "0.95rem" }}>Processing Times</h3>
@@ -311,10 +311,10 @@ export default function Withdraw() {
               <div className="space-y-3">
                 {PAYMENT_METHODS.filter(m => !m.investorOnly || isInvestor).map(m => (
                   <div key={m.key} className="flex justify-between items-center">
-                    <span className="text-sm flex items-center gap-2" style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif" }}>
+                    <span className="text-sm flex items-center gap-2" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif" }}>
                       <FontAwesomeIcon icon={m.faIcon} style={{ fontSize: "12px", color: m.iconColor }} /> {m.label}
                     </span>
-                    <span className="text-sm font-bold" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}>{m.desc}</span>
+                    <span className="text-sm font-bold" style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-secondary)" }}>{m.desc}</span>
                   </div>
                 ))}
               </div>
@@ -323,7 +323,7 @@ export default function Withdraw() {
         </div>
 
         {/* ── History ── */}
-        <div className="wd-in rounded-2xl p-6" style={{ animationDelay: ".18s", background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="wd-in rounded-2xl p-6" style={{ animationDelay: ".18s", background: "var(--bg-card)", border: "1px solid var(--border)" }}>
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#a855f7,#7c3aed)" }} />
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>Withdrawal History</h2>
@@ -331,19 +331,19 @@ export default function Withdraw() {
           {loading ? (
             <div className="space-y-2">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-xl animate-pulse" style={{ background: "#0a1209" }}>
-                  <div className="w-9 h-9 rounded-xl flex-shrink-0" style={{ background: "#1a2e1d" }} />
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl animate-pulse" style={{ background: "var(--bg-input)" }}>
+                  <div className="w-9 h-9 rounded-xl flex-shrink-0" style={{ background: "var(--border)" }} />
                   <div className="flex-1 space-y-1.5">
-                    <div className="h-3.5 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
-                    <div className="h-3 rounded-full w-1/4" style={{ background: "#1a2e1d" }} />
+                    <div className="h-3.5 rounded-full w-1/3" style={{ background: "var(--border)" }} />
+                    <div className="h-3 rounded-full w-1/4" style={{ background: "var(--border)" }} />
                   </div>
                 </div>
               ))}
             </div>
           ) : withdrawals.length === 0 ? (
             <div className="text-center py-12">
-              <FontAwesomeIcon icon={faDownload} style={{ fontSize: "32px", color: "#4a5568", display: "block", margin: "0 auto 12px" }} />
-              <p style={{ color: "#4a5568", fontFamily: "'DM Sans',sans-serif", fontSize: "14px" }}>No withdrawals yet.</p>
+              <FontAwesomeIcon icon={faDownload} style={{ fontSize: "32px", color: "var(--text-dim)", display: "block", margin: "0 auto 12px" }} />
+              <p style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif", fontSize: "14px" }}>No withdrawals yet.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -354,22 +354,22 @@ export default function Withdraw() {
                 const METHOD_ICONS = { bank: faBuilding, paystack: faCreditCard, usdt: faBitcoinSign };
                 const METHOD_COLORS = { bank: "#3b82f6", paystack: "#22c55e", usdt: "#f59e0b" };
                 return (
-                  <div key={w._id} className="flex items-center gap-4 p-4 rounded-xl transition-all" style={{ background: "#0a1209", border: `1px solid ${sc.border}` }}>
+                  <div key={w._id} className="flex items-center gap-4 p-4 rounded-xl transition-all" style={{ background: "var(--bg-input)", border: `1px solid ${sc.border}` }}>
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: sc.bg }}>
                       <FontAwesomeIcon icon={sc.faIcon} style={{ fontSize: "14px", color: sc.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-black text-white" style={{ fontFamily: "'Fraunces',serif" }}>${parseFloat(w.amount).toLocaleString()}</span>
-                        <span style={{ color: "#4a5568", fontSize: "12px" }}>→ net ${net.toFixed(2)}</span>
+                        <span style={{ color: "var(--text-dim)", fontSize: "12px" }}>→ net ${net.toFixed(2)}</span>
                         <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ fontFamily: "'Syne',sans-serif", background: sc.bg, color: sc.color }}>{sc.label}</span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        {METHOD_ICONS[w.method] && <span className="text-xs flex items-center gap-1" style={{ color: "#4a5568" }}>
+                        {METHOD_ICONS[w.method] && <span className="text-xs flex items-center gap-1" style={{ color: "var(--text-dim)" }}>
                           <FontAwesomeIcon icon={METHOD_ICONS[w.method]} style={{ fontSize: "10px", color: METHOD_COLORS[w.method] }} />
                           {w.method}
                         </span>}
-                        {w.createdAt && <span className="text-xs" style={{ color: "#4a5568" }}>{new Date(w.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
+                        {w.createdAt && <span className="text-xs" style={{ color: "var(--text-dim)" }}>{new Date(w.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
                       </div>
                     </div>
                     {w.status === "rejected" && w.rejectionReason && (

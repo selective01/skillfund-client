@@ -103,7 +103,7 @@ export default function BrowseInvestors() {
     if (user?.role !== "creator") { toast.error("Only creators can connect with investors"); return; }
     setActionLoading(prev => ({ ...prev, [`connect_${investorId}`]: true }));
     try {
-      await api.post("/connections/request", { recipientId: investorId });
+      await api.post("/connections/request", { receiverId: investorId });
       toast.success("Connection request sent!");
       setInvestors(prev => prev.map(inv =>
         (inv.userId?._id || inv.userId) === investorId ? { ...inv, connectionStatus: "pending" } : inv
@@ -124,7 +124,7 @@ export default function BrowseInvestors() {
   const hasActiveFilters = search || industry || minBudget;
 
   const selectStyle = {
-    background: "#070d08", border: "1px solid #1a2e1d", color: "white",
+    background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff",
     borderRadius: "12px", padding: "10px 36px 10px 14px", fontSize: "14px",
     outline: "none", width: "100%", appearance: "none", WebkitAppearance: "none",
     fontFamily: "'DM Sans', sans-serif",
@@ -134,17 +134,17 @@ export default function BrowseInvestors() {
     <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        .bi-input { background:#070d08; border:1px solid #1a2e1d; color:white; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .bi-input { background:#070d08; border:1px solid rgba(255,255,255,0.1); color:#ffffff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .bi-input:focus { border-color:rgba(34,197,94,0.4); }
-        .bi-input::placeholder { color:#2d4a31; }
-        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid #1a2e1d; background:#070d08; color:#4a5568; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .bi-input::placeholder { color:#5a8a63; }
+        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
         .ind-pill:hover { border-color:rgba(59,130,246,0.3); color:#9ca3af; }
-        .ind-pill.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:white; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid #1a2e1d; background:#070d08; color:#4a5568; font-family:'Syne',sans-serif; }
-        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:white; }
-        .page-btn.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:white; }
+        .ind-pill.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; }
+        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:#ffffff; }
+        .page-btn.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-        select option { background:#070d08; color:white; }
+        select option { background:#070d08; color:#ffffff; }
       `}</style>
 
       {/* Header */}
@@ -153,7 +153,7 @@ export default function BrowseInvestors() {
           <div>
             <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne', sans-serif", color: "#3b82f6" }}>DISCOVER</p>
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Investors</h2>
-            <p className="text-sm mt-0.5" style={{ color: "#4a5568" }}>
+            <p className="text-sm mt-0.5" style={{ color: "#9ca3af" }}>
               {loading ? "Loading..." : <><span className="text-white font-semibold">{total}</span> investors looking to fund creators</>}
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function BrowseInvestors() {
       {/* Search + Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
-          <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#2d4a31", fontSize: "13px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#5a8a63", fontSize: "13px", pointerEvents: "none" }} />
           <input
             type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by bio or location..."
@@ -176,7 +176,7 @@ export default function BrowseInvestors() {
             style={{ paddingLeft: "38px", paddingRight: search ? "38px" : "14px" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#4a5568" }}>
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#9ca3af" }}>
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
             </button>
           )}
@@ -185,7 +185,7 @@ export default function BrowseInvestors() {
           <select value={industry} onChange={e => setIndustry(e.target.value)} style={selectStyle}>
             {INDUSTRIES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -193,8 +193,8 @@ export default function BrowseInvestors() {
           style={{
             fontFamily: "'Syne', sans-serif",
             background: showFilters || hasActiveFilters ? "rgba(59,130,246,0.1)" : "#070d08",
-            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : "#1a2e1d"}`,
-            color: showFilters || hasActiveFilters ? "#3b82f6" : "#4a5568",
+            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : "rgba(255,255,255,0.1)"}`,
+            color: showFilters || hasActiveFilters ? "#3b82f6" : "#9ca3af",
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "13px" }} /> Filters
@@ -204,7 +204,7 @@ export default function BrowseInvestors() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
             {hasActiveFilters && (
@@ -215,16 +215,16 @@ export default function BrowseInvestors() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>MIN BUDGET ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MIN BUDGET ($)</label>
               <input type="number" value={minBudget} onChange={e => setMinBudget(e.target.value)} placeholder="0" className="bi-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>INDUSTRY</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>INDUSTRY</label>
               <div className="relative">
                 <select value={industry} onChange={e => setIndustry(e.target.value)} style={selectStyle}>
                   {INDUSTRIES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
                 </select>
-                <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "11px", pointerEvents: "none" }} />
+                <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
               </div>
             </div>
           </div>
@@ -302,19 +302,19 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
 
   return (
     <div
-      className="group rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-1"
-      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
+      className="group rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-1"
+      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/investors/${id}`)}
       onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 16px 48px rgba(0,0,0,0.5)"; e.currentTarget.style.borderColor = "rgba(59,130,246,0.25)"; }}
       onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
     >
       {/* Cover strip */}
-      <div className="relative h-24 overflow-hidden flex items-center justify-end pr-8" style={{ background: "rgba(0,0,0,0.2)" }}>
+      <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="text-7xl select-none" style={{ opacity: 0.1 }}>💼</div>
         {/* Plan badge */}
         <div className="absolute top-3 left-3 flex gap-1.5">
           {plan === "elite" && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(245,158,11,0.85)", color: "#000" }}>⭐ Elite</span>}
-          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(168,85,247,0.85)", color: "white" }}>Pro</span>}
+          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(168,85,247,0.85)", color: "#ffffff" }}>Pro</span>}
         </div>
         {/* Risk badge */}
         {risk && (
@@ -327,10 +327,10 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
       </div>
 
       {/* Body */}
-      <div className="p-5">
+      <div className="p-5 pt-10">
         {/* Avatar + name stacked */}
         <div className="mb-3">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden -mt-9 shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "white", border: "2px solid rgba(59,130,246,0.4)" }}>
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "white", border: "3px solid rgba(59,130,246,0.5)", position: "absolute", top: "calc(96px - 28px)", left: "20px" }}>
             {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="flex items-center gap-1.5">
@@ -341,7 +341,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
         </div>
 
         {location && (
-          <div className="flex items-center gap-1 mb-2" style={{ color: "#4a5568" }}>
+          <div className="flex items-center gap-1 mb-2" style={{ color: "#9ca3af" }}>
             <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px" }} /><span className="text-xs">{location}</span>
           </div>
         )}
@@ -358,7 +358,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
           ].map(({ faIcon, color, label, value }) => (
             <div key={label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.05)" }}>
               <div className="flex items-center gap-1 mb-1">
-                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#4a5568" }}>{label}</span>
+                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
               </div>
               <p className="font-black text-sm text-white" style={{ fontFamily: "'Fraunces', serif" }}>{value}</p>
             </div>
@@ -374,7 +374,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
               </span>
             ))}
             {industries.length > 3 && (
-              <span className="text-xs px-2 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.3)", color: "#4a5568" }}>+{industries.length - 3}</span>
+              <span className="text-xs px-2 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.3)", color: "#9ca3af" }}>+{industries.length - 3}</span>
             )}
           </div>
         )}
@@ -392,7 +392,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
                     fontFamily: "'Syne', sans-serif",
                     background: connectionStatus === "accepted" ? "rgba(34,197,94,0.1)" : connectionStatus === "pending" ? "rgba(245,158,11,0.1)" : "linear-gradient(135deg,#3b82f6,#1d4ed8)",
                     border: connectionStatus === "accepted" ? "1px solid rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "1px solid rgba(245,158,11,0.3)" : "none",
-                    color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "white",
+                    color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "#ffffff",
                     cursor: connectionStatus ? "default" : "pointer",
                     boxShadow: !connectionStatus ? "0 4px 16px rgba(59,130,246,0.3)" : "none",
                   }}
@@ -422,7 +422,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
             )}
           </div>
         )}
-        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#2d4a31", fontFamily: "'Syne', sans-serif" }}>Your profile</div>}
+        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#5a8a63", fontFamily: "'Syne', sans-serif" }}>Your profile</div>}
       </div>
     </div>
   );
@@ -433,18 +433,18 @@ function InvestorsGridSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="h-24" style={{ background: "#0a1209" }} />
           <div className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "#1a2e1d" }} />
-            <div className="h-3.5 rounded-full w-3/4" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-full" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-2/3" style={{ background: "#1a2e1d" }} />
+            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-1/3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.1)" }} />
             <div className="grid grid-cols-2 gap-2">
-              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: "#1a2e1d" }} />)}
+              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
             </div>
-            <div className="h-10 rounded-xl" style={{ background: "#1a2e1d" }} />
+            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
       ))}
@@ -455,14 +455,14 @@ function InvestorsGridSkeleton() {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onClear, hasFilters }) {
   return (
-    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
       <div className="text-5xl mb-4">💼</div>
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>No investors found</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#4a5568" }}>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#9ca3af" }}>
         {hasFilters ? "No investors match your current filters. Try adjusting your search." : "No investors are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (
-        <button onClick={onClear} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "white" }}>
+        <button onClick={onClear} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "#ffffff" }}>
           Clear Filters
         </button>
       )}

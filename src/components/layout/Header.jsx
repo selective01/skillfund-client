@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 
-export default function Header({ title, onMenuClick }) {
+export default function Header({ title, onMenuClick, sidebarOpen }) {
   const { user } = useAuthStore();
   const { theme } = useThemeStore();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -34,17 +34,26 @@ export default function Header({ title, onMenuClick }) {
 
   return (
     <header
-      className="h-16 flex items-center justify-between px-6 fixed top-0 right-0 left-64 z-40"
+      className="h-16 flex items-center justify-between px-4 lg:px-6 fixed top-0 right-0 left-0 lg:left-64 z-40"
       style={{
         background:   t.bg,
         borderBottom: `1px solid ${t.border}`,
         transition:   "background 0.25s ease, border-color 0.2s ease",
       }}
     >
-      <div className="flex items-center gap-4">
-        {onMenuClick && (
-          <button onClick={onMenuClick} className="lg:hidden" style={{ color: t.icon }}>☰</button>
-        )}
+      <div className="flex items-center gap-3">
+        {/* Hamburger — visible on mobile only */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl transition-all"
+          style={{
+            background: sidebarOpen ? "rgba(34,197,94,0.12)" : "transparent",
+            border: `1px solid ${sidebarOpen ? "rgba(34,197,94,0.25)" : t.border}`,
+            color: sidebarOpen ? "#22c55e" : t.icon,
+          }}
+        >
+          <FontAwesomeIcon icon={sidebarOpen ? faXmark : faBars} style={{ fontSize: "15px" }} />
+        </button>
         <h2
           className="font-semibold text-lg"
           style={{ color: t.title, fontFamily: "'Syne', sans-serif", transition: "color 0.2s ease" }}

@@ -83,10 +83,10 @@ export default function UserProfile() {
 
   if (!profileData) {
     return (
-        <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-          <Shield size={40} className="mx-auto mb-4" style={{ color: "#2d4a31" }} />
+        <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <Shield size={40} className="mx-auto mb-4" style={{ color: "#5a8a63" }} />
           <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>Profile not found</h3>
-          <p className="text-sm mb-6" style={{ color: "#4a5568" }}>This user doesn't exist or their profile is private.</p>
+          <p className="text-sm mb-6" style={{ color: "#9ca3af" }}>This user doesn't exist or their profile is private.</p>
           <button onClick={() => navigate(-1)} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
             Go Back
           </button>
@@ -112,16 +112,16 @@ export default function UserProfile() {
     <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        .p-card { background:#070d08; border:1px solid #1a2e1d; border-radius:20px; padding:20px; }
+        .p-card { background:#070d08; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; }
         .p-stat { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:12px; }
-        .p-tab { padding:7px 18px; border-radius:10px; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; transition:all .15s; cursor:pointer; border:1px solid #1a2e1d; background:#070d08; color:#4a5568; }
+        .p-tab { padding:7px 18px; border-radius:10px; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; transition:all .15s; cursor:pointer; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; }
         .p-tab:hover { color:#9ca3af; border-color:rgba(34,197,94,0.2); }
         .p-tab.on { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
-        .p-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #0f1a10; }
+        .p-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
         .p-row:last-child { border-bottom:none; }
         .p-stat-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid #0a1209; }
         .p-stat-row:last-child { border-bottom:none; }
-        .p-social { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; font-size:13px; font-family:'DM Sans',sans-serif; transition:all .15s; background:#070d08; border:1px solid #1a2e1d; color:#6b7280; text-decoration:none; }
+        .p-social { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; font-size:13px; font-family:'DM Sans',sans-serif; transition:all .15s; background:#070d08; border:1px solid rgba(255,255,255,0.1); color:#6b7280; text-decoration:none; }
         .p-social:hover { border-color:rgba(34,197,94,0.3); color:white; }
         .p-btn-green { display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; padding:10px 20px; border-radius:12px; transition:all .15s; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; white-space:nowrap; width:100%; box-shadow:0 4px 16px rgba(34,197,94,0.25); }
         .p-btn-green:hover:not(:disabled) { transform:scale(1.02); }
@@ -136,9 +136,9 @@ export default function UserProfile() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm mb-5 transition-colors"
-        style={{ color: "#4a5568", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
+        style={{ color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
         onMouseEnter={e => e.currentTarget.style.color = "white"}
-        onMouseLeave={e => e.currentTarget.style.color = "#4a5568"}
+        onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
       >
         <ChevronLeft size={15} /> Back
       </button>
@@ -227,8 +227,8 @@ export default function UserProfile() {
           <p className="font-semibold mt-1" style={{ color: "#22c55e" }}>{CATEGORY_EMOJI[profile.skillCategory]} {profile.skill}</p>
         )}
         <div className="flex items-center gap-4 mt-2 flex-wrap">
-          {profile.location && <span className="flex items-center gap-1 text-sm" style={{ color: "#4a5568" }}><MapPin size={12} /> {profile.location}</span>}
-          {isCreator && <span className="flex items-center gap-1 text-sm" style={{ color: "#4a5568" }}><Users size={12} /> {profile.profileViews || 0} profile views</span>}
+          {profile.location && <span className="flex items-center gap-1 text-sm" style={{ color: "#9ca3af" }}><MapPin size={12} /> {profile.location}</span>}
+          {isCreator && <span className="flex items-center gap-1 text-sm" style={{ color: "#9ca3af" }}><Users size={12} /> {profile.profileViews || 0} profile views</span>}
           {isCreator && profile.amountRaised > 0 && (
             <span className="flex items-center gap-1 text-sm font-semibold" style={{ color: "#22c55e" }}><DollarSign size={12} /> ${Number(profile.amountRaised).toLocaleString()} raised</span>
           )}
@@ -245,7 +245,7 @@ export default function UserProfile() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: "1px solid #1a2e1d" }}>
+      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
         {tabs.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`p-tab ${activeTab === tab ? "on" : ""}`}>
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -281,7 +281,7 @@ export default function UserProfile() {
                     { label: "Status", value: profile.isAcceptingInvestments ? "Open" : "Closed", isStatus: true },
                   ].map(d => (
                     <div key={d.label} className="p-stat">
-                      <p className="text-xs mb-1" style={{ color: "#4a5568" }}>{d.label}</p>
+                      <p className="text-xs mb-1" style={{ color: "#9ca3af" }}>{d.label}</p>
                       <p className="text-sm font-black" style={{ fontFamily: "'Fraunces', serif", color: d.isStatus ? (profile.isAcceptingInvestments ? "#22c55e" : "#ef4444") : "white" }}>{d.value}</p>
                     </div>
                   ))}
@@ -289,7 +289,7 @@ export default function UserProfile() {
                 {profile.fundingGoal > 0 && (
                   <div>
                     <div className="flex justify-between text-xs mb-1.5">
-                      <span style={{ color: "#4a5568" }}>Funding progress</span>
+                      <span style={{ color: "#9ca3af" }}>Funding progress</span>
                       <span className="font-black" style={{ color: "#22c55e", fontFamily: "'Fraunces', serif" }}>{progressPercent}%</span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.4)" }}>
@@ -301,8 +301,8 @@ export default function UserProfile() {
                   </div>
                 )}
                 {profile.fundingPurpose && (
-                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid #0f1a10" }}>
-                    <p className="text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>FUNDING PURPOSE</p>
+                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                    <p className="text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>FUNDING PURPOSE</p>
                     <p className="text-sm leading-relaxed" style={{ color: "#9ca3af" }}>{profile.fundingPurpose}</p>
                   </div>
                 )}
@@ -326,14 +326,14 @@ export default function UserProfile() {
                     { label: "Total Invested", value: profile.totalInvested     ? `$${Number(profile.totalInvested).toLocaleString()}` : "—" },
                   ].map(d => (
                     <div key={d.label} className="p-stat">
-                      <p className="text-xs mb-1" style={{ color: "#4a5568" }}>{d.label}</p>
+                      <p className="text-xs mb-1" style={{ color: "#9ca3af" }}>{d.label}</p>
                       <p className="text-sm font-black capitalize" style={{ fontFamily: "'Fraunces', serif", color: "white" }}>{d.value}</p>
                     </div>
                   ))}
                 </div>
                 {profile.industriesOfInterest?.length > 0 && (
-                  <div className="pt-3" style={{ borderTop: "1px solid #0f1a10" }}>
-                    <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>INDUSTRIES OF INTEREST</p>
+                  <div className="pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                    <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>INDUSTRIES OF INTEREST</p>
                     <div className="flex flex-wrap gap-2">
                       {profile.industriesOfInterest.map(ind => (
                         <span key={ind} className="text-xs px-3 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
@@ -384,13 +384,13 @@ export default function UserProfile() {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: profile.isAcceptingInvestments ? "rgba(34,197,94,0.12)" : "rgba(0,0,0,0.3)" }}>
                     {profile.isAcceptingInvestments
                       ? <CheckCircle size={17} style={{ color: "#22c55e" }} />
-                      : <Clock       size={17} style={{ color: "#4a5568" }} />}
+                      : <Clock       size={17} style={{ color: "#9ca3af" }} />}
                   </div>
                   <div>
                     <p className="text-white text-sm font-bold" style={{ fontFamily: "'Syne', sans-serif" }}>
                       {profile.isAcceptingInvestments ? "Open to Invest" : "Not Accepting"}
                     </p>
-                    <p className="text-xs" style={{ color: "#4a5568" }}>
+                    <p className="text-xs" style={{ color: "#9ca3af" }}>
                       {profile.isAcceptingInvestments ? "Looking for investors" : "Not currently seeking investment"}
                     </p>
                   </div>
@@ -439,7 +439,7 @@ export default function UserProfile() {
         profile.portfolio?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {profile.portfolio.map(item => (
-              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <div className="relative h-52 overflow-hidden">
                   <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" />
                 </div>
@@ -451,8 +451,8 @@ export default function UserProfile() {
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl p-12 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-            <p className="text-sm" style={{ color: "#4a5568" }}>No portfolio items yet.</p>
+          <div className="rounded-3xl p-12 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <p className="text-sm" style={{ color: "#9ca3af" }}>No portfolio items yet.</p>
           </div>
         )
       )}
@@ -475,8 +475,8 @@ export default function UserProfile() {
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
                   fontFamily: "'Syne', sans-serif",
                   background: profileData[b.key] ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.3)",
-                  border: `1px solid ${profileData[b.key] ? "rgba(34,197,94,0.25)" : "#1a2e1d"}`,
-                  color: profileData[b.key] ? "#22c55e" : "#4a5568",
+                  border: `1px solid ${profileData[b.key] ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}`,
+                  color: profileData[b.key] ? "#22c55e" : "#9ca3af",
                 }}>
                   {profileData[b.key] ? "✓ Verified" : "Pending"}
                 </span>
@@ -495,7 +495,7 @@ function StatRow({ icon, label, value }) {
     <div className="p-stat-row">
       <div className="flex items-center gap-2">
         {icon}
-        <span className="text-xs" style={{ color: "#4a5568" }}>{label}</span>
+        <span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
       </div>
       <span className="text-sm font-black" style={{ fontFamily: "'Fraunces', serif", color: "white" }}>{value}</span>
     </div>
@@ -515,30 +515,30 @@ function DetailRow({ label, value }) {
 function ProfileSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
-      <div className="h-40 rounded-3xl" style={{ background: "#070d08", border: "1px solid #1a2e1d" }} />
+      <div className="h-40 rounded-3xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }} />
       <div className="flex items-end gap-4 -mt-10 pl-6">
         <div className="w-20 h-20 rounded-2xl" style={{ background: "#0a1209" }} />
         <div className="space-y-2 pb-2">
-          <div className="h-5 rounded-full w-40" style={{ background: "#1a2e1d" }} />
-          <div className="h-3 rounded-full w-24" style={{ background: "#1a2e1d" }} />
+          <div className="h-5 rounded-full w-40" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="h-3 rounded-full w-24" style={{ background: "rgba(255,255,255,0.1)" }} />
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-            <div className="h-3 rounded-full w-1/4" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-3/4" style={{ background: "#1a2e1d" }} />
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="h-3 rounded-full w-1/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
           </div>
-          <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="grid grid-cols-3 gap-3">
-              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 rounded-xl" style={{ background: "#1a2e1d" }} />)}
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
             </div>
           </div>
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-4 rounded-full" style={{ background: "#1a2e1d" }} />)}
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-4 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />)}
           </div>
         </div>
       </div>

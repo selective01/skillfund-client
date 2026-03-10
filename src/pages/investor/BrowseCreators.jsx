@@ -111,7 +111,7 @@ export default function BrowseCreators() {
     if (user?.role !== "investor") { toast.error("Only investors can connect with creators"); return; }
     setActionLoading(prev => ({ ...prev, [`connect_${creatorId}`]: true }));
     try {
-      await api.post("/connections/request", { recipientId: creatorId });
+      await api.post("/connections/request", { receiverId: creatorId });
       toast.success("Connection request sent!");
       setCreators(prev => prev.map(c =>
         c._id === creatorId || c.userId === creatorId ? { ...c, connectionStatus: "pending" } : c
@@ -142,7 +142,7 @@ export default function BrowseCreators() {
   const hasActiveFilters = search || category || minGoal || maxGoal || verifiedOnly || !acceptingOnly;
 
   const selectStyle = {
-    background: "#070d08", border: "1px solid #1a2e1d", color: "white",
+    background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff",
     borderRadius: "12px", padding: "10px 36px 10px 14px", fontSize: "14px",
     outline: "none", width: "100%", appearance: "none", WebkitAppearance: "none",
     fontFamily: "'DM Sans', sans-serif",
@@ -152,17 +152,17 @@ export default function BrowseCreators() {
     <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        .browse-input { background:#070d08; border:1px solid #1a2e1d; color:white; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .browse-input { background:#070d08; border:1px solid rgba(255,255,255,0.1); color:#ffffff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .browse-input:focus { border-color:rgba(34,197,94,0.4); }
-        .browse-input::placeholder { color:#2d4a31; }
-        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid #1a2e1d; background:#070d08; color:#4a5568; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .browse-input::placeholder { color:#5a8a63; }
+        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
         .cat-pill:hover { border-color:rgba(34,197,94,0.3); color:#9ca3af; }
         .cat-pill.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid #1a2e1d; background:#070d08; color:#4a5568; font-family:'Syne',sans-serif; }
-        .page-btn:hover:not(:disabled) { border-color:rgba(34,197,94,0.3); color:white; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; }
+        .page-btn:hover:not(:disabled) { border-color:rgba(34,197,94,0.3); color:#ffffff; }
         .page-btn.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-        select option { background:#070d08; color:white; }
+        select option { background:#070d08; color:#ffffff; }
       `}</style>
 
       {/* Header */}
@@ -171,7 +171,7 @@ export default function BrowseCreators() {
           <div>
             <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne', sans-serif", color: "#22c55e" }}>DISCOVER</p>
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Creators</h2>
-            <p className="text-sm mt-0.5" style={{ color: "#4a5568" }}>
+            <p className="text-sm mt-0.5" style={{ color: "#9ca3af" }}>
               {loading ? "Loading..." : <><span className="text-white font-semibold">{total}</span> skilled creators looking for investors</>}
             </p>
           </div>
@@ -186,7 +186,7 @@ export default function BrowseCreators() {
       {/* Search + Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
-          <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#2d4a31", fontSize: "13px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#5a8a63", fontSize: "13px", pointerEvents: "none" }} />
           <input
             type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, skill, or location..."
@@ -194,7 +194,7 @@ export default function BrowseCreators() {
             style={{ paddingLeft: "38px", paddingRight: search ? "38px" : "14px" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#4a5568" }}>
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#9ca3af" }}>
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
             </button>
           )}
@@ -203,13 +203,13 @@ export default function BrowseCreators() {
           <select value={category} onChange={e => setCategory(e.target.value)} style={selectStyle}>
             {SKILL_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <div className="relative" style={{ minWidth: "180px" }}>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={selectStyle}>
             {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -217,8 +217,8 @@ export default function BrowseCreators() {
           style={{
             fontFamily: "'Syne', sans-serif",
             background: showFilters || hasActiveFilters ? "rgba(34,197,94,0.1)" : "#070d08",
-            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(34,197,94,0.35)" : "#1a2e1d"}`,
-            color: showFilters || hasActiveFilters ? "#22c55e" : "#4a5568",
+            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.1)"}`,
+            color: showFilters || hasActiveFilters ? "#22c55e" : "#9ca3af",
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "13px" }} /> Filters
@@ -228,7 +228,7 @@ export default function BrowseCreators() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
             {hasActiveFilters && (
@@ -239,22 +239,22 @@ export default function BrowseCreators() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>MIN GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MIN GOAL ($)</label>
               <input type="number" value={minGoal} onChange={e => setMinGoal(e.target.value)} placeholder="0" className="browse-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>MAX GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MAX GOAL ($)</label>
               <input type="number" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} placeholder="Any" className="browse-input" />
             </div>
             <div className="flex flex-col justify-end">
-              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: "#0a1209", border: "1px solid #1a2e1d" }}>
+              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <input type="checkbox" checked={verifiedOnly} onChange={e => setVerifiedOnly(e.target.checked)} className="w-4 h-4 accent-green-500" />
                 <span className="text-sm" style={{ color: "#9ca3af" }}>Verified only</span>
                 <FontAwesomeIcon icon={faCircleCheck} className="ml-auto" style={{ fontSize: "12px", color: "#22c55e" }} />
               </label>
             </div>
             <div className="flex flex-col justify-end">
-              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: "#0a1209", border: "1px solid #1a2e1d" }}>
+              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <input type="checkbox" checked={acceptingOnly} onChange={e => setAcceptingOnly(e.target.checked)} className="w-4 h-4 accent-green-500" />
                 <span className="text-sm" style={{ color: "#9ca3af" }}>Accepting investments</span>
                 <FontAwesomeIcon icon={faArrowTrendUp} className="ml-auto" style={{ fontSize: "12px", color: "#22c55e" }} />
@@ -336,14 +336,14 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
 
   return (
     <div
-      className="group rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-1"
-      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
+      className="group rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-1"
+      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/creators/${id}`)}
       onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 16px 48px rgba(0,0,0,0.5)"; e.currentTarget.style.borderColor = "rgba(34,197,94,0.25)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "#0a1209"; }}
     >
       {/* Cover */}
-      <div className="relative h-32 overflow-hidden" style={{ background: "rgba(0,0,0,0.2)" }}>
+      <div className="relative h-32 overflow-hidden rounded-t-2xl" style={{ background: "rgba(0,0,0,0.2)" }}>
         {portfolio[0]?.imageUrl ? (
           <img src={portfolio[0].imageUrl} alt={portfolio[0].title} className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-300" />
         ) : (
@@ -358,7 +358,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
             </span>
           )}
           {plan === "elite" && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(245,158,11,0.85)", color: "#000" }}>⭐ Elite</span>}
-          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(168,85,247,0.85)", color: "white" }}>Pro</span>}
+          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(168,85,247,0.85)", color: "#ffffff" }}>Pro</span>}
         </div>
         <div className="absolute top-3 right-3">
           <span className="text-xs px-2.5 py-1 rounded-full capitalize" style={{ background: "rgba(0,0,0,0.5)", color: "#9ca3af", backdropFilter: "blur(4px)" }}>
@@ -369,10 +369,10 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
       </div>
 
       {/* Body */}
-      <div className="p-5">
-        {/* ── Avatar stacked above name (fixes text shrink bug) ── */}
+      <div className="p-5 pt-10">
+        {/* ── Avatar — absolutely positioned to straddle cover/body line ── */}
         <div className="mb-3">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden -mt-9 shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "2px solid rgba(34,197,94,0.4)" }}>
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "3px solid rgba(34,197,94,0.5)", position: "absolute", top: "calc(128px - 28px)", left: "20px" }}>
             {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="flex items-center gap-1.5">
@@ -383,7 +383,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
         </div>
 
         {location && (
-          <div className="flex items-center gap-1 mb-2" style={{ color: "#4a5568" }}>
+          <div className="flex items-center gap-1 mb-2" style={{ color: "#9ca3af" }}>
             <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px" }} /><span className="text-xs">{location}</span>
           </div>
         )}
@@ -393,7 +393,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
         {fundingGoal > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs" style={{ color: "#4a5568" }}>${amountRaised.toLocaleString()} raised</span>
+              <span className="text-xs" style={{ color: "#9ca3af" }}>${amountRaised.toLocaleString()} raised</span>
               <span className="text-xs font-black" style={{ color: "#22c55e", fontFamily: "'Fraunces', serif" }}>{progressPercent}%</span>
             </div>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
@@ -402,7 +402,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
                 background: progressPercent >= 90 ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#16a34a,#22c55e,#4ade80)",
               }} />
             </div>
-            <span className="text-xs mt-1 block" style={{ color: "#2d4a31" }}>Goal: ${fundingGoal.toLocaleString()}</span>
+            <span className="text-xs mt-1 block" style={{ color: "#5a8a63" }}>Goal: ${fundingGoal.toLocaleString()}</span>
           </div>
         )}
 
@@ -413,7 +413,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
           ].map(({ faIcon, color, label, value }) => (
             <div key={label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.05)" }}>
               <div className="flex items-center gap-1 mb-1">
-                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#4a5568" }}>{label}</span>
+                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
               </div>
               <p className="font-black text-sm text-white" style={{ fontFamily: "'Fraunces', serif" }}>{value}</p>
             </div>
@@ -470,7 +470,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
             )}
           </div>
         )}
-        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#2d4a31", fontFamily: "'Syne', sans-serif" }}>Your profile</div>}
+        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#5a8a63", fontFamily: "'Syne', sans-serif" }}>Your profile</div>}
       </div>
     </div>
   );
@@ -481,20 +481,20 @@ function CreatorsGridSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="h-32" style={{ background: "#0a1209" }} />
           <div className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "#1a2e1d" }} />
-            <div className="h-3.5 rounded-full w-3/4" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-1/2" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full" style={{ background: "#1a2e1d" }} />
-            <div className="h-3 rounded-full w-2/3" style={{ background: "#1a2e1d" }} />
-            <div className="h-1.5 rounded-full" style={{ background: "#1a2e1d" }} />
+            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-1/2" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
             <div className="grid grid-cols-2 gap-2">
-              <div className="h-14 rounded-xl" style={{ background: "#1a2e1d" }} />
-              <div className="h-14 rounded-xl" style={{ background: "#1a2e1d" }} />
+              <div className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
             </div>
-            <div className="h-10 rounded-xl" style={{ background: "#1a2e1d" }} />
+            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
       ))}
@@ -505,10 +505,10 @@ function CreatorsGridSkeleton() {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onClear, hasFilters }) {
   return (
-    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
       <div className="text-5xl mb-4">🔍</div>
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>No creators found</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#4a5568" }}>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#9ca3af" }}>
         {hasFilters ? "No creators match your current filters. Try adjusting your search." : "No creators are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (

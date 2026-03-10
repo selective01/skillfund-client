@@ -78,7 +78,7 @@ function SyndicateCard({ syndicate, onClick, index }) {
           </div>
           <div className="flex justify-between text-xs" style={{ fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>
             <span style={{ color: theme.barColor }}>{fundingPct}% funded</span>
-            <span style={{ color: "#4a5568" }}>${syndicate.amountRaised.toLocaleString()} / ${syndicate.fundingGoal.toLocaleString()}</span>
+            <span style={{ color: "#9ca3af" }}>${syndicate.amountRaised.toLocaleString()} / ${syndicate.fundingGoal.toLocaleString()}</span>
           </div>
         </div>
 
@@ -91,13 +91,13 @@ function SyndicateCard({ syndicate, onClick, index }) {
             <div key={s.label} className="rounded-xl p-2.5 text-center" style={{ background: theme.statBg, border: `1px solid ${theme.barColor}15` }}>
               <FontAwesomeIcon icon={s.icon} style={{ fontSize: "11px", color: s.color, display: "block", margin: "0 auto 4px" }} />
               <p className="font-black text-white text-xs" style={{ fontFamily: "'Fraunces',serif" }}>{s.value}</p>
-              <p className="text-xs" style={{ color: "#4a5568", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{s.label}</p>
+              <p className="text-xs" style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{s.label}</p>
             </div>
           ))}
         </div>
 
         <div className="flex items-center justify-between pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          <p className="text-xs" style={{ color: "#4a5568" }}>
+          <p className="text-xs" style={{ color: "#9ca3af" }}>
             Min. <span className="font-bold" style={{ color: "#9ca3af" }}>${syndicate.minInvestment.toLocaleString()}</span>
           </p>
           {isAlmostFull && (
@@ -113,21 +113,21 @@ function SyndicateCard({ syndicate, onClick, index }) {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl p-5 space-y-4 animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+    <div className="rounded-2xl p-5 space-y-4 animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl" style={{ background: "#1a2e1d" }} />
+        <div className="w-10 h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
         <div className="flex-1 space-y-2">
-          <div className="h-3 rounded-full w-3/4" style={{ background: "#1a2e1d" }} />
-          <div className="h-2 rounded-full w-1/2" style={{ background: "#1a2e1d" }} />
+          <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="h-2 rounded-full w-1/2" style={{ background: "rgba(255,255,255,0.1)" }} />
         </div>
       </div>
       <div className="space-y-1.5">
-        <div className="h-2 rounded-full" style={{ background: "#1a2e1d" }} />
-        <div className="h-2 rounded-full w-4/5" style={{ background: "#1a2e1d" }} />
+        <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+        <div className="h-2 rounded-full w-4/5" style={{ background: "rgba(255,255,255,0.1)" }} />
       </div>
-      <div className="h-1.5 rounded-full" style={{ background: "#1a2e1d" }} />
+      <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
       <div className="grid grid-cols-3 gap-2">
-        {[0,1,2].map(i => <div key={i} className="h-14 rounded-xl" style={{ background: "#1a2e1d" }} />)}
+        {[0,1,2].map(i => <div key={i} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
       </div>
     </div>
   );
@@ -208,7 +208,7 @@ export default function BrowseSyndicates() {
         @keyframes fadeUp    { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         .syn-in    { animation: fadeUp 0.45s ease forwards; opacity: 0; }
         .slide-down { animation: slideDown 0.25s ease forwards; }
-        .syn-search::placeholder { color: #2d4a31; }
+        .syn-search::placeholder { color: #5a8a63; }
         .syn-search:focus { outline: none; border-color: rgba(34,197,94,0.4) !important; box-shadow: 0 0 0 3px rgba(34,197,94,0.08); }
         .syn-input:focus  { outline: none; border-color: rgba(34,197,94,0.4) !important; }
         .syn-select { -webkit-appearance: none; appearance: none; }
@@ -249,10 +249,10 @@ export default function BrowseSyndicates() {
       {/* ── Search + Controls ── */}
       <div className="syn-in flex flex-wrap gap-3 mb-4" style={{ animationDelay: ".08s" }}>
         <div className="relative flex-1 min-w-52">
-          <FontAwesomeIcon icon={faSearch} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#2d4a31", fontSize: "12px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faSearch} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#5a8a63", fontSize: "12px", pointerEvents: "none" }} />
           <input
             className="syn-search w-full text-sm text-white rounded-xl px-4 py-3 transition-all"
-            style={{ paddingLeft: "2.2rem", background: "#070d08", border: "1px solid #1a2e1d", fontFamily: "'DM Sans',sans-serif" }}
+            style={{ paddingLeft: "2.2rem", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }}
             placeholder="Search campaigns, skills, creators..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -261,18 +261,18 @@ export default function BrowseSyndicates() {
         <div className="relative">
           <select
             className="syn-select syn-input text-sm text-white rounded-xl px-4 py-3 pr-9 cursor-pointer"
-            style={{ background: "#070d08", border: "1px solid #1a2e1d", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}
+            style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}
             value={sort}
             onChange={e => setSort(e.target.value)}
           >
             {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "10px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "10px", pointerEvents: "none" }} />
         </div>
         <button
           onClick={() => setShowFilters(v => !v)}
           className="flex items-center gap-2 font-bold text-sm px-4 py-3 rounded-xl transition-all"
-          style={{ fontFamily: "'Syne',sans-serif", background: showFilters ? "rgba(34,197,94,0.1)" : "#070d08", border: showFilters ? "1px solid rgba(34,197,94,0.35)" : "1px solid #1a2e1d", color: showFilters ? "#22c55e" : "#6b7280" }}
+          style={{ fontFamily: "'Syne',sans-serif", background: showFilters ? "rgba(34,197,94,0.1)" : "#070d08", border: showFilters ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(255,255,255,0.1)", color: showFilters ? "#22c55e" : "#6b7280" }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "12px" }} />
           Filters
@@ -282,16 +282,16 @@ export default function BrowseSyndicates() {
 
       {/* ── Filter Panel ── */}
       {showFilters && (
-        <div className="slide-down rounded-2xl p-5 mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="slide-down rounded-2xl p-5 mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="sm:col-span-2">
-            <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily: "'Syne',sans-serif", color: "#4a5568" }}>CATEGORY</p>
+            <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}>CATEGORY</p>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map(c => (
                 <button
                   key={c}
                   onClick={() => setCategory(c)}
                   className="cat-pill text-xs px-3 py-1.5 rounded-full font-bold capitalize"
-                  style={{ fontFamily: "'Syne',sans-serif", background: category === c ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.04)", border: category === c ? "1px solid rgba(34,197,94,0.4)" : "1px solid #1a2e1d", color: category === c ? "#22c55e" : "#6b7280" }}
+                  style={{ fontFamily: "'Syne',sans-serif", background: category === c ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.04)", border: category === c ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(255,255,255,0.1)", color: category === c ? "#22c55e" : "#6b7280" }}
                 >
                   {c === "all" ? "All" : `${CATEGORY_EMOJI[c]} ${c}`}
                 </button>
@@ -299,20 +299,20 @@ export default function BrowseSyndicates() {
             </div>
           </div>
           <div className="space-y-3">
-            <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#4a5568" }}>FUNDING GOAL</p>
+            <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}>FUNDING GOAL</p>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "10px", pointerEvents: "none" }} />
-                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid #1a2e1d", fontFamily: "'DM Sans',sans-serif" }} placeholder="Min" value={minGoal} onChange={e => setMinGoal(e.target.value)} />
+                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "10px", pointerEvents: "none" }} />
+                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Min" value={minGoal} onChange={e => setMinGoal(e.target.value)} />
               </div>
               <div className="relative flex-1">
-                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#4a5568", fontSize: "10px", pointerEvents: "none" }} />
-                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid #1a2e1d", fontFamily: "'DM Sans',sans-serif" }} placeholder="Max" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} />
+                <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "10px", pointerEvents: "none" }} />
+                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Max" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} />
               </div>
             </div>
             {hasFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-1.5 text-xs font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: "#4a5568" }}
-                onMouseEnter={e => e.currentTarget.style.color = "#f43f5e"} onMouseLeave={e => e.currentTarget.style.color = "#4a5568"}>
+              <button onClick={clearFilters} className="flex items-center gap-1.5 text-xs font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}
+                onMouseEnter={e => e.currentTarget.style.color = "#f43f5e"} onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}>
                 <FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Clear all filters
               </button>
             )}
@@ -322,7 +322,7 @@ export default function BrowseSyndicates() {
 
       {/* Results count */}
       {!loading && (
-        <p className="text-xs font-bold tracking-widest mb-4" style={{ fontFamily: "'Syne',sans-serif", color: "#2d4a31" }}>
+        <p className="text-xs font-bold tracking-widest mb-4" style={{ fontFamily: "'Syne',sans-serif", color: "#5a8a63" }}>
           {total} CAMPAIGN{total !== 1 ? "S" : ""} FOUND
         </p>
       )}
@@ -333,12 +333,12 @@ export default function BrowseSyndicates() {
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : syndicates.length === 0 ? (
-        <div className="rounded-2xl p-16 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div className="rounded-2xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)" }}>
             <FontAwesomeIcon icon={faUsers} style={{ fontSize: "24px", color: "#3b82f6" }} />
           </div>
           <p className="font-black text-white text-lg mb-1" style={{ fontFamily: "'Fraunces',serif" }}>No campaigns found</p>
-          <p className="text-sm mb-5" style={{ color: "#4a5568" }}>{hasFilters ? "Try adjusting your filters" : "Check back soon — new campaigns launch regularly"}</p>
+          <p className="text-sm mb-5" style={{ color: "#9ca3af" }}>{hasFilters ? "Try adjusting your filters" : "Check back soon — new campaigns launch regularly"}</p>
           {isCreator && (
             <button onClick={() => navigate("/syndicates/create")} className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff" }}>
               <FontAwesomeIcon icon={faPlus} style={{ fontSize: "12px" }} /> Create the First Campaign
@@ -364,7 +364,7 @@ export default function BrowseSyndicates() {
       )}
 
       {!hasMore && syndicates.length > 0 && (
-        <p className="text-center py-6 text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#2d4a31" }}>
+        <p className="text-center py-6 text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#5a8a63" }}>
           ✦ ALL {total} CAMPAIGNS LOADED ✦
         </p>
       )}

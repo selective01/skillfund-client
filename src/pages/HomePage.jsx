@@ -508,18 +508,18 @@ export default function HomePage() {
       {/* ══════════ STATS STRIP ══════════ */}
       <section id="stats" className="py-20 bg-[#030604]">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label:"Total Funded",    display:"$4.2M+" },
               { label:"Active Creators", end:1200, suffix:"+" },
               { label:"Investors",       end:340,  suffix:"+" },
               { label:"Avg Monthly ROI", end:17.8, suffix:"%", decimals:1 },
             ].map((s,i)=>(
-              <div key={i} className="text-center py-8 px-6 rounded-2xl" style={{ background:"linear-gradient(135deg,#0a1a0b,#061009)", border:"1px solid rgba(34,197,94,0.12)" }}>
-                <p className="number-gradient font-black mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "3rem", lineHeight:1 }}>
+              <div key={i} className="text-center py-6 px-3 rounded-2xl" style={{ background:"linear-gradient(135deg,#0a1a0b,#061009)", border:"1px solid rgba(34,197,94,0.12)" }}>
+                <p className="number-gradient font-black mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.6rem,4vw,3rem)", lineHeight:1 }}>
                   {s.display || <Counter end={s.end} suffix={s.suffix} decimals={s.decimals||0}/>}
                 </p>
-                <p className="text-[#6b7280] text-sm font-semibold" style={{ fontFamily: "'Syne', sans-serif" }}>{s.label}</p>
+                <p className="text-[#6b7280] font-semibold" style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(10px,1.5vw,13px)" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -1075,7 +1075,7 @@ export default function HomePage() {
         </div>
 
         {/* Section 2: 4-column links */}
-        <div className="py-14" style={{ background:"#040806" }}>
+        <div className="py-14" style={{ background:"var(--bg)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
               {[

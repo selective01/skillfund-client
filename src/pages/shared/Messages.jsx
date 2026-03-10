@@ -1,23 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Send,
-  Search,
-  ArrowLeft,
-  BadgeCheck,
-  MoreVertical,
-  TrendingUp,
-  Check,
-  X,
-  MessageSquare,
-  Loader2,
-  ChevronRight,
-  DollarSign,
-  Clock,
-  CheckCheck,
-} from "lucide-react";
-import Layout from "../../components/layout/Layout";
+  faMagnifyingGlass,
+  faPaperPlane,
+  faArrowLeft,
+  faCircleCheck,
+  faArrowTrendUp,
+  faXmark,
+  faMessage,
+  faCircleNotch,
+  faChevronRight,
+  faCheck,
+  faClockRotateLeft,
+  faHandshake,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 
@@ -68,16 +67,12 @@ export default function Messages() {
   const inputRef = useRef(null);
   const pollingRef = useRef(null);
 
-  // ─── Scroll to bottom ─────────────────────────────────────────────────
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
-  // ─── Fetch conversations ───────────────────────────────────────────────
   const fetchConversations = useCallback(async () => {
     try {
       const res = await api.get("/messages/conversations");
@@ -92,7 +87,6 @@ export default function Messages() {
     }
   }, []);
 
-  // ─── Fetch messages for active conversation ────────────────────────────
   const fetchMessages = useCallback(async (convId) => {
     if (!convId) return;
     setLoadingMsgs(true);
@@ -106,39 +100,29 @@ export default function Messages() {
     }
   }, []);
 
-  // ─── Start or open conversation with a user ────────────────────────────
-  const openConversationWithUser = useCallback(
-    async (userId, convList) => {
-      const existing = convList.find((c) => {
-        const participants = c.participants || [];
-        return participants.some(
-          (p) => (p._id || p) === userId
-        );
-      });
-      if (existing) {
-        setActiveConv(existing);
-        fetchMessages(existing._id);
-        setMobileShowChat(true);
-        return;
-      }
-      // Create a new conversation
-      try {
-        const res = await api.post("/messages/conversations", {
-          recipientId: userId,
-        });
-        const newConv = res.data.conversation || res.data;
-        setConversations((prev) => [newConv, ...prev]);
-        setActiveConv(newConv);
-        setMessages([]);
-        setMobileShowChat(true);
-      } catch {
-        toast.error("Could not open conversation");
-      }
-    },
-    [fetchMessages]
-  );
+  const openConversationWithUser = useCallback(async (userId, convList) => {
+    const existing = convList.find((c) => {
+      const participants = c.participants || [];
+      return participants.some((p) => String(p._id || p) === String(userId));
+    });
+    if (existing) {
+      setActiveConv(existing);
+      fetchMessages(existing._id);
+      setMobileShowChat(true);
+      return;
+    }
+    try {
+      const res = await api.post("/messages/conversations", { recipientId: userId });
+      const newConv = res.data.conversation || res.data;
+      setConversations((prev) => [newConv, ...prev]);
+      setActiveConv(newConv);
+      setMessages([]);
+      setMobileShowChat(true);
+    } catch {
+      toast.error("Could not open conversation");
+    }
+  }, [fetchMessages]);
 
-  // ─── Initial load ──────────────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
       const convs = await fetchConversations();
@@ -152,16 +136,21 @@ export default function Messages() {
     init();
   }, [fetchConversations, fetchMessages, initialUserId, openConversationWithUser]);
 
-  // ─── Poll for new messages every 5s (until Socket.IO in Phase 9) ──────
   useEffect(() => {
     if (!activeConv) return;
-    pollingRef.current = setInterval(() => {
-      fetchMessages(activeConv._id);
+    pollingRef.current = setInterval(async () => {
+      try {
+        const res = await api.get(`/messages/${activeConv._id}`);
+        const fetched = res.data.messages || res.data || [];
+        setMessages(prev => {
+          const pending = prev.filter(m => m.pending);
+          return [...fetched, ...pending];
+        });
+      } catch { /* silent poll fail */ }
     }, 5000);
     return () => clearInterval(pollingRef.current);
-  }, [activeConv, fetchMessages]);
+  }, [activeConv]);
 
-  // ─── Select conversation ───────────────────────────────────────────────
   const handleSelectConv = (conv) => {
     setActiveConv(conv);
     fetchMessages(conv._id);
@@ -169,14 +158,13 @@ export default function Messages() {
     setShowProposalForm(false);
   };
 
-  // ─── Send message ──────────────────────────────────────────────────────
   const handleSend = async () => {
     const text = newMessage.trim();
     if (!text || !activeConv) return;
     setSending(true);
     const optimistic = {
       _id: `temp_${Date.now()}`,
-      senderId: user?._id || user?.id,
+      sender: user?._id || user?.id,
       message: text,
       type: "text",
       createdAt: new Date().toISOString(),
@@ -191,11 +179,10 @@ export default function Messages() {
         type: "text",
       });
       fetchMessages(activeConv._id);
-      // Update last message in conv list
       setConversations((prev) =>
         prev.map((c) =>
           c._id === activeConv._id
-            ? { ...c, lastMessage: { message: text, createdAt: new Date() } }
+            ? { ...c, lastMessage: text, lastMessageAt: new Date() }
             : c
         )
       );
@@ -216,34 +203,28 @@ export default function Messages() {
     }
   };
 
-  // ─── Proposal actions ──────────────────────────────────────────────────
   const handleProposalAction = async (proposalId, action, counterData = null) => {
     try {
-      if (action === "accept") {
-        await api.put(`/proposals/${proposalId}/accept`);
-        toast.success("Proposal accepted! Investment is now locked.");
-      } else if (action === "reject") {
-        await api.put(`/proposals/${proposalId}/reject`);
-        toast.success("Proposal declined.");
-      } else if (action === "negotiate") {
-        await api.put(`/proposals/${proposalId}/negotiate`, counterData);
-        toast.success("Counter-proposal sent!");
-      }
+      const actionMap = { accept: "accepted", reject: "rejected", negotiate: "negotiating" };
+      await api.put(`/messages/proposals/${proposalId}/respond`, {
+        action: actionMap[action],
+        counterOffer: counterData,
+      });
+      const labels = { accept: "Proposal accepted!", reject: "Proposal declined.", negotiate: "Counter-proposal sent!" };
+      toast.success(labels[action]);
       fetchMessages(activeConv._id);
     } catch (error) {
       toast.error(error.response?.data?.message || `Failed to ${action} proposal`);
     }
   };
 
-  // ─── Get other participant ─────────────────────────────────────────────
   const getOtherParticipant = (conv) => {
     if (!conv) return null;
     const myId = user?._id || user?.id;
     const participants = conv.participants || [];
-    return participants.find((p) => (p._id || p) !== myId) || null;
+    return participants.find((p) => String(p._id || p) !== String(myId)) || null;
   };
 
-  // ─── Filtered conversations ────────────────────────────────────────────
   const filteredConvs = conversations.filter((c) => {
     if (!convSearch.trim()) return true;
     const other = getOtherParticipant(c);
@@ -253,52 +234,71 @@ export default function Messages() {
 
   const myId = user?._id || user?.id;
 
-  // ─── Render ────────────────────────────────────────────────────────────
   return (
-    <Layout title="Messages">
-      <div className="flex h-[calc(100vh-8rem)] rounded-2xl overflow-hidden border border-dark-500">
+    <div className="space-y-6">
+      <style>{`
+        .sf-msg-input { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:14px; padding:11px 16px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; resize:none; }
+        .sf-msg-input::placeholder { color:#5a8a63; }
+        .sf-msg-input:focus { border-color:rgba(34,197,94,0.35); }
+        .sf-conv-search { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:10px; padding:8px 12px 8px 34px; font-size:13px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .sf-conv-search::placeholder { color:#5a8a63; }
+        .sf-conv-search:focus { border-color:rgba(34,197,94,0.3); }
+        .sf-prop-input { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:9px; padding:7px 11px; font-size:13px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .sf-prop-input::placeholder { color:#5a8a63; }
+        .sf-prop-input:focus { border-color:rgba(34,197,94,0.35); }
+        .sf-conv-item { transition:background .15s; border-bottom:1px solid rgba(255,255,255,0.04); width:100%; text-align:left; background:transparent; border-left:2px solid transparent; cursor:pointer; }
+        .sf-conv-item:hover { background:rgba(34,197,94,0.04); }
+        .sf-conv-item.active { background:rgba(34,197,94,0.08); border-left-color:#22c55e; }
+        .sf-messages-scroll::-webkit-scrollbar { width:4px; }
+        .sf-messages-scroll::-webkit-scrollbar-track { background:transparent; }
+        .sf-messages-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:4px; }
+        .sf-convs-scroll::-webkit-scrollbar { width:3px; }
+        .sf-convs-scroll::-webkit-scrollbar-track { background:transparent; }
+        .sf-convs-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+      `}</style>
 
+      <div
+        className="flex rounded-2xl overflow-hidden"
+        style={{ height: "calc(100vh - 9rem)", border: "1px solid rgba(255,255,255,0.1)", background: "#040806" }}
+      >
         {/* ── Conversations Sidebar ── */}
         <div
-          className={`w-full sm:w-80 flex-shrink-0 bg-dark-700 border-r border-dark-500 flex flex-col ${
-            mobileShowChat ? "hidden sm:flex" : "flex"
-          }`}
+          className={`flex-shrink-0 flex flex-col ${mobileShowChat ? "hidden sm:flex" : "flex"}`}
+          style={{ width: "295px", borderRight: "1px solid rgba(255,255,255,0.1)", background: "#070d08" }}
         >
-          {/* Sidebar header */}
-          <div className="p-4 border-b border-dark-500">
-            <h3 className="text-white font-bold text-lg mb-3">Messages</h3>
+          <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+            <h3 className="font-black text-white mb-3" style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px" }}>
+              Messages
+            </h3>
             <div className="relative">
-              <Search
-                size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-300 pointer-events-none"
-              />
+              <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", color: "#5a8a63", fontSize: "12px", pointerEvents: "none" }} />
               <input
                 type="text"
                 value={convSearch}
                 onChange={(e) => setConvSearch(e.target.value)}
                 placeholder="Search conversations..."
-                style={{ paddingLeft: "2rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", fontSize: "0.875rem" }}
-                className="input-field w-full"
+                className="sf-conv-search"
               />
             </div>
           </div>
 
-          {/* Conversation list */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto sf-convs-scroll">
             {loadingConvs ? (
               <ConvListSkeleton />
             ) : filteredConvs.length === 0 ? (
-              <div className="p-6 text-center">
-                <MessageSquare size={32} className="text-dark-400 mx-auto mb-2" />
-                <p className="text-dark-300 text-sm">
-                  {convSearch ? "No results" : "No conversations yet"}
+              <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                  <FontAwesomeIcon icon={faMessage} style={{ color: "#22c55e", fontSize: "18px" }} />
+                </div>
+                <p style={{ color: "#9ca3af", fontSize: "13px", marginBottom: "10px" }}>
+                  {convSearch ? "No results found" : "No conversations yet"}
                 </p>
                 {user?.role === "investor" && !convSearch && (
                   <button
                     onClick={() => navigate("/browse")}
-                    className="mt-3 text-primary-400 text-sm hover:text-primary-300 flex items-center gap-1 mx-auto"
+                    style={{ color: "#22c55e", fontSize: "12px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", margin: "0 auto", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
                   >
-                    Browse creators <ChevronRight size={14} />
+                    Browse creators <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: "10px" }} />
                   </button>
                 )}
               </div>
@@ -311,42 +311,30 @@ export default function Messages() {
                   <button
                     key={conv._id}
                     onClick={() => handleSelectConv(conv)}
-                    className={`w-full flex items-start gap-3 p-4 text-left transition-colors border-b border-dark-600 ${
-                      isActive
-                        ? "bg-primary-500/10 border-l-2 border-l-primary-500"
-                        : "hover:bg-dark-600"
-                    }`}
+                    className={`sf-conv-item ${isActive ? "active" : ""}`}
+                    style={{ padding: "12px 16px", border: "none", display: "flex", alignItems: "flex-start", gap: "10px" }}
                   >
-                    {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-primary-500/20 border border-primary-500/30 flex items-center justify-center text-primary-400 font-bold text-sm overflow-hidden flex-shrink-0">
-                      {other?.avatar ? (
-                        <img
-                          src={other.avatar}
-                          alt={other.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        other?.name?.charAt(0).toUpperCase() || "?"
-                      )}
+                    <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "15px", color: "#000", overflow: "hidden", flexShrink: 0 }}>
+                      {other?.avatar
+                        ? <img src={other.avatar} alt={other.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : other?.name?.charAt(0).toUpperCase() || "?"}
                     </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-white text-sm font-semibold truncate flex items-center gap-1">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
+                        <span style={{ color: "#fff", fontSize: "13px", fontWeight: 700, fontFamily: "'Syne', sans-serif", display: "flex", alignItems: "center", gap: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {other?.name || "User"}
-                          {other?.isVerified && (
-                            <BadgeCheck size={12} className="text-green-400" />
-                          )}
+                          {other?.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "11px", color: "#22c55e", flexShrink: 0 }} />}
                         </span>
-                        <span className="text-dark-300 text-xs flex-shrink-0 ml-1">
-                          {formatTime(lastMsg?.createdAt)}
+                        <span style={{ color: "#5a8a63", fontSize: "11px", flexShrink: 0, marginLeft: "6px" }}>
+                          {formatTime(conv.lastMessageAt || conv.updatedAt)}
                         </span>
                       </div>
-                      <p className="text-dark-300 text-xs truncate">
-                        {lastMsg?.type === "proposal"
-                          ? "💼 Investment proposal"
-                          : lastMsg?.message || "Start a conversation"}
+                      <p style={{ color: "#9ca3af", fontSize: "12px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
+                        {typeof lastMsg === "string"
+                          ? lastMsg
+                          : lastMsg?.type === "proposal"
+                            ? "💼 Investment proposal"
+                            : lastMsg?.message || "Start a conversation"}
                       </p>
                     </div>
                   </button>
@@ -358,13 +346,11 @@ export default function Messages() {
 
         {/* ── Chat Panel ── */}
         <div
-          className={`flex-1 flex flex-col bg-dark-800 ${
-            !mobileShowChat ? "hidden sm:flex" : "flex"
-          }`}
+          className={`flex flex-col flex-1 ${!mobileShowChat ? "hidden sm:flex" : "flex"}`}
+          style={{ background: "#040806", minWidth: 0 }}
         >
           {activeConv ? (
             <>
-              {/* Chat header */}
               <ChatHeader
                 conv={activeConv}
                 other={getOtherParticipant(activeConv)}
@@ -374,39 +360,31 @@ export default function Messages() {
                 showProposalForm={showProposalForm}
               />
 
-              {/* Proposal form */}
               {showProposalForm && user?.role === "investor" && (
                 <ProposalForm
                   conv={activeConv}
-                  onSent={() => {
-                    setShowProposalForm(false);
-                    fetchMessages(activeConv._id);
-                  }}
+                  other={getOtherParticipant(activeConv)}
+                  onSent={() => { setShowProposalForm(false); fetchMessages(activeConv._id); }}
                   onClose={() => setShowProposalForm(false)}
                 />
               )}
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              <div className="flex-1 overflow-y-auto sf-messages-scroll" style={{ padding: "16px 18px 4px" }}>
                 {loadingMsgs ? (
                   <MessagesSkeleton />
                 ) : messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <MessageSquare size={40} className="text-dark-500 mb-3" />
-                    <p className="text-dark-300 text-sm">
-                      No messages yet. Say hello! 👋
-                    </p>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center" }}>
+                    <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+                      <FontAwesomeIcon icon={faMessage} style={{ color: "#22c55e", fontSize: "22px" }} />
+                    </div>
+                    <p style={{ color: "#9ca3af", fontSize: "14px" }}>No messages yet. Say hello! 👋</p>
                   </div>
                 ) : (
                   <>
                     {messages.map((msg, idx) => {
-                      const isMe =
-                        (msg.senderId?._id || msg.senderId) === myId;
-                      const showTime =
-                        idx === 0 ||
-                        new Date(msg.createdAt) -
-                          new Date(messages[idx - 1]?.createdAt) >
-                          300000;
+                      const senderId = msg.sender?._id || msg.sender || msg.senderId?._id || msg.senderId;
+                      const isMe = senderId === myId;
+                      const showTime = idx === 0 || new Date(msg.createdAt) - new Date(messages[idx - 1]?.createdAt) > 300000;
 
                       if (msg.type === "proposal") {
                         return (
@@ -421,47 +399,39 @@ export default function Messages() {
                       }
 
                       return (
-                        <div key={msg._id}>
+                        <div key={msg._id} style={{ marginBottom: "3px" }}>
                           {showTime && (
-                            <div className="text-center my-3">
-                              <span className="text-dark-400 text-xs bg-dark-700 px-3 py-1 rounded-full">
+                            <div style={{ textAlign: "center", margin: "14px 0 8px" }}>
+                              <span style={{ color: "#5a8a63", fontSize: "11px", background: "#070d08", padding: "3px 12px", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.1)" }}>
                                 {formatFullTime(msg.createdAt)}
                               </span>
                             </div>
                           )}
-                          <div
-                            className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                          >
+                          <div style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start" }}>
                             <div
-                              className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                                isMe
-                                  ? "bg-primary-500 text-white rounded-br-sm"
-                                  : "bg-dark-600 text-dark-100 rounded-bl-sm"
-                              } ${msg.pending ? "opacity-70" : ""}`}
+                              style={{
+                                maxWidth: "70%",
+                                padding: "9px 13px",
+                                borderRadius: isMe ? "17px 17px 4px 17px" : "17px 17px 17px 4px",
+                                fontSize: "14px",
+                                lineHeight: "1.55",
+                                background: isMe ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#0a1209",
+                                color: isMe ? "#000" : "#e5e7eb",
+                                border: isMe ? "none" : "1px solid rgba(255,255,255,0.1)",
+                                opacity: msg.pending ? 0.6 : 1,
+                                fontFamily: "'DM Sans', sans-serif",
+                              }}
                             >
-                              <p className="whitespace-pre-wrap break-words">
-                                {msg.message}
-                              </p>
-                              <div
-                                className={`flex items-center gap-1 mt-1 ${
-                                  isMe ? "justify-end" : "justify-start"
-                                }`}
-                              >
-                                <span
-                                  className={`text-xs ${
-                                    isMe ? "text-white/60" : "text-dark-400"
-                                  }`}
-                                >
+                              <p style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{msg.message}</p>
+                              <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "4px", justifyContent: isMe ? "flex-end" : "flex-start" }}>
+                                <span style={{ fontSize: "10px", color: isMe ? "rgba(0,0,0,0.45)" : "#5a8a63" }}>
                                   {formatFullTime(msg.createdAt)}
                                 </span>
                                 {isMe && (
-                                  <span className="text-white/60">
-                                    {msg.pending ? (
-                                      <Clock size={10} />
-                                    ) : (
-                                      <CheckCheck size={10} />
-                                    )}
-                                  </span>
+                                  <FontAwesomeIcon
+                                    icon={msg.pending ? faClockRotateLeft : faCheck}
+                                    style={{ fontSize: "9px", color: "rgba(0,0,0,0.4)" }}
+                                  />
                                 )}
                               </div>
                             </div>
@@ -474,17 +444,17 @@ export default function Messages() {
                 )}
               </div>
 
-              {/* Message input */}
-              <div className="p-4 border-t border-dark-600 bg-dark-700">
-                <div className="flex items-end gap-3">
+              {/* Input */}
+              <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(255,255,255,0.1)", background: "#070d08", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
                   <textarea
                     ref={inputRef}
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a message... (Enter to send)"
+                    placeholder="Type a message… (Enter to send)"
                     rows={1}
-                    className="flex-1 bg-dark-600 border border-dark-500 text-white placeholder-dark-300 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:border-primary-500 transition-colors"
+                    className="sf-msg-input"
                     style={{ maxHeight: "120px" }}
                     onInput={(e) => {
                       e.target.style.height = "auto";
@@ -494,27 +464,29 @@ export default function Messages() {
                   <button
                     onClick={handleSend}
                     disabled={!newMessage.trim() || sending}
-                    className="w-10 h-10 flex items-center justify-center bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors flex-shrink-0"
+                    style={{
+                      width: "44px", height: "44px", borderRadius: "13px", cursor: "pointer",
+                      background: newMessage.trim() && !sending ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#0a1209",
+                      color: newMessage.trim() && !sending ? "#000" : "#5a8a63",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, transition: "all .2s",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                    }}
                   >
-                    {sending ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Send size={16} />
-                    )}
+                    <FontAwesomeIcon icon={sending ? faCircleNotch : faPaperPlane} spin={sending} style={{ fontSize: "14px" }} />
                   </button>
                 </div>
               </div>
             </>
           ) : (
-            /* Empty state — no conversation selected */
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-              <div className="w-16 h-16 rounded-full bg-primary-500/10 flex items-center justify-center mb-4">
-                <MessageSquare size={28} className="text-primary-400" />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "40px" }}>
+              <div style={{ width: "72px", height: "72px", borderRadius: "20px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <FontAwesomeIcon icon={faMessage} style={{ color: "#22c55e", fontSize: "28px" }} />
               </div>
-              <h3 className="text-white font-bold text-lg mb-2">
+              <h3 className="text-white font-black mb-2" style={{ fontFamily: "'Syne', sans-serif", fontSize: "18px" }}>
                 Your messages
               </h3>
-              <p className="text-dark-300 text-sm max-w-xs">
+              <p style={{ color: "#9ca3af", fontSize: "14px", maxWidth: "280px", lineHeight: "1.65", marginBottom: "20px", fontFamily: "'DM Sans', sans-serif" }}>
                 {user?.role === "investor"
                   ? "Connect with creators and start a conversation to discuss investment opportunities."
                   : "When investors reach out, conversations will appear here."}
@@ -522,7 +494,7 @@ export default function Messages() {
               {user?.role === "investor" && (
                 <button
                   onClick={() => navigate("/browse")}
-                  className="btn-primary mt-4 px-6"
+                  style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", borderRadius: "12px", padding: "10px 24px", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "13px", cursor: "pointer" }}
                 >
                   Browse Creators
                 </button>
@@ -531,73 +503,54 @@ export default function Messages() {
           )}
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
 
 // ─── Chat Header ──────────────────────────────────────────────────────────────
-function ChatHeader({
-  other,
-  currentUser,
-  onBack,
-  onShowProposal,
-  showProposalForm,
-}) {
+function ChatHeader({ other, currentUser, onBack, onShowProposal, showProposalForm }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-dark-600 bg-dark-700">
-      {/* Back button (mobile) */}
-      <button
-        onClick={onBack}
-        className="sm:hidden text-dark-200 hover:text-white"
-      >
-        <ArrowLeft size={20} />
+    <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "13px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)", background: "#070d08", flexShrink: 0 }}>
+      <button onClick={onBack} className="sm:hidden" style={{ background: "none", border: "none", color: "#9ca3af", cursor: "pointer", padding: "4px", flexShrink: 0 }}>
+        <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "16px" }} />
       </button>
 
-      {/* Avatar */}
-      <div className="w-9 h-9 rounded-full bg-primary-500/20 border border-primary-500/30 flex items-center justify-center text-primary-400 font-bold text-sm overflow-hidden flex-shrink-0">
-        {other?.avatar ? (
-          <img
-            src={other.avatar}
-            alt={other.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          other?.name?.charAt(0).toUpperCase() || "?"
-        )}
+      <div style={{ width: "38px", height: "38px", borderRadius: "11px", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "14px", color: "#000", overflow: "hidden", flexShrink: 0 }}>
+        {other?.avatar
+          ? <img src={other.avatar} alt={other.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          : other?.name?.charAt(0).toUpperCase() || "?"}
       </div>
 
-      {/* Name + role */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-white font-semibold text-sm truncate">
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "14px", fontFamily: "'Syne', sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {other?.name || "User"}
           </span>
-          {other?.isVerified && (
-            <BadgeCheck size={13} className="text-green-400" />
-          )}
+          {other?.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "11px", color: "#22c55e", flexShrink: 0 }} />}
         </div>
         {other?.role && (
-          <span className="text-dark-300 text-xs capitalize">{other.role}</span>
+          <span style={{ color: "#9ca3af", fontSize: "11px", textTransform: "capitalize", fontFamily: "'DM Sans', sans-serif" }}>{other.role}</span>
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {currentUser?.role === "investor" && (
           <button
             onClick={onShowProposal}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              showProposalForm
-                ? "bg-primary-500 text-white"
-                : "bg-primary-500/10 text-primary-400 hover:bg-primary-500/20 border border-primary-500/20"
-            }`}
+            style={{
+              display: "flex", alignItems: "center", gap: "6px", padding: "7px 13px", borderRadius: "10px",
+              fontSize: "12px", fontFamily: "'Syne', sans-serif", fontWeight: 700, cursor: "pointer", transition: "all .15s",
+              background: showProposalForm ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(34,197,94,0.08)",
+              color: showProposalForm ? "#000" : "#22c55e",
+              border: showProposalForm ? "none" : "1px solid rgba(34,197,94,0.2)",
+            }}
           >
-            <TrendingUp size={13} />
+            <FontAwesomeIcon icon={showProposalForm ? faXmark : faArrowTrendUp} style={{ fontSize: "11px" }} />
             {showProposalForm ? "Cancel" : "Send Proposal"}
           </button>
         )}
-        <button className="text-dark-300 hover:text-white p-1">
-          <MoreVertical size={18} />
+        <button style={{ background: "none", border: "none", color: "#9ca3af", cursor: "pointer", padding: "4px 6px" }}>
+          <FontAwesomeIcon icon={faEllipsisVertical} style={{ fontSize: "15px" }} />
         </button>
       </div>
     </div>
@@ -605,23 +558,13 @@ function ChatHeader({
 }
 
 // ─── Proposal Form ────────────────────────────────────────────────────────────
-function ProposalForm({ conv, onSent, onClose }) {
-  const [form, setForm] = useState({
-    amount: "",
-    profitShare: "",
-    duration: "",
-    notes: "",
-  });
+function ProposalForm({ conv, other, onSent, onClose }) {
+  const [form, setForm] = useState({ amount: "", profitShare: "", duration: "", notes: "" });
   const [sending, setSending] = useState(false);
 
   const projectedROI =
     form.amount && form.profitShare && form.duration
-      ? (
-          ((parseFloat(form.amount) *
-            parseFloat(form.profitShare)) /
-            100) *
-          parseFloat(form.duration)
-        ).toFixed(0)
+      ? (((parseFloat(form.amount) * parseFloat(form.profitShare)) / 100) * parseFloat(form.duration)).toFixed(0)
       : null;
 
   const handleSubmit = async () => {
@@ -631,12 +574,14 @@ function ProposalForm({ conv, onSent, onClose }) {
     }
     setSending(true);
     try {
-      await api.post("/proposals", {
+      const creatorParticipant = conv.participants?.find((p) => p.role === "creator");
+      await api.post("/messages/proposals", {
         conversationId: conv._id,
+        creatorId: creatorParticipant?._id || creatorParticipant,
         amount: parseFloat(form.amount),
-        profitShare: parseFloat(form.profitShare),
+        profitSharePercentage: parseFloat(form.profitShare),
         duration: parseInt(form.duration),
-        notes: form.notes,
+        terms: form.notes,
       });
       toast.success("Investment proposal sent!");
       onSent();
@@ -648,92 +593,54 @@ function ProposalForm({ conv, onSent, onClose }) {
   };
 
   return (
-    <div className="bg-dark-700 border-b border-dark-500 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-white font-bold text-sm flex items-center gap-2">
-          <TrendingUp size={15} className="text-primary-400" />
+    <div style={{ background: "#070d08", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "14px 16px", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+        <h4 style={{ color: "#fff", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "13px", display: "flex", alignItems: "center", gap: "7px", margin: 0 }}>
+          <FontAwesomeIcon icon={faHandshake} style={{ color: "#22c55e" }} />
           New Investment Proposal
+          {other?.name && <span style={{ color: "#9ca3af", fontWeight: 600 }}>→ {other.name}</span>}
         </h4>
-        <button onClick={onClose} className="text-dark-300 hover:text-white">
-          <X size={16} />
+        <button onClick={onClose} style={{ background: "none", border: "none", color: "#9ca3af", cursor: "pointer", fontSize: "13px" }}>
+          <FontAwesomeIcon icon={faXmark} />
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        <div>
-          <label className="block text-dark-300 text-xs mb-1">Amount ($)</label>
-          <input
-            type="number"
-            value={form.amount}
-            onChange={(e) => setForm((p) => ({ ...p, amount: e.target.value }))}
-            placeholder="2000"
-            className="input-field w-full text-sm py-2"
-          />
-        </div>
-        <div>
-          <label className="block text-dark-300 text-xs mb-1">Profit Share (%)</label>
-          <input
-            type="number"
-            value={form.profitShare}
-            onChange={(e) =>
-              setForm((p) => ({ ...p, profitShare: e.target.value }))
-            }
-            placeholder="20"
-            min="1"
-            max="50"
-            className="input-field w-full text-sm py-2"
-          />
-        </div>
-        <div>
-          <label className="block text-dark-300 text-xs mb-1">Duration (months)</label>
-          <input
-            type="number"
-            value={form.duration}
-            onChange={(e) =>
-              setForm((p) => ({ ...p, duration: e.target.value }))
-            }
-            placeholder="12"
-            className="input-field w-full text-sm py-2"
-          />
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginBottom: "10px" }}>
+        {[
+          { key: "amount", label: "Amount ($)", placeholder: "2000" },
+          { key: "profitShare", label: "Profit Share (%)", placeholder: "20" },
+          { key: "duration", label: "Duration (months)", placeholder: "12" },
+        ].map(({ key, label, placeholder }) => (
+          <div key={key}>
+            <label style={{ display: "block", color: "#9ca3af", fontSize: "10px", fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</label>
+            <input type="number" value={form[key]} onChange={(e) => setForm((p) => ({ ...p, [key]: e.target.value }))} placeholder={placeholder} className="sf-prop-input" />
+          </div>
+        ))}
       </div>
 
       {projectedROI && (
-        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl px-3 py-2 mb-3 text-sm">
-          <span className="text-dark-300">Projected total return: </span>
-          <span className="text-primary-400 font-bold">${projectedROI}</span>
-          <span className="text-dark-300"> over {form.duration} months</span>
+        <div style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.18)", borderRadius: "9px", padding: "7px 11px", marginBottom: "10px", fontSize: "12px", fontFamily: "'DM Sans', sans-serif" }}>
+          <span style={{ color: "#9ca3af" }}>Projected total return: </span>
+          <span style={{ color: "#22c55e", fontWeight: 700 }}>${parseInt(projectedROI).toLocaleString()}</span>
+          <span style={{ color: "#9ca3af" }}> over {form.duration} months</span>
         </div>
       )}
 
-      <div className="mb-3">
-        <label className="block text-dark-300 text-xs mb-1">Note (optional)</label>
-        <textarea
-          value={form.notes}
-          onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-          placeholder="Add a note to your proposal..."
-          rows={2}
-          className="input-field w-full text-sm resize-none"
-        />
+      <div style={{ marginBottom: "12px" }}>
+        <label style={{ display: "block", color: "#9ca3af", fontSize: "10px", fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Note (optional)</label>
+        <textarea value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} placeholder="Add a note to your proposal..." rows={2} className="sf-prop-input" style={{ resize: "none" }} />
       </div>
 
-      <div className="flex gap-2">
+      <div style={{ display: "flex", gap: "8px" }}>
         <button
           onClick={handleSubmit}
           disabled={sending}
-          className="flex-1 btn-primary py-2 text-sm flex items-center justify-center gap-2"
+          style={{ flex: 1, background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", borderRadius: "9px", padding: "9px 0", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", opacity: sending ? 0.7 : 1 }}
         >
-          {sending ? (
-            <Loader2 size={14} className="animate-spin" />
-          ) : (
-            <Send size={14} />
-          )}
+          <FontAwesomeIcon icon={sending ? faCircleNotch : faPaperPlane} spin={sending} style={{ fontSize: "11px" }} />
           {sending ? "Sending..." : "Send Proposal"}
         </button>
-        <button
-          onClick={onClose}
-          className="px-4 py-2 rounded-xl bg-dark-600 text-dark-200 hover:text-white text-sm transition-colors"
-        >
+        <button onClick={onClose} style={{ padding: "9px 16px", borderRadius: "9px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}>
           Cancel
         </button>
       </div>
@@ -741,19 +648,16 @@ function ProposalForm({ conv, onSent, onClose }) {
   );
 }
 
-// ─── Proposal Card (in chat) ──────────────────────────────────────────────────
+// ─── Proposal Card ────────────────────────────────────────────────────────────
 function ProposalCard({ msg, isMe, currentUser, onAction }) {
   const [negotiating, setNegotiating] = useState(false);
-  const [counter, setCounter] = useState({
-    profitShare: "",
-    duration: "",
-  });
+  const [counter, setCounter] = useState({ profitShare: "", duration: "" });
   const [actionLoading, setActionLoading] = useState(null);
 
-  const proposal = msg.proposal || msg;
+  const proposal = msg.proposalId || msg.proposal || {};
   const status = proposal.status || "pending";
   const amount = proposal.amount || 0;
-  const profitShare = proposal.profitShare || proposal.profitSharePercentage || 0;
+  const profitShare = proposal.profitSharePercentage || proposal.profitShare || 0;
   const duration = proposal.duration || 0;
   const projectedROI = ((amount * profitShare) / 100) * duration;
 
@@ -762,162 +666,101 @@ function ProposalCard({ msg, isMe, currentUser, onAction }) {
 
   const doAction = async (action) => {
     setActionLoading(action);
-    const counterData =
-      action === "negotiate"
-        ? {
-            profitShare: parseFloat(counter.profitShare) || profitShare,
-            duration: parseInt(counter.duration) || duration,
-          }
-        : null;
+    const counterData = action === "negotiate"
+      ? { amount, profitSharePercentage: parseFloat(counter.profitShare) || profitShare, duration: parseInt(counter.duration) || duration }
+      : null;
     await onAction(proposal._id || msg._id, action, counterData);
     setActionLoading(null);
     setNegotiating(false);
   };
 
   const statusConfig = {
-    pending: { label: "Awaiting Response", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
-    accepted: { label: "Accepted ✓", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
-    rejected: { label: "Declined", color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" },
-    negotiating: { label: "Counter-proposed", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+    pending:     { label: "Awaiting Response", color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.2)" },
+    accepted:    { label: "Accepted ✓",        color: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.2)" },
+    rejected:    { label: "Declined",          color: "#ef4444", bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.2)" },
+    negotiating: { label: "Counter-proposed",  color: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.2)" },
   };
-
   const sc = statusConfig[status] || statusConfig.pending;
 
   return (
-    <div className={`flex ${isMe ? "justify-end" : "justify-start"} my-2`}>
-      <div className={`w-full max-w-sm border rounded-2xl overflow-hidden ${sc.border} ${sc.bg}`}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary-500/20 flex items-center justify-center">
-              <DollarSign size={14} className="text-primary-400" />
+    <div style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", margin: "10px 0" }}>
+      <div style={{ width: "100%", maxWidth: "360px", background: "#070d08", border: `1px solid ${sc.border}`, borderRadius: "16px", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FontAwesomeIcon icon={faHandshake} style={{ color: "#22c55e", fontSize: "12px" }} />
             </div>
-            <span className="text-white font-bold text-sm">Investment Proposal</span>
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: "13px", fontFamily: "'Syne', sans-serif" }}>Investment Proposal</span>
           </div>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${sc.bg} ${sc.color}`}>
+          <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "999px", background: sc.bg, color: sc.color, fontFamily: "'Syne', sans-serif" }}>
             {sc.label}
           </span>
         </div>
 
-        {/* Details */}
-        <div className="px-4 py-3 space-y-2">
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-dark-700/60 rounded-xl p-2">
-              <p className="text-dark-300 text-xs mb-0.5">Amount</p>
-              <p className="text-white font-bold text-sm">${amount.toLocaleString()}</p>
-            </div>
-            <div className="bg-dark-700/60 rounded-xl p-2">
-              <p className="text-dark-300 text-xs mb-0.5">Share</p>
-              <p className="text-white font-bold text-sm">{profitShare}%</p>
-            </div>
-            <div className="bg-dark-700/60 rounded-xl p-2">
-              <p className="text-dark-300 text-xs mb-0.5">Duration</p>
-              <p className="text-white font-bold text-sm">{duration}mo</p>
-            </div>
+        <div style={{ padding: "12px 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "7px", marginBottom: "9px" }}>
+            {[
+              { label: "Amount", value: `$${amount.toLocaleString()}` },
+              { label: "Share", value: `${profitShare}%` },
+              { label: "Duration", value: `${duration}mo` },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", padding: "7px 8px", textAlign: "center" }}>
+                <p style={{ color: "#9ca3af", fontSize: "10px", margin: "0 0 2px", fontFamily: "'Syne', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{label}</p>
+                <p style={{ color: "#fff", fontWeight: 800, fontSize: "13px", margin: 0, fontFamily: "'Syne', sans-serif" }}>{value}</p>
+              </div>
+            ))}
           </div>
-
-          <div className="flex items-center justify-between text-xs pt-1">
-            <span className="text-dark-300">Expected ROI</span>
-            <span className="text-primary-400 font-bold">${projectedROI.toLocaleString()}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+            <span style={{ color: "#9ca3af" }}>Expected ROI</span>
+            <span style={{ color: "#22c55e", fontWeight: 700 }}>${projectedROI.toLocaleString()}</span>
           </div>
-
-          {proposal.notes && (
-            <p className="text-dark-300 text-xs italic border-t border-white/5 pt-2">
-              "{proposal.notes}"
+          {proposal.terms && (
+            <p style={{ color: "#9ca3af", fontSize: "12px", fontStyle: "italic", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "8px", margin: "8px 0 0", fontFamily: "'DM Sans', sans-serif" }}>
+              "{proposal.terms}"
             </p>
           )}
         </div>
 
-        {/* Actions — only for creator on pending proposals */}
         {canAct && !negotiating && (
-          <div className="flex gap-2 px-4 pb-3">
-            <button
-              onClick={() => doAction("accept")}
-              disabled={actionLoading !== null}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold py-2 rounded-xl transition-colors disabled:opacity-60"
-            >
-              {actionLoading === "accept" ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Check size={12} />
-              )}
-              Accept
+          <div style={{ display: "flex", gap: "6px", padding: "0 14px 12px" }}>
+            <button onClick={() => doAction("accept")} disabled={actionLoading !== null} style={{ flex: 1, background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", borderRadius: "8px", padding: "8px 0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", opacity: actionLoading ? 0.6 : 1 }}>
+              <FontAwesomeIcon icon={actionLoading === "accept" ? faCircleNotch : faCheck} spin={actionLoading === "accept"} style={{ fontSize: "10px" }} /> Accept
             </button>
-            <button
-              onClick={() => setNegotiating(true)}
-              disabled={actionLoading !== null}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-bold py-2 rounded-xl transition-colors disabled:opacity-60"
-            >
-              Negotiate
+            <button onClick={() => setNegotiating(true)} disabled={actionLoading !== null} style={{ flex: 1, background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.2)", borderRadius: "8px", padding: "8px 0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "11px", cursor: "pointer", opacity: actionLoading ? 0.6 : 1 }}>
+              Counter
             </button>
-            <button
-              onClick={() => doAction("reject")}
-              disabled={actionLoading !== null}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-dark-700 hover:bg-red-500/10 text-dark-200 hover:text-red-400 text-xs font-bold py-2 rounded-xl transition-colors disabled:opacity-60"
-            >
-              {actionLoading === "reject" ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <X size={12} />
-              )}
-              Decline
+            <button onClick={() => doAction("reject")} disabled={actionLoading !== null} style={{ flex: 1, background: "#0a1209", color: "#9ca3af", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", opacity: actionLoading ? 0.6 : 1 }}>
+              <FontAwesomeIcon icon={actionLoading === "reject" ? faCircleNotch : faXmark} spin={actionLoading === "reject"} style={{ fontSize: "10px" }} /> Decline
             </button>
           </div>
         )}
 
-        {/* Negotiate form */}
         {canAct && negotiating && (
-          <div className="px-4 pb-3 space-y-2">
-            <p className="text-dark-300 text-xs font-medium">Counter-propose new terms:</p>
-            <div className="grid grid-cols-2 gap-2">
+          <div style={{ padding: "0 14px 12px" }}>
+            <p style={{ color: "#9ca3af", fontSize: "10px", fontWeight: 700, fontFamily: "'Syne', sans-serif", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "7px" }}>Counter-propose new terms:</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px", marginBottom: "8px" }}>
               <div>
-                <label className="text-dark-400 text-xs">New Share (%)</label>
-                <input
-                  type="number"
-                  value={counter.profitShare}
-                  onChange={(e) =>
-                    setCounter((p) => ({ ...p, profitShare: e.target.value }))
-                  }
-                  placeholder={profitShare}
-                  className="input-field w-full text-xs py-1.5 mt-0.5"
-                />
+                <label style={{ color: "#9ca3af", fontSize: "11px" }}>New Share (%)</label>
+                <input type="number" value={counter.profitShare} onChange={(e) => setCounter((p) => ({ ...p, profitShare: e.target.value }))} placeholder={profitShare} className="sf-prop-input" style={{ marginTop: "3px" }} />
               </div>
               <div>
-                <label className="text-dark-400 text-xs">New Duration (mo)</label>
-                <input
-                  type="number"
-                  value={counter.duration}
-                  onChange={(e) =>
-                    setCounter((p) => ({ ...p, duration: e.target.value }))
-                  }
-                  placeholder={duration}
-                  className="input-field w-full text-xs py-1.5 mt-0.5"
-                />
+                <label style={{ color: "#9ca3af", fontSize: "11px" }}>New Duration (mo)</label>
+                <input type="number" value={counter.duration} onChange={(e) => setCounter((p) => ({ ...p, duration: e.target.value }))} placeholder={duration} className="sf-prop-input" style={{ marginTop: "3px" }} />
               </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => doAction("negotiate")}
-                disabled={actionLoading !== null}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-1"
-              >
-                {actionLoading === "negotiate" ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : null}
-                Send Counter
+            <div style={{ display: "flex", gap: "6px" }}>
+              <button onClick={() => doAction("negotiate")} disabled={actionLoading !== null} style={{ flex: 1, background: "rgba(59,130,246,0.9)", color: "#fff", border: "none", borderRadius: "8px", padding: "7px 0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}>
+                {actionLoading === "negotiate" && <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "10px" }} />} Send Counter
               </button>
-              <button
-                onClick={() => setNegotiating(false)}
-                className="px-3 py-2 rounded-xl bg-dark-700 text-dark-300 hover:text-white text-xs transition-colors"
-              >
+              <button onClick={() => setNegotiating(false)} style={{ padding: "7px 12px", borderRadius: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontSize: "11px", cursor: "pointer" }}>
                 Back
               </button>
             </div>
           </div>
         )}
 
-        <div className="px-4 pb-2">
-          <p className="text-dark-400 text-xs">{formatTime(msg.createdAt)}</p>
+        <div style={{ padding: "0 14px 10px" }}>
+          <p style={{ color: "#5a8a63", fontSize: "10px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{formatTime(msg.createdAt)}</p>
         </div>
       </div>
     </div>
@@ -927,13 +770,13 @@ function ProposalCard({ msg, isMe, currentUser, onAction }) {
 // ─── Skeletons ────────────────────────────────────────────────────────────────
 function ConvListSkeleton() {
   return (
-    <div className="space-y-0">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 p-4 border-b border-dark-600 animate-pulse">
-          <div className="w-10 h-10 rounded-full bg-dark-600 flex-shrink-0" />
-          <div className="flex-1 space-y-1.5">
-            <div className="h-3 bg-dark-600 rounded w-3/4" />
-            <div className="h-2.5 bg-dark-600 rounded w-1/2" />
+    <div>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)" }} className="animate-pulse">
+          <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#0a1209", flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ height: "11px", background: "#0a1209", borderRadius: "6px", width: "68%", marginBottom: "6px" }} />
+            <div style={{ height: "9px", background: "#0a1209", borderRadius: "6px", width: "44%" }} />
           </div>
         </div>
       ))}
@@ -943,12 +786,10 @@ function ConvListSkeleton() {
 
 function MessagesSkeleton() {
   return (
-    <div className="space-y-3 p-2">
-      {[false, true, false, false, true].map((isMe, i) => (
-        <div key={i} className={`flex ${isMe ? "justify-end" : "justify-start"} animate-pulse`}>
-          <div
-            className={`h-9 rounded-2xl bg-dark-600 ${isMe ? "w-40" : "w-52"}`}
-          />
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      {[false, true, false, false, true, false].map((isMe, i) => (
+        <div key={i} style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start" }} className="animate-pulse">
+          <div style={{ height: "36px", borderRadius: "16px", background: "#0a1209", width: isMe ? "150px" : "210px" }} />
         </div>
       ))}
     </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -95,7 +96,42 @@ export default function Settings() {
       <div className="sg-in flex flex-col lg:flex-row gap-6" style={{ animationDelay: ".06s" }}>
         {/* ── Section nav ── */}
         <div className="lg:w-52 flex-shrink-0">
-          <div className="rounded-2xl p-2 space-y-0.5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+          {/* Mobile: horizontal scrollable pills */}
+          <div className="relative lg:hidden">
+            <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              {SECTIONS.map(s => {
+                const isActive = activeSection === s.key;
+                return (
+                  <button key={s.key} onClick={() => setActiveSection(s.key)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold flex-shrink-0 transition-all"
+                    style={{ fontFamily: "'Syne',sans-serif", background: isActive ? `${s.color}14` : "var(--bg-card)", border: isActive ? `1px solid ${s.color}30` : "1px solid var(--border)", color: isActive ? s.color : "var(--text-dim)", whiteSpace: "nowrap" }}
+                  >
+                    <FontAwesomeIcon icon={s.faIcon} style={{ fontSize: "11px" }} />
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Right fade — hints there's more to scroll */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 pointer-events-none" style={{ background: "linear-gradient(to right, transparent, var(--bg))" }} />
+            {/* Scroll indicator dots */}
+            <div className="flex items-center justify-center gap-1 mt-1">
+              {SECTIONS.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: activeSection === s.key ? "16px" : "4px",
+                    height: "3px",
+                    borderRadius: "999px",
+                    background: activeSection === s.key ? "#22c55e" : "rgba(255,255,255,0.1)",
+                    transition: "all .2s ease",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Desktop: vertical list */}
+          <div className="hidden lg:block rounded-2xl p-2 space-y-0.5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
             {SECTIONS.map(s => {
               const isActive = activeSection === s.key;
               return (
@@ -103,7 +139,7 @@ export default function Settings() {
                   className="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all"
                   style={{ fontFamily: "'Syne',sans-serif", background: isActive ? `${s.color}14` : "transparent", border: isActive ? `1px solid ${s.color}25` : "1px solid transparent", color: isActive ? s.color : "var(--text-dim)" }}
                   onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "var(--bg-input)"; } }}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = "#4a5568"; e.currentTarget.style.background = "transparent"; } }}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; } }}
                 >
                   <div className="flex items-center gap-2.5">
                     <FontAwesomeIcon icon={s.faIcon} style={{ fontSize: "12px", color: isActive ? s.color : "var(--text-dim)" }} />
@@ -118,7 +154,7 @@ export default function Settings() {
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all"
                 style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = "#4a5568"; e.currentTarget.style.background = "transparent"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; }}
               >
                 <FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: "12px" }} /> Log Out
               </button>
@@ -160,7 +196,7 @@ function AccountSection({ user, updateUser }) {
   const verifications = [
     { label: "Email",    verified: user?.emailVerified },
     { label: "Phone",    verified: user?.phoneVerified },
-    { label: "Identity", verified: user?.idVerified    },
+    { label: "Identity", verified: user?.idVerified,   kycLink: true },
     { label: "Profile",  verified: user?.isVerified    },
   ];
 
@@ -203,10 +239,17 @@ function AccountSection({ user, updateUser }) {
           {verifications.map(v => (
             <div key={v.label} className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
               <span className="text-sm" style={{ color: "var(--text-secondary)", fontFamily: "'DM Sans',sans-serif" }}>{v.label}</span>
-              <span className="text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1.5" style={{ fontFamily: "'Syne',sans-serif", background: v.verified ? "rgba(34,197,94,0.1)" : "var(--bg-input)", border: v.verified ? "1px solid rgba(34,197,94,0.2)" : "1px solid var(--border)", color: v.verified ? "#22c55e" : "var(--text-dim)" }}>
-                <FontAwesomeIcon icon={v.verified ? faCircleCheck : faCircleExclamation} style={{ fontSize: "10px" }} />
-                {v.verified ? "Verified" : "Pending"}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1.5" style={{ fontFamily: "'Syne',sans-serif", background: v.verified ? "rgba(34,197,94,0.1)" : "var(--bg-input)", border: v.verified ? "1px solid rgba(34,197,94,0.2)" : "1px solid var(--border)", color: v.verified ? "#22c55e" : "var(--text-dim)" }}>
+                  <FontAwesomeIcon icon={v.verified ? faCircleCheck : faCircleExclamation} style={{ fontSize: "10px" }} />
+                  {v.verified ? "Verified" : "Pending"}
+                </span>
+                {v.kycLink && !v.verified && (
+                  <Link to="/kyc" className="text-xs font-black px-2.5 py-1 rounded-full transition-all" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(20,184,166,0.25)", color: "#14b8a6" }}>
+                    Verify Now →
+                  </Link>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -306,7 +349,7 @@ function NotificationsSection() {
   };
 
   const ToggleRow = ({ prefKey, label, desc }) => (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: "1px solid #0f1a10" }}>
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
       <div>
         <p className="text-sm font-bold text-white" style={{ fontFamily: "'Syne',sans-serif" }}>{label}</p>
         {desc && <p className="text-xs mt-0.5" style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}>{desc}</p>}

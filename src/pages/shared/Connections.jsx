@@ -73,7 +73,7 @@ export default function Connections() {
   const handleAccept = async (connectionId) => {
     setActionLoading(p => ({ ...p, [`accept_${connectionId}`]: true }));
     try {
-      await api.post("/connections/accept", { connectionId });
+      await api.put(`/connections/accept/${connectionId}`);
       toast.success("Connection accepted!");
       const accepted = received.find(c => c._id === connectionId);
       if (accepted) {
@@ -90,7 +90,7 @@ export default function Connections() {
   const handleReject = async (connectionId, isSent = false) => {
     setActionLoading(p => ({ ...p, [`reject_${connectionId}`]: true }));
     try {
-      await api.post("/connections/reject", { connectionId });
+      await api.put(`/connections/reject/${connectionId}`);
       toast.success(isSent ? "Request cancelled" : "Request declined");
       if (isSent) setSent(p => p.filter(c => c._id !== connectionId));
       else setReceived(p => p.filter(c => c._id !== connectionId));
@@ -105,7 +105,7 @@ export default function Connections() {
     if (!window.confirm("Remove this connection?")) return;
     setActionLoading(p => ({ ...p, [`remove_${connectionId}`]: true }));
     try {
-      await api.post("/connections/reject", { connectionId });
+      await api.put(`/connections/reject/${connectionId}`);
       toast.success("Connection removed");
       setConnections(p => p.filter(c => c._id !== connectionId));
     } catch (error) {

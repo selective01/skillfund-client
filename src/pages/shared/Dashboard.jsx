@@ -10,29 +10,29 @@ import {
 
 function StatCard({ label, value, icon, colorClass, loading }) {
   const colorMap = {
-    green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.15)",  card: "linear-gradient(135deg,#0f2e10,#091e09)" },
-    blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.15)", card: "linear-gradient(135deg,#0f2244,#091830)" },
-    purple: { text: "#a855f7", bg: "rgba(168,85,247,0.1)",  border: "rgba(168,85,247,0.15)", card: "linear-gradient(135deg,#220f44,#180930)" },
-    amber:  { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.15)", card: "linear-gradient(135deg,#3d2200,#2a1600)" },
+    green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.15)",  card: "var(--card-green)" },
+    blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.15)", card: "var(--card-blue)" },
+    purple: { text: "#a855f7", bg: "rgba(168,85,247,0.1)",  border: "rgba(168,85,247,0.15)", card: "var(--card-purple)" },
+    amber:  { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.15)", card: "var(--card-amber)" },
   };
   const c = colorMap[colorClass] || colorMap.green;
   if (loading) {
     return (
-      <div className="rounded-2xl p-5 animate-pulse" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
-        <div className="h-3 rounded-full w-1/2 mb-5" style={{ background: "#1a2e1d" }} />
-        <div className="h-8 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
+      <div className="rounded-2xl p-4 animate-pulse" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+        <div className="h-3 rounded-full w-1/2 mb-5" style={{ background: "var(--border)" }} />
+        <div className="h-8 rounded-full w-1/3" style={{ background: "var(--border)" }} />
       </div>
     );
   }
   return (
-    <div className="group rounded-2xl p-5 transition-all duration-200 hover:-translate-y-1 cursor-default" style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>{label.toUpperCase()}</p>
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: c.bg }}>
-          <FontAwesomeIcon icon={icon} style={{ color: c.text, fontSize: "15px" }} />
+    <div className="group rounded-2xl p-4 transition-all duration-200 hover:-translate-y-1 cursor-default" style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "var(--text-dim)" }}>{label.toUpperCase()}</p>
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: c.bg }}>
+          <FontAwesomeIcon icon={icon} style={{ color: c.text, fontSize: "13px" }} />
         </div>
       </div>
-      <p className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "2rem", lineHeight: 1 }}>{value}</p>
+      <p className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.6rem", lineHeight: 1 }}>{value}</p>
     </div>
   );
 }
@@ -42,24 +42,24 @@ function QuickAction({ emoji, label, description, path }) {
     <Link
       to={path}
       className="group flex items-center gap-4 p-4 rounded-2xl transition-all duration-200"
-      style={{ background: "#070d08", border: "1px solid #1a2e1d" }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(34,197,94,0.35)"; e.currentTarget.style.background = "#0a1209"; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a2e1d"; e.currentTarget.style.background = "#070d08"; }}
+      style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(34,197,94,0.35)"; e.currentTarget.style.background = "var(--bg-input)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg-card)"; }}
     >
       <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)" }}>{emoji}</div>
       <div className="flex-1 min-w-0">
         <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{label}</p>
-        {description && <p className="text-xs truncate mt-0.5" style={{ color: "#4a5568" }}>{description}</p>}
+        {description && <p className="text-xs truncate mt-0.5" style={{ color: "var(--text-dim)" }}>{description}</p>}
       </div>
-      <FontAwesomeIcon icon={faArrowRight} className="flex-shrink-0 transition-transform group-hover:translate-x-1" style={{ color: "#2d4a31", fontSize: "13px" }} />
+      <FontAwesomeIcon icon={faArrowRight} className="flex-shrink-0 transition-transform group-hover:translate-x-1" style={{ color: "var(--text-ghost)", fontSize: "13px" }} />
     </Link>
   );
 }
 
 function StatusItem({ label, value, last }) {
   return (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid #0f1a10" }}>
-      <span className="text-sm" style={{ color: "#6b7280", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.08)" }}>
+      <span className="text-sm" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
       <div className="flex items-center gap-1.5">
         {value
           ? <><FontAwesomeIcon icon={faCircleCheck} style={{ color: "#22c55e", fontSize: "13px" }} /><span className="text-xs font-bold" style={{ color: "#22c55e", fontFamily: "'Syne', sans-serif" }}>Verified</span></>
@@ -83,7 +83,14 @@ export default function Dashboard() {
           setStats(res.data.analytics);
         } else {
           const res = await api.get("/investments/my-investments");
-          setStats(res.data.summary);
+          const invs = res.data.investments || [];
+          // Compute summary directly from investments array
+          setStats({
+            totalInvested:        invs.reduce((s, i) => s + (i.amount || 0), 0),
+            activeInvestments:    invs.filter(i => i.status === "active").length,
+            totalReturns:         invs.reduce((s, i) => s + (i.totalPaidToInvestor || 0), 0),
+            completedInvestments: invs.filter(i => i.status === "completed").length,
+          });
         }
       } catch {
         console.error("Failed to fetch stats");
@@ -164,7 +171,7 @@ export default function Dashboard() {
               <span className="text-xs font-bold tracking-widest text-[#22c55e]" style={{ fontFamily: "'Syne', sans-serif" }}>{user?.role?.toUpperCase()} DASHBOARD</span>
             </div>
             <h2 className="font-black text-white mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.4rem,2.5vw,1.9rem)" }}>Welcome back, {user?.name} 👋</h2>
-            <p className="text-sm" style={{ color: "#6b7280" }}>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
               You're on the <span className="font-bold capitalize" style={{ color: "#22c55e" }}>{user?.plan}</span> plan
               {user?.plan === "basic" && <> · <span style={{ color: "#f59e0b" }}>Upgrade to unlock more features</span></>}
             </p>
@@ -188,7 +195,7 @@ export default function Dashboard() {
 
       {/* Bottom Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="dash-in d5 rounded-3xl p-6" style={{ background: "linear-gradient(145deg, #070d08, #040806)", border: "1px solid #1a2e1d", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+        <div className="dash-in d5 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
             <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Quick Actions</h3>
@@ -198,28 +205,28 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="dash-in d6 rounded-3xl p-6" style={{ background: "linear-gradient(145deg, #070d08, #040806)", border: "1px solid #1a2e1d", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+        <div className="dash-in d6 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
             <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Account Status</h3>
           </div>
-          <div className="rounded-2xl p-4 mb-4" style={{ background: "#040806", border: "1px solid #1a2e1d" }}>
+          <div className="rounded-2xl p-4 mb-4" style={{ background: "var(--bg)", border: "1px solid var(--border)" }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#4a5568" }}>VERIFICATION PROGRESS</span>
+              <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "var(--text-dim)" }}>VERIFICATION PROGRESS</span>
               <span className="text-xs font-black" style={{ fontFamily: "'Fraunces', serif", color: "#22c55e" }}>{verifiedCount}/{verifications.length}</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: "#0f1a10" }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
               <div className="h-full rounded-full transition-all duration-700" style={{ width: `${verifiedPct}%`, background: "linear-gradient(90deg, #16a34a, #22c55e, #4ade80)" }} />
             </div>
-            <p className="text-xs mt-1.5" style={{ color: "#2d4a31" }}>
+            <p className="text-xs mt-1.5" style={{ color: "var(--text-ghost)" }}>
               {verifiedPct === 100 ? "✓ Fully verified" : `${100 - verifiedPct}% remaining to full trust score`}
             </p>
           </div>
           <div className="px-1">
             {verifications.map((v, i) => <StatusItem key={i} label={v.label} value={v.value} last={i === verifications.length - 1} />)}
           </div>
-          <div className="mt-4 flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "#040806", border: "1px solid #1a2e1d" }}>
-            <span className="text-sm font-semibold" style={{ color: "#6b7280" }}>Current Plan</span>
+          <div className="mt-4 flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "var(--bg)", border: "1px solid var(--border)" }}>
+            <span className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>Current Plan</span>
             <span className="text-xs font-black capitalize px-3 py-1.5 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
               {user?.plan}
             </span>

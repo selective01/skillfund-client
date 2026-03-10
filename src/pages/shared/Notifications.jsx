@@ -34,7 +34,7 @@ const TYPE_CONFIG = {
   withdrawal_rejected: { icon: DollarSign,   color: "text-red-400",     bg: "bg-red-400/10",     label: "Withdrawal" },
   kyc_approved:        { icon: Star,         color: "text-green-400",   bg: "bg-green-400/10",   label: "Verification" },
   kyc_rejected:        { icon: AlertCircle,  color: "text-red-400",     bg: "bg-red-400/10",     label: "Verification" },
-  system:              { icon: Info,         color: "text-dark-300",    bg: "bg-dark-500/30",    label: "System" },
+  system:              { icon: Info,         color: "text-gray-400",    bg: "bg-white/10/30",    label: "System" },
 };
 
 const FILTER_TABS = ["all", "unread", "connection", "message", "proposal", "investment", "withdrawal"];
@@ -145,7 +145,7 @@ export default function Notifications() {
               </span>
             )}
           </h2>
-          <p className="text-dark-200 text-sm mt-0.5">
+          <p className="text-gray-400 text-sm mt-0.5">
             {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
           </p>
         </div>
@@ -154,7 +154,7 @@ export default function Notifications() {
           <button
             onClick={markAllRead}
             disabled={actionLoading.markAll}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-dark-700 hover:bg-dark-500 text-dark-200 hover:text-white border border-dark-500 text-sm transition-all disabled:opacity-60"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 text-sm transition-all disabled:opacity-60"
           >
             {actionLoading.markAll ? (
               <Loader2 size={14} className="animate-spin" />
@@ -168,7 +168,7 @@ export default function Notifications() {
 
       {/* ── Filter tabs ── */}
       <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 scrollbar-none">
-        <Filter size={14} className="text-dark-400 flex-shrink-0 mt-2 ml-1" />
+        <Filter size={14} className="text-gray-400 flex-shrink-0 mt-2 ml-1" />
         {FILTER_TABS.map((tab) => (
           <button
             key={tab}
@@ -176,7 +176,7 @@ export default function Notifications() {
             className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium capitalize transition-all ${
               activeTab === tab
                 ? "bg-primary-500 text-white"
-                : "bg-dark-700 text-dark-300 hover:text-white border border-dark-500"
+                : "bg-white/5 text-gray-400 hover:text-white border border-white/10"
             }`}
           >
             {tab}
@@ -194,11 +194,11 @@ export default function Notifications() {
         <NotificationsSkeleton />
       ) : filtered.length === 0 ? (
         <div className="card text-center py-16">
-          <BellOff size={40} className="text-dark-400 mx-auto mb-3" />
+          <BellOff size={40} className="text-gray-400 mx-auto mb-3" />
           <h3 className="text-white font-bold mb-1">
             {activeTab === "unread" ? "No unread notifications" : "No notifications"}
           </h3>
-          <p className="text-dark-300 text-sm">
+          <p className="text-gray-400 text-sm">
             {activeTab === "unread"
               ? "You're all caught up!"
               : "Notifications will appear here when something happens."}
@@ -215,8 +215,8 @@ export default function Notifications() {
                 key={notif._id}
                 className={`group flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
                   notif.isRead
-                    ? "bg-dark-700/40 border-dark-600 hover:border-dark-400"
-                    : "bg-dark-700 border-primary-500/20 hover:border-primary-500/40"
+                    ? "bg-white/5/40 border-white/10 hover:border-white/10"
+                    : "bg-white/5 border-primary-500/20 hover:border-primary-500/40"
                 }`}
                 onClick={() => handleClick(notif)}
               >
@@ -233,11 +233,11 @@ export default function Notifications() {
                       <span className={`text-xs font-semibold uppercase tracking-wide ${tc.color}`}>
                         {tc.label}
                       </span>
-                      <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? "text-dark-200" : "text-white font-medium"}`}>
+                      <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? "text-gray-400" : "text-white font-medium"}`}>
                         {notif.message || notif.title || notif.body || "New notification"}
                       </p>
                       {notif.description && (
-                        <p className="text-dark-300 text-xs mt-0.5 leading-relaxed">
+                        <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">
                           {notif.description}
                         </p>
                       )}
@@ -245,14 +245,14 @@ export default function Notifications() {
 
                     {/* Time + actions */}
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      <span className="text-dark-400 text-xs whitespace-nowrap">
+                      <span className="text-gray-400 text-xs whitespace-nowrap">
                         {formatTime(notif.createdAt)}
                       </span>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {!notif.isRead && (
                           <button
                             onClick={(e) => { e.stopPropagation(); markRead(notif._id); }}
-                            className="p-1.5 rounded-lg bg-dark-600 hover:bg-primary-500/20 text-dark-300 hover:text-primary-400 transition-all"
+                            className="p-1.5 rounded-lg bg-white/8 hover:bg-primary-500/20 text-gray-400 hover:text-primary-400 transition-all"
                             title="Mark as read"
                           >
                             <Check size={12} />
@@ -260,7 +260,7 @@ export default function Notifications() {
                         )}
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteNotification(notif._id); }}
-                          className="p-1.5 rounded-lg bg-dark-600 hover:bg-red-500/20 text-dark-300 hover:text-red-400 transition-all"
+                          className="p-1.5 rounded-lg bg-white/8 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all"
                           title="Delete"
                         >
                           <Trash2 size={12} />
@@ -291,14 +291,14 @@ function NotificationsSkeleton() {
   return (
     <div className="space-y-2">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-dark-700 animate-pulse">
-          <div className="w-10 h-10 rounded-xl bg-dark-600 flex-shrink-0" />
+        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-white/5 animate-pulse">
+          <div className="w-10 h-10 rounded-xl bg-white/8 flex-shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 bg-dark-600 rounded w-1/5" />
-            <div className="h-3.5 bg-dark-600 rounded w-3/4" />
-            <div className="h-3 bg-dark-600 rounded w-1/3" />
+            <div className="h-3 bg-white/8 rounded w-1/5" />
+            <div className="h-3.5 bg-white/8 rounded w-3/4" />
+            <div className="h-3 bg-white/8 rounded w-1/3" />
           </div>
-          <div className="h-3 bg-dark-600 rounded w-10 flex-shrink-0" />
+          <div className="h-3 bg-white/8 rounded w-10 flex-shrink-0" />
         </div>
       ))}
     </div>

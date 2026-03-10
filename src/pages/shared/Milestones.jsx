@@ -12,7 +12,7 @@ import useAuthStore from "../../store/authStore";
 
 // ─── Status config ──────────────────────────────────────────────────────────
 const STATUS = {
-  locked:           { label: "Locked",           color: "text-dark-400",    bg: "bg-dark-600",       icon: Lock },
+  locked:           { label: "Locked",           color: "text-gray-400",    bg: "bg-white/8",       icon: Lock },
   proof_submitted:  { label: "Proof Submitted",  color: "text-yellow-400",  bg: "bg-yellow-500/20",  icon: Clock },
   approved:         { label: "Approved",          color: "text-primary-400", bg: "bg-primary-500/20", icon: CheckCircle },
   auto_released:    { label: "Auto-Released",     color: "text-blue-400",    bg: "bg-blue-500/20",    icon: RefreshCw },
@@ -128,7 +128,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
   };
 
   return (
-    <div className={`card border ${isDone ? "border-primary-500/30" : milestone.status === "disputed" ? "border-red-500/30" : milestone.status === "proof_submitted" ? "border-yellow-500/30" : "border-dark-500"}`}>
+    <div className={`card border ${isDone ? "border-primary-500/30" : milestone.status === "disputed" ? "border-red-500/30" : milestone.status === "proof_submitted" ? "border-yellow-500/30" : "border-white/10"}`}>
       {/* ── Header row ── */}
       <div
         className="flex items-center justify-between cursor-pointer"
@@ -136,12 +136,12 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
       >
         <div className="flex items-center gap-3">
           {/* Order badge */}
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isDone ? "bg-primary-500/20 text-primary-400" : "bg-dark-600 text-dark-300"}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isDone ? "bg-primary-500/20 text-primary-400" : "bg-white/8 text-gray-400"}`}>
             {milestone.order}
           </div>
           <div>
             <p className="font-semibold text-dark-100">{milestone.title}</p>
-            <p className="text-xs text-dark-400">${milestone.amount.toLocaleString()}</p>
+            <p className="text-xs text-gray-400">${milestone.amount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -152,19 +152,19 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
           {milestone.status === "proof_submitted" && milestone.autoReleaseAt && (
             <Countdown autoReleaseAt={milestone.autoReleaseAt} />
           )}
-          {expanded ? <ChevronUp size={16} className="text-dark-400" /> : <ChevronDown size={16} className="text-dark-400" />}
+          {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
         </div>
       </div>
 
       {/* ── Expanded content ── */}
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-dark-600 space-y-4">
-          <p className="text-sm text-dark-300">{milestone.description}</p>
+        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+          <p className="text-sm text-gray-400">{milestone.description}</p>
 
           {/* Proof files already submitted */}
           {milestone.proofFiles?.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-dark-400 uppercase tracking-wide mb-2">Proof Submitted</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Proof Submitted</p>
               <div className="space-y-1">
                 {milestone.proofFiles.map((f, i) => (
                   <a
@@ -179,7 +179,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
                 ))}
               </div>
               {milestone.proofNotes && (
-                <p className="mt-2 text-sm text-dark-300 italic">"{milestone.proofNotes}"</p>
+                <p className="mt-2 text-sm text-gray-400 italic">"{milestone.proofNotes}"</p>
               )}
             </div>
           )}
@@ -188,28 +188,28 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
           {milestone.adminNote && (
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
               <p className="text-xs font-semibold text-blue-400 mb-1">Admin Note</p>
-              <p className="text-sm text-dark-200">{milestone.adminNote}</p>
+              <p className="text-sm text-gray-400">{milestone.adminNote}</p>
             </div>
           )}
 
           {/* ── Creator actions ── */}
           {isCreator && milestone.status === "locked" && (
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-dark-400 uppercase tracking-wide">Submit Proof</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Submit Proof</p>
 
               {/* File upload */}
-              <label className="flex items-center gap-2 cursor-pointer border border-dashed border-dark-500 rounded-lg p-3 hover:border-primary-500/50 transition-colors">
-                <Upload size={16} className="text-dark-400" />
-                <span className="text-sm text-dark-300">Upload files (photos, receipts, video)</span>
+              <label className="flex items-center gap-2 cursor-pointer border border-dashed border-white/10 rounded-lg p-3 hover:border-primary-500/50 transition-colors">
+                <Upload size={16} className="text-gray-400" />
+                <span className="text-sm text-gray-400">Upload files (photos, receipts, video)</span>
                 <input type="file" multiple accept="image/*,video/*,.pdf" className="hidden" onChange={handleFileChange} />
               </label>
 
               {files.length > 0 && (
                 <div className="space-y-1">
                   {files.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between bg-dark-600 rounded px-3 py-1.5">
-                      <span className="text-xs text-dark-200 truncate">{f.name}</span>
-                      <button onClick={() => removeFile(i)} className="text-dark-400 hover:text-red-400 ml-2">
+                    <div key={i} className="flex items-center justify-between bg-white/8 rounded px-3 py-1.5">
+                      <span className="text-xs text-gray-400 truncate">{f.name}</span>
+                      <button onClick={() => removeFile(i)} className="text-gray-400 hover:text-red-400 ml-2">
                         <X size={13} />
                       </button>
                     </div>
@@ -268,7 +268,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
                     <button onClick={handleDispute} disabled={loading} className="flex-1 text-sm bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg px-4 py-2 hover:bg-red-500/30 transition-colors">
                       {loading ? "Submitting..." : "Submit Dispute"}
                     </button>
-                    <button onClick={() => setShowDispute(false)} className="flex-1 text-sm border border-dark-500 text-dark-300 rounded-lg px-4 py-2 hover:bg-dark-600 transition-colors">
+                    <button onClick={() => setShowDispute(false)} className="flex-1 text-sm border border-white/10 text-gray-400 rounded-lg px-4 py-2 hover:bg-white/8 transition-colors">
                       Cancel
                     </button>
                   </div>
@@ -279,7 +279,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
 
           {/* Approved / done state */}
           {isDone && milestone.approvedAt && (
-            <p className="text-xs text-dark-400">
+            <p className="text-xs text-gray-400">
               {milestone.status === "auto_released" ? "Auto-released" : "Approved"} on{" "}
               {new Date(milestone.approvedAt).toLocaleDateString()}
             </p>
@@ -338,14 +338,14 @@ function CreateMilestonesForm({ investment, onCreated }) {
 
       {/* Budget tracker */}
       <div className="flex justify-between text-sm">
-        <span className="text-dark-400">Total budget: <span className="text-dark-100 font-medium">${investment.amount.toLocaleString()}</span></span>
+        <span className="text-gray-400">Total budget: <span className="text-dark-100 font-medium">${investment.amount.toLocaleString()}</span></span>
         <span className={remaining < 0 ? "text-red-400" : remaining === 0 ? "text-primary-400" : "text-yellow-400"}>
           {remaining < 0 ? `Over by $${Math.abs(remaining).toFixed(2)}` : remaining === 0 ? "✓ Fully allocated" : `$${remaining.toFixed(2)} remaining`}
         </span>
       </div>
 
       {/* Budget bar */}
-      <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+      <div className="h-2 bg-white/8 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${totalEntered > investment.amount ? "bg-red-500" : "bg-primary-500"}`}
           style={{ width: `${Math.min((totalEntered / investment.amount) * 100, 100)}%` }}
@@ -354,11 +354,11 @@ function CreateMilestonesForm({ investment, onCreated }) {
 
       {/* Milestone rows */}
       {rows.map((row, i) => (
-        <div key={i} className="card border border-dark-500 space-y-3">
+        <div key={i} className="card border border-white/10 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-dark-200">Milestone {i + 1}</p>
+            <p className="text-sm font-semibold text-gray-400">Milestone {i + 1}</p>
             {rows.length > 1 && (
-              <button onClick={() => removeRow(i)} className="text-dark-400 hover:text-red-400">
+              <button onClick={() => removeRow(i)} className="text-gray-400 hover:text-red-400">
                 <Trash2 size={15} />
               </button>
             )}
@@ -378,7 +378,7 @@ function CreateMilestonesForm({ investment, onCreated }) {
               onChange={(e) => updateRow(i, "description", e.target.value)}
             />
             <div className="relative">
-              <DollarSign size={14} className="absolute left-3 top-3.5 text-dark-400" />
+              <DollarSign size={14} className="absolute left-3 top-3.5 text-gray-400" />
               <input
                 type="number"
                 className="input-field text-sm"
@@ -394,7 +394,7 @@ function CreateMilestonesForm({ investment, onCreated }) {
 
       <button
         onClick={addRow}
-        className="w-full border border-dashed border-dark-500 rounded-lg py-2.5 text-sm text-dark-300 hover:border-primary-500/50 hover:text-primary-400 transition-colors flex items-center justify-center gap-2"
+        className="w-full border border-dashed border-white/10 rounded-lg py-2.5 text-sm text-gray-400 hover:border-primary-500/50 hover:text-primary-400 transition-colors flex items-center justify-center gap-2"
       >
         <Plus size={15} /> Add Milestone
       </button>
@@ -434,13 +434,13 @@ export default function Milestones() {
       setMilestones(milRes.data.milestones || []);
       setSummary(milRes.data.summary);
       setNoMilestones((milRes.data.milestones || []).length === 0);
-    } catch (_err) {
+    } catch {
       // If milestones 404, investment might still be valid
       try {
         const invRes = await api.get(`/investments/${investmentId}`);
         setInvestment(invRes.data.investment);
         setNoMilestones(true);
-      } catch (_err) {
+      } catch {
         toast.error("Investment not found");
         navigate("/investments");
       }
@@ -472,23 +472,23 @@ export default function Milestones() {
         {/* Back */}
         <button
           onClick={() => navigate("/investments")}
-          className="flex items-center gap-2 text-sm text-dark-400 hover:text-dark-200 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-400 transition-colors"
         >
           <ArrowLeft size={15} /> Back to Investments
         </button>
 
         {/* Investment summary card */}
-        <div className="card border border-dark-500">
+        <div className="card border border-white/10">
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
               <h2 className="text-lg font-bold text-dark-100">
                 {isCreator ? investment.investor?.name : investment.creator?.name}
               </h2>
-              <p className="text-sm text-dark-400">
+              <p className="text-sm text-gray-400">
                 ${investment.amount.toLocaleString()} · {investment.profitSharePercentage}% for {investment.duration} months
               </p>
             </div>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium ${investment.status === "active" ? "bg-primary-500/20 text-primary-400" : "bg-dark-600 text-dark-300"}`}>
+            <span className={`text-xs px-2 py-1 rounded-full font-medium ${investment.status === "active" ? "bg-primary-500/20 text-primary-400" : "bg-white/8 text-gray-400"}`}>
               {investment.status}
             </span>
           </div>
@@ -496,20 +496,20 @@ export default function Milestones() {
           {/* Progress */}
           {summary && summary.totalAmount > 0 && (
             <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-xs text-dark-400">
+              <div className="flex justify-between text-xs text-gray-400">
                 <span>${summary.completedAmount.toLocaleString()} released</span>
                 <span>${summary.totalAmount.toLocaleString()} total</span>
               </div>
-              <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+              <div className="h-2 bg-white/8 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary-500 rounded-full transition-all"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <div className="flex gap-4 text-xs text-dark-400">
+              <div className="flex gap-4 text-xs text-gray-400">
                 <span><span className="text-primary-400 font-medium">{summary.completedCount}</span> completed</span>
                 <span><span className="text-yellow-400 font-medium">{summary.pendingCount}</span> pending review</span>
-                <span><span className="text-dark-300 font-medium">{summary.lockedCount}</span> locked</span>
+                <span><span className="text-gray-400 font-medium">{summary.lockedCount}</span> locked</span>
               </div>
             </div>
           )}
@@ -532,10 +532,10 @@ export default function Milestones() {
 
           {/* Investor — waiting */}
           {noMilestones && !isCreator && (
-            <div className="card border border-dark-500 text-center py-10">
-              <Clock size={32} className="text-dark-400 mx-auto mb-3" />
-              <p className="text-dark-300 font-medium">Awaiting milestone setup</p>
-              <p className="text-sm text-dark-500 mt-1">
+            <div className="card border border-white/10 text-center py-10">
+              <Clock size={32} className="text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-400 font-medium">Awaiting milestone setup</p>
+              <p className="text-sm text-gray-300 mt-1">
                 The creator hasn't set up their milestones yet.
               </p>
             </div>
@@ -554,8 +554,8 @@ export default function Milestones() {
 
         {/* How it works info box */}
         {!noMilestones && (
-          <div className="bg-dark-700 border border-dark-600 rounded-xl p-4 text-sm text-dark-400 space-y-1">
-            <p className="font-semibold text-dark-300 mb-2">How milestones work</p>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-400 space-y-1">
+            <p className="font-semibold text-gray-400 mb-2">How milestones work</p>
             <p>1. Creator completes a milestone task and submits photo/receipt/video proof.</p>
             <p>2. Investor reviews and approves — funds are released instantly.</p>
             <p>3. If the investor doesn't respond within 72 hours, funds auto-release.</p>

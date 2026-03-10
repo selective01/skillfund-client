@@ -1,22 +1,39 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import { Camera, Plus, Trash2, Save } from "lucide-react";
-import Layout from "../../components/layout/Layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCamera,
+  faPlus,
+  faTrash,
+  faFloppyDisk,
+  faCircleNotch,
+  faUser,
+  faImages,
+  faShareNodes,
+  faLocationDot,
+  faArrowTrendUp,
+  faWallet,
+  faCircleCheck,
+  faChevronDown,
+  faLock,
+  faGlobe,
+} from "@fortawesome/free-solid-svg-icons";
+import { faInstagram, faXTwitter, faLinkedin } from "@fortawesome/free-brands-svg-icons";
+
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 
 const SKILL_CATEGORIES = [
-  { value: "fashion", label: "Fashion & Tailoring" },
-  { value: "carpentry", label: "Carpentry & Woodwork" },
-  { value: "farming", label: "Farming & Agriculture" },
+  { value: "fashion",     label: "Fashion & Tailoring" },
+  { value: "carpentry",   label: "Carpentry & Woodwork" },
+  { value: "farming",     label: "Farming & Agriculture" },
   { value: "photography", label: "Photography & Video" },
-  { value: "baking", label: "Baking & Pastry" },
-  { value: "mechanics", label: "Mechanics & Auto" },
-  { value: "technology", label: "Technology & IT" },
-  { value: "hair", label: "Hair & Beauty" },
-  { value: "artisan", label: "Artisan & Crafts" },
-  { value: "other", label: "Other" },
+  { value: "baking",      label: "Baking & Pastry" },
+  { value: "mechanics",   label: "Mechanics & Auto" },
+  { value: "technology",  label: "Technology & IT" },
+  { value: "hair",        label: "Hair & Beauty" },
+  { value: "artisan",     label: "Artisan & Crafts" },
+  { value: "other",       label: "Other" },
 ];
 
 const INDUSTRIES = [
@@ -26,47 +43,45 @@ const INDUSTRIES = [
 
 const PORTFOLIO_LIMITS = { basic: 2, starter: 5, pro: 20, elite: "∞" };
 
+const TABS = [
+  { id: "profile",   label: "Profile",    icon: faUser },
+  { id: "portfolio", label: "Portfolio",  icon: faImages },
+  { id: "social",    label: "Social",     icon: faShareNodes },
+];
+
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
   const [profile, setProfile] = useState(null);
+  const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState("profile");
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [portfolioUploading, setPortfolioUploading] = useState(false);
+  const avatarInputRef = useRef(null);
+  const portfolioInputRef = useRef(null);
 
+  const isCreator = user?.role === "creator";
+  const portfolioLimit = PORTFOLIO_LIMITS[user?.plan] || 2;
+
+  // ─── Form state ───────────────────────────────────────────────────────────
   const [form, setForm] = useState({
-    bio: "",
-    location: "",
-    skill: "",
-    skillCategory: "other",
-    fundingGoal: "",
-    fundingPurpose: "",
-    projectedMonthlyIncome: "",
-    profitSharePercentage: "",
-    profitShareDuration: "",
-    isAcceptingInvestments: true,
-    investmentBudget: "",
+    bio: "", location: "",
+    // creator
+    skill: "", skillCategory: "other",
+    fundingGoal: "", fundingPurpose: "",
+    projectedMonthlyIncome: "", profitSharePercentage: "",
+    profitShareDuration: "", isAcceptingInvestments: true,
+    // investor
+    investmentBudget: "", preferredROI: "",
+    riskTolerance: "medium", preferredDuration: "",
     industriesOfInterest: [],
-    preferredROI: "",
-    riskTolerance: "medium",
-    preferredDuration: "",
-    socialLinks: {
-      instagram: "",
-      twitter: "",
-      linkedin: "",
-      website: "",
-    },
+    // social
+    socialLinks: { instagram: "", twitter: "", linkedin: "", website: "" },
   });
 
-  const [portfolioTitle, setPortfolioTitle] = useState("");
-  const [portfolioDescription, setPortfolioDescription] = useState("");
-  const [portfolioFile, setPortfolioFile] = useState(null);
-  const [portfolioPreview, setPortfolioPreview] = useState(null);
-
-  // Fix: define fetchProfile inside useEffect so it's stable and doesn't
-  // need to be listed as a dependency of the effect.
+  // ─── Load profile ─────────────────────────────────────────────────────────
   useEffect(() => {
-    const fetchProfile = async () => {
+    const load = async () => {
       try {
         const res = await api.get("/profiles/me");
         const p = res.data.profile;
@@ -83,58 +98,53 @@ export default function Profile() {
           profitShareDuration: p.profitShareDuration || "",
           isAcceptingInvestments: p.isAcceptingInvestments ?? true,
           investmentBudget: p.investmentBudget || "",
-          industriesOfInterest: p.industriesOfInterest || [],
           preferredROI: p.preferredROI || "",
           riskTolerance: p.riskTolerance || "medium",
           preferredDuration: p.preferredDuration || "",
-          socialLinks: p.socialLinks || {
-            instagram: "",
-            twitter: "",
-            linkedin: "",
-            website: "",
+          industriesOfInterest: p.industriesOfInterest || [],
+          socialLinks: {
+            instagram: p.socialLinks?.instagram || "",
+            twitter: p.socialLinks?.twitter || "",
+            linkedin: p.socialLinks?.linkedin || "",
+            website: p.socialLinks?.website || "",
           },
         });
       } catch {
-        // Profile doesn't exist yet — that's fine
+        // Profile may not exist yet — that's fine
       } finally {
         setLoading(false);
       }
     };
+    load();
+  }, []);
 
-    fetchProfile();
-  }, []); // runs once on mount
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (name.startsWith("socialLinks.")) {
-      const key = name.split(".")[1];
-      setForm((prev) => ({
-        ...prev,
-        socialLinks: { ...prev.socialLinks, [key]: value },
-      }));
-    } else {
-      setForm((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    }
-  };
-
-  const toggleIndustry = (industry) => {
-    setForm((prev) => ({
-      ...prev,
-      industriesOfInterest: prev.industriesOfInterest.includes(industry)
-        ? prev.industriesOfInterest.filter((i) => i !== industry)
-        : [...prev.industriesOfInterest, industry],
-    }));
-  };
-
+  // ─── Save profile ─────────────────────────────────────────────────────────
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await api.put("/profiles/me", form);
-      setProfile(res.data.profile);
-      toast.success("Profile saved successfully!");
+      const payload = {
+        bio: form.bio,
+        location: form.location,
+        socialLinks: form.socialLinks,
+        ...(isCreator ? {
+          skill: form.skill,
+          skillCategory: form.skillCategory,
+          fundingGoal: parseFloat(form.fundingGoal) || 0,
+          fundingPurpose: form.fundingPurpose,
+          projectedMonthlyIncome: parseFloat(form.projectedMonthlyIncome) || 0,
+          profitSharePercentage: parseFloat(form.profitSharePercentage) || 0,
+          profitShareDuration: parseInt(form.profitShareDuration) || 0,
+          isAcceptingInvestments: form.isAcceptingInvestments,
+        } : {
+          investmentBudget: parseFloat(form.investmentBudget) || 0,
+          preferredROI: parseFloat(form.preferredROI) || 0,
+          riskTolerance: form.riskTolerance,
+          preferredDuration: parseInt(form.preferredDuration) || 0,
+          industriesOfInterest: form.industriesOfInterest,
+        }),
+      };
+      await api.put("/profiles/me", payload);
+      toast.success("Profile saved!");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to save profile");
     } finally {
@@ -142,612 +152,473 @@ export default function Profile() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPortfolioFile(file);
-      setPortfolioPreview(URL.createObjectURL(file));
+  // ─── Avatar upload ────────────────────────────────────────────────────────
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const data = new FormData();
+      data.append("avatar", file);
+      const res = await api.put("/profiles/avatar", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const newAvatar = res.data.avatar;
+      setProfile((p) => ({ ...p, avatar: newAvatar }));
+      updateUser({ avatar: newAvatar });
+      toast.success("Avatar updated!");
+    } catch {
+      toast.error("Avatar upload failed");
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
-  const handlePortfolioUpload = async () => {
-    if (!portfolioFile || !portfolioTitle) {
-      toast.error("Please provide a title and image");
+  // ─── Portfolio upload ─────────────────────────────────────────────────────
+  const handlePortfolioUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const currentCount = profile?.portfolio?.length || 0;
+    if (typeof portfolioLimit === "number" && currentCount >= portfolioLimit) {
+      toast.error(`Your ${user?.plan} plan allows max ${portfolioLimit} portfolio items. Upgrade to add more.`);
       return;
     }
-    setUploading(true);
+    setPortfolioUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("image", portfolioFile);
-      formData.append("title", portfolioTitle);
-      formData.append("description", portfolioDescription);
-
-      const res = await api.post("/profiles/portfolio", formData, {
+      const data = new FormData();
+      data.append("image", file);
+      data.append("title", file.name.replace(/\.[^.]+$/, ""));
+      data.append("description", "");
+      const res = await api.post("/profiles/portfolio", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      setProfile((prev) => ({ ...prev, portfolio: res.data.portfolio }));
-      setPortfolioTitle("");
-      setPortfolioDescription("");
-      setPortfolioFile(null);
-      setPortfolioPreview(null);
-      toast.success("Portfolio item uploaded!");
+      setProfile((p) => ({ ...p, portfolio: res.data.portfolio }));
+      toast.success("Portfolio item added!");
     } catch (error) {
       toast.error(error.response?.data?.message || "Upload failed");
     } finally {
-      setUploading(false);
+      setPortfolioUploading(false);
     }
   };
 
-  const handleDeletePortfolio = async (itemId) => {
-    if (!window.confirm("Delete this portfolio item?")) return;
+  // ─── Portfolio delete ─────────────────────────────────────────────────────
+  const handlePortfolioDelete = async (itemId) => {
     try {
       const res = await api.delete(`/profiles/portfolio/${itemId}`);
-      setProfile((prev) => ({ ...prev, portfolio: res.data.portfolio }));
-      toast.success("Portfolio item deleted");
+      setProfile((p) => ({ ...p, portfolio: res.data.portfolio }));
+      toast.success("Item removed");
     } catch {
-      toast.error("Failed to delete portfolio item");
+      toast.error("Failed to delete item");
     }
   };
 
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    toast.loading("Uploading avatar...");
-    try {
-      const res = await api.put("/profiles/avatar", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      setProfile((prev) => ({ ...prev, avatar: res.data.avatar }));
-      updateUser({ ...user, avatar: res.data.avatar });
-
-      toast.dismiss();
-      toast.success("Avatar updated!");
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.response?.data?.message || "Avatar upload failed");
-    }
+  // ─── Industry toggle ──────────────────────────────────────────────────────
+  const toggleIndustry = (ind) => {
+    setForm((p) => ({
+      ...p,
+      industriesOfInterest: p.industriesOfInterest.includes(ind)
+        ? p.industriesOfInterest.filter((i) => i !== ind)
+        : [...p.industriesOfInterest, ind],
+    }));
   };
 
-  if (loading) {
-    return (
-      <Layout title="My Profile">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-dark-200">Loading profile...</div>
-        </div>
-      </Layout>
-    );
-  }
+  const avatar = profile?.avatar || user?.avatar;
+  const avatarInitial = (user?.name || "U").charAt(0).toUpperCase();
 
-  const tabs = ["profile"];
-  if (user?.role === "creator") tabs.push("portfolio");
-  tabs.push("social");
+  if (loading) return <ProfileSkeleton />;
 
   return (
-    <Layout title="My Profile">
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-dark-500 pb-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-xl font-medium capitalize transition-all ${
-              activeTab === tab
-                ? "bg-primary-500 text-white"
-                : "text-dark-200 hover:text-white hover:bg-dark-600"
-            }`}
+    <div className="space-y-6">
+      <style>{`
+        .sf-field { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .sf-field::placeholder { color:#5a8a63; }
+        .sf-field:focus { border-color:rgba(34,197,94,0.35); }
+        .sf-select { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; appearance:none; cursor:pointer; transition:border-color .2s; }
+        .sf-select:focus { border-color:rgba(34,197,94,0.35); }
+        .sf-select option { background:#070d08; }
+        .sf-label { display:block; font-size:11px; font-weight:700; font-family:'Syne',sans-serif; text-transform:uppercase; letter-spacing:.05em; color:#9ca3af; margin-bottom:5px; }
+        .sf-ind-pill { padding:5px 12px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#0a1209; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .sf-ind-pill.active { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.35); color:#22c55e; }
+        .sf-ind-pill:hover:not(.active) { border-color:rgba(34,197,94,0.2); color:#9ca3af; }
+        .sf-tab { padding:8px 18px; border-radius:10px; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; cursor:pointer; transition:all .15s; border:none; display:flex; align-items:center; gap:7px; }
+        .sf-tab.active { background:rgba(34,197,94,0.12); color:#22c55e; border:1px solid rgba(34,197,94,0.25); }
+        .sf-tab:not(.active) { background:transparent; color:#9ca3af; border:1px solid transparent; }
+        .sf-tab:not(.active):hover { color:#9ca3af; background:rgba(255,255,255,0.03); }
+        .sf-toggle { position:relative; width:44px; height:24px; border-radius:12px; border:none; cursor:pointer; transition:background .2s; flex-shrink:0; }
+        .sf-toggle-thumb { position:absolute; top:3px; width:18px; height:18px; border-radius:9px; background:#fff; transition:left .2s; }
+      `}</style>
+
+      {/* ── Header card ── */}
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "20px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
+        {/* Avatar */}
+        <div className="relative" style={{ flexShrink: 0 }}>
+          <div
+            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+            style={{ width: "80px", height: "80px", borderRadius: "20px", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: "28px", color: "#000", overflow: "hidden", border: "3px solid rgba(34,197,94,0.3)", cursor: "pointer", position: "relative" }}
           >
-            {tab}
+            {avatar ? <img src={avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : avatarInitial}
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity .2s" }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0}
+            >
+              <FontAwesomeIcon icon={avatarUploading ? faCircleNotch : faCamera} spin={avatarUploading} style={{ color: "#fff", fontSize: "18px" }} />
+            </div>
+          </div>
+          {/* Camera button overlay */}
+          <button
+            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+            style={{ position: "absolute", bottom: "-4px", right: "-4px", width: "26px", height: "26px", borderRadius: "8px", background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "2px solid #040806", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+          >
+            <FontAwesomeIcon icon={avatarUploading ? faCircleNotch : faCamera} spin={avatarUploading} style={{ color: "#000", fontSize: "10px" }} />
           </button>
-        ))}
+          <input ref={avatarInputRef} type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: "none" }} />
+        </div>
+
+        {/* Info */}
+        <div style={{ flex: 1, minWidth: "160px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <h2 className="text-white font-black" style={{ fontFamily: "'Syne', sans-serif", fontSize: "20px", margin: 0 }}>
+              {user?.name}
+            </h2>
+            {user?.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ color: "#22c55e", fontSize: "15px" }} />}
+          </div>
+          <p style={{ color: "#9ca3af", fontSize: "13px", margin: "0 0 8px", fontFamily: "'DM Sans', sans-serif" }}>
+            {user?.email}
+          </p>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
+              {user?.role}
+            </span>
+            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
+              {user?.plan} Plan
+            </span>
+          </div>
+        </div>
+
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", borderRadius: "12px", padding: "10px 20px", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", flexShrink: 0, width: "100%", maxWidth: "200px", opacity: saving ? 0.7 : 1 }}
+        >
+          <FontAwesomeIcon icon={saving ? faCircleNotch : faFloppyDisk} spin={saving} style={{ fontSize: "13px" }} />
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
       </div>
 
-      {/* ── PROFILE TAB ── */}
-      {activeTab === "profile" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Avatar Card */}
-          <div className="card text-center">
-            <div className="relative w-24 h-24 mx-auto mb-4">
-              <div className="w-24 h-24 rounded-full bg-primary-500/20 border-2 border-primary-500/30 flex items-center justify-center text-primary-400 font-bold text-3xl overflow-hidden">
-                {profile?.avatar || user?.avatar ? (
-                  <img
-                    src={profile?.avatar || user?.avatar}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  user?.name?.charAt(0).toUpperCase()
-                )}
-              </div>
-              <button
-                onClick={() => document.getElementById("avatarInput").click()}
-                className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors shadow-lg"
-              >
-                <Camera size={14} className="text-white" />
-              </button>
-              <input
-                id="avatarInput"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleAvatarUpload}
-                className="hidden"
-              />
-            </div>
+      {/* ── Tabs ── */}
+      <div style={{ display: "flex", gap: "6px" }}>
+        {TABS.map((tab) => {
+          // Hide portfolio tab for investors
+          if (tab.id === "portfolio" && !isCreator) return null;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`sf-tab ${activeTab === tab.id ? "active" : ""}`}
+            >
+              <FontAwesomeIcon icon={tab.icon} style={{ fontSize: "12px" }} />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
-            <p className="text-dark-300 text-xs mb-3">Click camera to change photo</p>
+      {/* ── Tab content ── */}
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px" }}>
 
-            <h3 className="text-white font-bold text-lg">{user?.name}</h3>
-            <p className="text-dark-200 text-sm capitalize">{user?.role}</p>
-            <div className="mt-3 flex justify-center gap-2 flex-wrap">
-              <span className="text-xs bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full capitalize">
-                {user?.plan} plan
-              </span>
-              {user?.isVerified && (
-                <span className="text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full">
-                  ✓ Verified
-                </span>
-              )}
-            </div>
-            {profile && (
-              <div className="mt-4 pt-4 border-t border-dark-500 text-left space-y-2">
-                <p className="text-dark-200 text-xs">
-                  📍 {profile.location || "No location set"}
-                </p>
-                <p className="text-dark-200 text-xs">
-                  👁 {profile.profileViews} profile views
-                </p>
-                {user?.role === "creator" && (
-                  <p className="text-dark-200 text-xs">
-                    💰 ${profile.amountRaised} raised
-                  </p>
-                )}
-                {user?.role === "investor" && (
-                  <p className="text-dark-200 text-xs">
-                    📊 ${profile.totalInvested} total invested
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
+        {/* Profile Tab */}
+        {activeTab === "profile" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
-          {/* Form */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Basic Info */}
-            <div className="card">
-              <h3 className="text-white font-bold mb-4">Basic Information</h3>
-              <div className="space-y-4">
+            {/* Basic info */}
+            <Section title="Basic Information">
+              <div style={{ display: "grid", gap: "14px" }}>
                 <div>
-                  <label className="block text-dark-100 text-sm font-medium mb-2">
-                    Bio
-                  </label>
+                  <label className="sf-label">Bio</label>
                   <textarea
-                    name="bio"
                     value={form.bio}
-                    onChange={handleChange}
-                    placeholder="Tell investors about yourself and your skill..."
+                    onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
+                    placeholder="Tell investors about yourself and your work..."
                     rows={4}
-                    className="input-field resize-none"
+                    className="sf-field"
+                    style={{ resize: "vertical" }}
                   />
                 </div>
                 <div>
-                  <label className="block text-dark-100 text-sm font-medium mb-2">
+                  <label className="sf-label">
+                    <FontAwesomeIcon icon={faLocationDot} style={{ marginRight: "5px" }} />
                     Location
                   </label>
                   <input
                     type="text"
-                    name="location"
                     value={form.location}
-                    onChange={handleChange}
-                    placeholder="Lagos, Nigeria"
-                    className="input-field"
+                    onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))}
+                    placeholder="e.g. Lagos, Nigeria"
+                    className="sf-field"
                   />
                 </div>
               </div>
-            </div>
+            </Section>
 
-            {/* Creator Fields */}
-            {user?.role === "creator" && (
-              <div className="card">
-                <h3 className="text-white font-bold mb-4">Skill & Funding</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+            {/* Creator fields */}
+            {isCreator && (
+              <>
+                <Section title="Skill & Expertise">
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                     <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Your Skill
-                      </label>
+                      <label className="sf-label">Skill / Trade</label>
                       <input
                         type="text"
-                        name="skill"
                         value={form.skill}
-                        onChange={handleChange}
-                        placeholder="e.g. Fashion Design"
-                        className="input-field"
+                        onChange={(e) => setForm((p) => ({ ...p, skill: e.target.value }))}
+                        placeholder="e.g. Tailoring, Photography..."
+                        className="sf-field"
                       />
                     </div>
                     <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Category
-                      </label>
-                      <select
-                        name="skillCategory"
-                        value={form.skillCategory}
-                        onChange={handleChange}
-                        className="input-field"
-                      >
-                        {SKILL_CATEGORIES.map((cat) => (
-                          <option key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="sf-label">Category</label>
+                      <div className="relative">
+                        <select value={form.skillCategory} onChange={(e) => setForm((p) => ({ ...p, skillCategory: e.target.value }))} className="sf-select">
+                          {SKILL_CATEGORIES.map((c) => (
+                            <option key={c.value} value={c.value}>{c.label}</option>
+                          ))}
+                        </select>
+                        <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
+                      </div>
+                    </div>
+                  </div>
+                </Section>
+
+                <Section title={<><FontAwesomeIcon icon={faArrowTrendUp} style={{ color: "#22c55e", marginRight: "6px" }} />Investment Terms</>}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    <div>
+                      <label className="sf-label">Funding Goal ($)</label>
+                      <input type="number" value={form.fundingGoal} onChange={(e) => setForm((p) => ({ ...p, fundingGoal: e.target.value }))} placeholder="5000" className="sf-field" />
+                    </div>
+                    <div>
+                      <label className="sf-label">Projected Monthly Income ($)</label>
+                      <input type="number" value={form.projectedMonthlyIncome} onChange={(e) => setForm((p) => ({ ...p, projectedMonthlyIncome: e.target.value }))} placeholder="1500" className="sf-field" />
+                    </div>
+                    <div>
+                      <label className="sf-label">Profit Share Offered (%)</label>
+                      <input type="number" value={form.profitSharePercentage} onChange={(e) => setForm((p) => ({ ...p, profitSharePercentage: e.target.value }))} placeholder="20" min="1" max="50" className="sf-field" />
+                    </div>
+                    <div>
+                      <label className="sf-label">Profit Share Duration (months)</label>
+                      <input type="number" value={form.profitShareDuration} onChange={(e) => setForm((p) => ({ ...p, profitShareDuration: e.target.value }))} placeholder="12" className="sf-field" />
+                    </div>
+                    <div style={{ gridColumn: "1/-1" }}>
+                      <label className="sf-label">Funding Purpose</label>
+                      <textarea value={form.fundingPurpose} onChange={(e) => setForm((p) => ({ ...p, fundingPurpose: e.target.value }))} placeholder="What will you use the investment for?" rows={3} className="sf-field" style={{ resize: "vertical" }} />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-dark-100 text-sm font-medium mb-2">
-                      Funding Purpose
-                    </label>
-                    <textarea
-                      name="fundingPurpose"
-                      value={form.fundingPurpose}
-                      onChange={handleChange}
-                      placeholder="What will you use the funding for?"
-                      rows={3}
-                      className="input-field resize-none"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
+                  {/* Accepting investments toggle */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "16px", padding: "14px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}>
                     <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Funding Goal ($)
-                      </label>
-                      <input
-                        type="number"
-                        name="fundingGoal"
-                        value={form.fundingGoal}
-                        onChange={handleChange}
-                        placeholder="2000"
-                        className="input-field"
-                      />
+                      <p style={{ color: "#fff", fontWeight: 700, fontSize: "14px", margin: "0 0 2px", fontFamily: "'Syne', sans-serif" }}>Accepting Investments</p>
+                      <p style={{ color: "#9ca3af", fontSize: "12px", margin: 0 }}>Allow investors to send you proposals</p>
                     </div>
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Projected Monthly Income ($)
-                      </label>
-                      <input
-                        type="number"
-                        name="projectedMonthlyIncome"
-                        value={form.projectedMonthlyIncome}
-                        onChange={handleChange}
-                        placeholder="800"
-                        className="input-field"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Profit Share (%)
-                      </label>
-                      <input
-                        type="number"
-                        name="profitSharePercentage"
-                        value={form.profitSharePercentage}
-                        onChange={handleChange}
-                        placeholder="20"
-                        min="1"
-                        max="50"
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Duration (months)
-                      </label>
-                      <input
-                        type="number"
-                        name="profitShareDuration"
-                        value={form.profitShareDuration}
-                        onChange={handleChange}
-                        placeholder="12"
-                        className="input-field"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-4 bg-dark-700 rounded-xl">
-                    <input
-                      type="checkbox"
-                      id="acceptingInvestments"
-                      name="isAcceptingInvestments"
-                      checked={form.isAcceptingInvestments}
-                      onChange={handleChange}
-                      className="w-4 h-4 accent-green-500"
-                    />
-                    <label
-                      htmlFor="acceptingInvestments"
-                      className="text-dark-100 text-sm cursor-pointer"
+                    <button
+                      onClick={() => setForm((p) => ({ ...p, isAcceptingInvestments: !p.isAcceptingInvestments }))}
+                      className="sf-toggle"
+                      style={{ background: form.isAcceptingInvestments ? "#22c55e" : "rgba(255,255,255,0.1)" }}
                     >
-                      I am currently accepting investments
-                    </label>
+                      <div className="sf-toggle-thumb" style={{ left: form.isAcceptingInvestments ? "23px" : "3px" }} />
+                    </button>
                   </div>
-                </div>
-              </div>
+                </Section>
+              </>
             )}
 
-            {/* Investor Fields */}
-            {user?.role === "investor" && (
-              <div className="card">
-                <h3 className="text-white font-bold mb-4">Investment Preferences</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Investment Budget ($)
-                      </label>
-                      <input
-                        type="number"
-                        name="investmentBudget"
-                        value={form.investmentBudget}
-                        onChange={handleChange}
-                        placeholder="5000"
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Preferred ROI (%)
-                      </label>
-                      <input
-                        type="number"
-                        name="preferredROI"
-                        value={form.preferredROI}
-                        onChange={handleChange}
-                        placeholder="18"
-                        className="input-field"
-                      />
-                    </div>
+            {/* Investor fields */}
+            {!isCreator && (
+              <Section title={<><FontAwesomeIcon icon={faWallet} style={{ color: "#22c55e", marginRight: "6px" }} />Investment Preferences</>}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                  <div>
+                    <label className="sf-label">Investment Budget ($)</label>
+                    <input type="number" value={form.investmentBudget} onChange={(e) => setForm((p) => ({ ...p, investmentBudget: e.target.value }))} placeholder="10000" className="sf-field" />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Risk Tolerance
-                      </label>
-                      <select
-                        name="riskTolerance"
-                        value={form.riskTolerance}
-                        onChange={handleChange}
-                        className="input-field"
-                      >
+                  <div>
+                    <label className="sf-label">Preferred ROI (%)</label>
+                    <input type="number" value={form.preferredROI} onChange={(e) => setForm((p) => ({ ...p, preferredROI: e.target.value }))} placeholder="15" className="sf-field" />
+                  </div>
+                  <div>
+                    <label className="sf-label">Risk Tolerance</label>
+                    <div className="relative">
+                      <select value={form.riskTolerance} onChange={(e) => setForm((p) => ({ ...p, riskTolerance: e.target.value }))} className="sf-select">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
                       </select>
-                    </div>
-                    <div>
-                      <label className="block text-dark-100 text-sm font-medium mb-2">
-                        Preferred Duration (months)
-                      </label>
-                      <input
-                        type="number"
-                        name="preferredDuration"
-                        value={form.preferredDuration}
-                        onChange={handleChange}
-                        placeholder="12"
-                        className="input-field"
-                      />
+                      <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-dark-100 text-sm font-medium mb-3">
-                      Industries of Interest
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {INDUSTRIES.map((industry) => (
-                        <button
-                          key={industry}
-                          type="button"
-                          onClick={() => toggleIndustry(industry)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${
-                            form.industriesOfInterest.includes(industry)
-                              ? "bg-primary-500 text-white"
-                              : "bg-dark-700 text-dark-200 hover:bg-dark-500 hover:text-white"
-                          }`}
-                        >
-                          {industry}
-                        </button>
-                      ))}
-                    </div>
+                    <label className="sf-label">Preferred Duration (months)</label>
+                    <input type="number" value={form.preferredDuration} onChange={(e) => setForm((p) => ({ ...p, preferredDuration: e.target.value }))} placeholder="12" className="sf-field" />
                   </div>
                 </div>
+
+                <div style={{ marginTop: "14px" }}>
+                  <label className="sf-label" style={{ marginBottom: "8px" }}>Industries of Interest</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {INDUSTRIES.map((ind) => (
+                      <button
+                        key={ind}
+                        onClick={() => toggleIndustry(ind)}
+                        className={`sf-ind-pill ${form.industriesOfInterest.includes(ind) ? "active" : ""}`}
+                      >
+                        {ind.charAt(0).toUpperCase() + ind.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </Section>
+            )}
+          </div>
+        )}
+
+        {/* Portfolio Tab (creators only) */}
+        {activeTab === "portfolio" && isCreator && (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+              <div>
+                <h3 style={{ color: "#fff", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 4px" }}>Portfolio</h3>
+                <p style={{ color: "#9ca3af", fontSize: "13px", margin: 0 }}>
+                  {profile?.portfolio?.length || 0} / {portfolioLimit} items · {user?.plan} plan
+                </p>
+              </div>
+              <button
+                onClick={() => portfolioInputRef.current?.click()}
+                disabled={portfolioUploading || (typeof portfolioLimit === "number" && (profile?.portfolio?.length || 0) >= portfolioLimit)}
+                style={{ display: "flex", alignItems: "center", gap: "7px", padding: "9px 16px", borderRadius: "11px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "13px", cursor: "pointer", opacity: portfolioUploading ? 0.7 : 1 }}
+              >
+                <FontAwesomeIcon icon={portfolioUploading ? faCircleNotch : faPlus} spin={portfolioUploading} style={{ fontSize: "12px" }} />
+                {portfolioUploading ? "Uploading..." : "Add Item"}
+              </button>
+              <input ref={portfolioInputRef} type="file" accept="image/*" onChange={handlePortfolioUpload} style={{ display: "none" }} />
+            </div>
+
+            {!profile?.portfolio?.length ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", border: "2px dashed rgba(255,255,255,0.1)", borderRadius: "16px" }}>
+                <FontAwesomeIcon icon={faImages} style={{ color: "#5a8a63", fontSize: "36px", marginBottom: "12px" }} />
+                <p style={{ color: "#9ca3af", fontSize: "14px", marginBottom: "16px" }}>No portfolio items yet</p>
+                <button
+                  onClick={() => portfolioInputRef.current?.click()}
+                  style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e", borderRadius: "10px", padding: "8px 20px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
+                >
+                  Upload first item
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px" }}>
+                {profile.portfolio.map((item) => (
+                  <div key={item._id} style={{ position: "relative", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", background: "#0a1209", aspectRatio: "1" }} className="group">
+                    <img src={item.imageUrl} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%)", opacity: 0, transition: "opacity .2s", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "12px" }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                      onMouseLeave={e => e.currentTarget.style.opacity = 0}
+                    >
+                      <p style={{ color: "#fff", fontSize: "12px", fontWeight: 700, margin: "0 0 6px", fontFamily: "'Syne', sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</p>
+                      <button
+                        onClick={() => handlePortfolioDelete(item._id)}
+                        style={{ display: "flex", alignItems: "center", gap: "5px", background: "rgba(239,68,68,0.85)", border: "none", borderRadius: "7px", padding: "5px 10px", color: "#fff", fontSize: "11px", fontWeight: 700, cursor: "pointer", width: "fit-content", fontFamily: "'Syne', sans-serif" }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} style={{ fontSize: "10px" }} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Locked slots */}
+                {typeof portfolioLimit === "number" &&
+                  Array.from({ length: Math.max(0, portfolioLimit - (profile.portfolio.length || 0)) }).map((_, i) => (
+                    <div key={`slot-${i}`} style={{ borderRadius: "14px", border: "2px dashed rgba(255,255,255,0.1)", aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                      <FontAwesomeIcon icon={faPlus} style={{ color: "#5a8a63", fontSize: "18px" }} />
+                      <span style={{ color: "#5a8a63", fontSize: "11px", fontFamily: "'Syne', sans-serif" }}>Empty slot</span>
+                    </div>
+                  ))
+                }
               </div>
             )}
 
-            {/* Save Button */}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="btn-primary w-full flex items-center justify-center gap-2"
-            >
-              <Save size={18} />
-              {saving ? "Saving..." : "Save Profile"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── PORTFOLIO TAB ── */}
-      {activeTab === "portfolio" && user?.role === "creator" && (
-        <div className="space-y-6">
-          <div className="card">
-            <h3 className="text-white font-bold mb-4">
-              Upload Portfolio Item
-              <span className="text-dark-200 text-sm font-normal ml-2">
-                ({profile?.portfolio?.length || 0}/
-                {PORTFOLIO_LIMITS[user?.plan]} used)
-              </span>
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Image Upload */}
-              <div>
-                <label className="block text-dark-100 text-sm font-medium mb-2">
-                  Image
-                </label>
-                <div
-                  className="border-2 border-dashed border-dark-400 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 transition-colors"
-                  onClick={() =>
-                    document.getElementById("portfolioInput").click()
-                  }
-                >
-                  {portfolioPreview ? (
-                    <img
-                      src={portfolioPreview}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-xl"
-                    />
-                  ) : (
-                    <div>
-                      <Camera size={32} className="text-dark-300 mx-auto mb-2" />
-                      <p className="text-dark-200 text-sm">Click to upload image</p>
-                      <p className="text-dark-300 text-xs mt-1">
-                        JPEG, PNG or WebP — max 5MB
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    id="portfolioInput"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
+            {/* Plan upgrade prompt */}
+            {user?.plan !== "elite" && (
+              <div style={{ marginTop: "20px", padding: "14px 16px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <FontAwesomeIcon icon={faLock} style={{ color: "#22c55e", fontSize: "13px" }} />
+                  <span style={{ color: "#9ca3af", fontSize: "13px", fontFamily: "'DM Sans', sans-serif" }}>
+                    Upgrade to <strong style={{ color: "#22c55e" }}>Pro</strong> or <strong style={{ color: "#22c55e" }}>Elite</strong> for more portfolio items
+                  </span>
                 </div>
+                <a href="/settings?tab=subscription" style={{ color: "#22c55e", fontSize: "12px", fontWeight: 700, fontFamily: "'Syne', sans-serif", textDecoration: "none" }}>
+                  Upgrade →
+                </a>
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Details */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-dark-100 text-sm font-medium mb-2">
-                    Title *
+        {/* Social Tab */}
+        {activeTab === "social" && (
+          <div>
+            <h3 style={{ color: "#fff", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 20px" }}>Social Links</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              {[
+                { key: "instagram", label: "Instagram",   icon: faInstagram, placeholder: "https://instagram.com/yourhandle", color: "#e1306c" },
+                { key: "twitter",   label: "X (Twitter)", icon: faXTwitter,  placeholder: "https://x.com/yourhandle",         color: "#9ca3af" },
+                { key: "linkedin",  label: "LinkedIn",    icon: faLinkedin,  placeholder: "https://linkedin.com/in/yourname", color: "#0a66c2" },
+                { key: "website",   label: "Website",     icon: faGlobe,     placeholder: "https://yourwebsite.com",          color: "#22c55e" },
+              ].map(({ key, label, icon, placeholder, color }) => (
+                <div key={key}>
+                  <label className="sf-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <FontAwesomeIcon icon={icon} style={{ color, fontSize: "13px" }} />
+                    {label}
                   </label>
                   <input
-                    type="text"
-                    value={portfolioTitle}
-                    onChange={(e) => setPortfolioTitle(e.target.value)}
-                    placeholder="e.g. Wedding Dress Collection"
-                    className="input-field"
+                    type="url"
+                    value={form.socialLinks[key]}
+                    onChange={(e) => setForm((p) => ({ ...p, socialLinks: { ...p.socialLinks, [key]: e.target.value } }))}
+                    placeholder={placeholder}
+                    className="sf-field"
                   />
-                </div>
-                <div>
-                  <label className="block text-dark-100 text-sm font-medium mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={portfolioDescription}
-                    onChange={(e) => setPortfolioDescription(e.target.value)}
-                    placeholder="Describe this piece of work..."
-                    rows={4}
-                    className="input-field resize-none"
-                  />
-                </div>
-                <button
-                  onClick={handlePortfolioUpload}
-                  disabled={uploading}
-                  className="btn-primary w-full flex items-center justify-center gap-2"
-                >
-                  <Plus size={18} />
-                  {uploading ? "Uploading..." : "Upload Item"}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Portfolio Grid */}
-          {profile?.portfolio?.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {profile.portfolio.map((item) => (
-                <div key={item._id} className="card p-0 overflow-hidden group">
-                  <div className="relative">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <button
-                      onClick={() => handleDeletePortfolio(item._id)}
-                      className="absolute top-2 right-2 w-8 h-8 bg-red-500/80 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
-                    >
-                      <Trash2 size={14} className="text-white" />
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <h4 className="text-white font-semibold">{item.title}</h4>
-                    {item.description && (
-                      <p className="text-dark-200 text-sm mt-1 line-clamp-2">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="card text-center py-12">
-              <Camera size={48} className="text-dark-300 mx-auto mb-4" />
-              <h3 className="text-white font-bold mb-2">No portfolio items yet</h3>
-              <p className="text-dark-200 text-sm">
-                Upload your work to attract investors
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── SOCIAL TAB ── */}
-      {activeTab === "social" && (
-        <div className="card max-w-xl">
-          <h3 className="text-white font-bold mb-6">Social Links</h3>
-          <div className="space-y-4">
-            {[
-              { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/yourhandle" },
-              { key: "twitter", label: "Twitter / X", placeholder: "https://twitter.com/yourhandle" },
-              { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/in/yourname" },
-              { key: "website", label: "Website", placeholder: "https://yourwebsite.com" },
-            ].map((social) => (
-              <div key={social.key}>
-                <label className="block text-dark-100 text-sm font-medium mb-2">
-                  {social.label}
-                </label>
-                <input
-                  type="url"
-                  name={`socialLinks.${social.key}`}
-                  value={form.socialLinks[social.key]}
-                  onChange={handleChange}
-                  placeholder={social.placeholder}
-                  className="input-field"
-                />
-              </div>
-            ))}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
-            >
-              <Save size={18} />
-              {saving ? "Saving..." : "Save Social Links"}
-            </button>
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+function Section({ title, children }) {
+  return (
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
+      <h4 style={{ color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px", display: "flex", alignItems: "center" }}>
+        {title}
+      </h4>
+      {children}
+    </div>
+  );
+}
+
+// ─── Loading skeleton ─────────────────────────────────────────────────────────
+function ProfileSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
+        <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "#0a1209", flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ height: "20px", background: "#0a1209", borderRadius: "6px", width: "160px", marginBottom: "8px" }} />
+          <div style={{ height: "13px", background: "#0a1209", borderRadius: "6px", width: "220px", marginBottom: "10px" }} />
+          <div style={{ height: "22px", background: "#0a1209", borderRadius: "999px", width: "80px" }} />
         </div>
-      )}
-    </Layout>
+      </div>
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px", height: "320px" }} />
+    </div>
   );
 }
