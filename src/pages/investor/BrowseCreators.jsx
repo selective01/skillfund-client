@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+
+const MatchRecommendations = lazy(() =>
+  import("../../components/MatchRecommendations").catch(() => ({ default: () => null }))
+);
 
 const SKILL_CATEGORIES = [
   { value: "", label: "All Categories" },
@@ -151,32 +155,40 @@ export default function BrowseCreators() {
   return (
     <div className="space-y-6">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
         .browse-input { background:#070d08; border:1px solid rgba(255,255,255,0.1); color:#ffffff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .browse-input:focus { border-color:rgba(34,197,94,0.4); }
         .browse-input::placeholder { color:#5a8a63; }
-        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Plus Jakarta Sans',sans-serif; white-space:nowrap; }
         .cat-pill:hover { border-color:rgba(34,197,94,0.3); color:#9ca3af; }
         .cat-pill.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Plus Jakarta Sans',sans-serif; }
         .page-btn:hover:not(:disabled) { border-color:rgba(34,197,94,0.3); color:#ffffff; }
         .page-btn.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
         select option { background:#070d08; color:#ffffff; }
       `}</style>
 
+      {/* ── AI Match Recommendations (investors only) ── */}
+      {user?.role === "investor" && (
+        <div className="mb-2">
+          <Suspense fallback={null}>
+            <MatchRecommendations />
+          </Suspense>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne', sans-serif", color: "#22c55e" }}>DISCOVER</p>
+            <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#22c55e" }}>DISCOVER</p>
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Creators</h2>
             <p className="text-sm mt-0.5" style={{ color: "#9ca3af" }}>
               {loading ? "Loading..." : <><span className="text-white font-semibold">{total}</span> skilled creators looking for investors</>}
             </p>
           </div>
           {user?.role === "creator" && (
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#f59e0b", fontFamily: "'Syne', sans-serif" }}>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#f59e0b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               👋 Switch to investor to invest in creators
             </div>
           )}
@@ -215,7 +227,7 @@ export default function BrowseCreators() {
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex-shrink-0"
           style={{
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             background: showFilters || hasActiveFilters ? "rgba(34,197,94,0.1)" : "#070d08",
             border: `1px solid ${showFilters || hasActiveFilters ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.1)"}`,
             color: showFilters || hasActiveFilters ? "#22c55e" : "#9ca3af",
@@ -230,20 +242,20 @@ export default function BrowseCreators() {
       {showFilters && (
         <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
+            <p className="text-white font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Advanced Filters</p>
             {hasActiveFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Syne', sans-serif" }}>
+              <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 <FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Clear all
               </button>
             )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MIN GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#9ca3af" }}>MIN GOAL ($)</label>
               <input type="number" value={minGoal} onChange={e => setMinGoal(e.target.value)} placeholder="0" className="browse-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MAX GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#9ca3af" }}>MAX GOAL ($)</label>
               <input type="number" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} placeholder="Any" className="browse-input" />
             </div>
             <div className="flex flex-col justify-end">
@@ -353,12 +365,12 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
         )}
         <div className="absolute top-3 left-3 flex gap-1.5">
           {isAcceptingInvestments && (
-            <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.9)", color: "#000" }}>
+            <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(34,197,94,0.9)", color: "#000" }}>
               <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" /> Open
             </span>
           )}
-          {plan === "elite" && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(245,158,11,0.85)", color: "#000" }}>⭐ Elite</span>}
-          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(168,85,247,0.85)", color: "#ffffff" }}>Pro</span>}
+          {plan === "elite" && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(245,158,11,0.85)", color: "#000" }}>⭐ Elite</span>}
+          {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(168,85,247,0.85)", color: "#ffffff" }}>Pro</span>}
         </div>
         <div className="absolute top-3 right-3">
           <span className="text-xs px-2.5 py-1 rounded-full capitalize" style={{ background: "rgba(0,0,0,0.5)", color: "#9ca3af", backdropFilter: "blur(4px)" }}>
@@ -370,13 +382,13 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
 
       {/* Body */}
       <div className="p-5 pt-10">
-        {/* ── Avatar — absolutely positioned to straddle cover/body line ── */}
+        {/* Avatar */}
         <div className="mb-3">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "3px solid rgba(34,197,94,0.5)", position: "absolute", top: "calc(128px - 28px)", left: "20px" }}>
             {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-white font-black text-base truncate" style={{ fontFamily: "'Syne', sans-serif" }}>{name}</h3>
+            <h3 className="text-white font-black text-base truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{name}</h3>
             {isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "13px", color: "#22c55e", flexShrink: 0 }} />}
           </div>
           <p className="text-sm font-semibold truncate" style={{ color: "#22c55e" }}>{skill}</p>
@@ -425,8 +437,15 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
             {isInvestor && isAcceptingInvestments && (
               <button
                 onClick={e => onInvest(creator, e)}
-                className="flex-1 flex items-center justify-center gap-1.5 font-black text-sm py-2.5 rounded-xl transition-all hover:scale-105 whitespace-nowrap"
-                style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 4px 16px rgba(34,197,94,0.3)" }}
+                className="flex-1 flex items-center justify-center gap-1.5 font-black text-sm rounded-xl transition-all hover:scale-105 whitespace-nowrap"
+                style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  background: "linear-gradient(135deg,#22c55e,#16a34a)",
+                  color: "#000",
+                  boxShadow: "0 4px 16px rgba(34,197,94,0.3)",
+                  padding: "0 16px",
+                  height: "42px",
+                }}
               >
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: "12px" }} /> Invest
               </button>
@@ -436,9 +455,11 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
                 <button
                   onClick={e => onConnect(id, e)}
                   disabled={connectLoading || connectionStatus === "pending" || connectionStatus === "accepted"}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
+                  className="flex items-center justify-center gap-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
                   style={{
-                    fontFamily: "'Syne', sans-serif",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    padding: "0 14px",
+                    height: "42px",
                     background: connectionStatus === "accepted" ? "rgba(34,197,94,0.1)" : connectionStatus === "pending" ? "rgba(245,158,11,0.1)" : "rgba(0,0,0,0.3)",
                     border: `1px solid ${connectionStatus === "accepted" ? "rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.1)"}`,
                     color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "#9ca3af",
@@ -452,8 +473,8 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
                 </button>
                 <button
                   onClick={e => onMessage(id, e)}
-                  className="flex items-center justify-center px-3 py-2.5 rounded-xl transition-all"
-                  style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
+                  className="flex items-center justify-center rounded-xl transition-all"
+                  style={{ padding: "0 14px", height: "42px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
                 >
                   <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} />
                 </button>
@@ -462,15 +483,15 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
             {currentUser?.role === "creator" && (
               <button
                 onClick={e => onMessage(id, e)}
-                className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold py-2.5 rounded-xl transition-all whitespace-nowrap"
-                style={{ fontFamily: "'Syne', sans-serif", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
+                className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold rounded-xl transition-all whitespace-nowrap"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", padding: "0 16px", height: "42px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
               >
                 <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} /> Message
               </button>
             )}
           </div>
         )}
-        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#5a8a63", fontFamily: "'Syne', sans-serif" }}>Your profile</div>}
+        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#5a8a63", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Your profile</div>}
       </div>
     </div>
   );
@@ -512,7 +533,7 @@ function EmptyState({ onClear, hasFilters }) {
         {hasFilters ? "No creators match your current filters. Try adjusting your search." : "No creators are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (
-        <button onClick={onClear} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
+        <button onClick={onClear} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
           Clear Filters
         </button>
       )}

@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const PLAN_FEES = { basic: 5, starter: 4, pro: 3, elite: 2 };
 
@@ -18,10 +19,10 @@ const PAYMENT_METHODS = [
 ];
 
 const STATUS_CONFIG = {
-  pending:   { label: "Pending",   color: "#f59e0b", bg: "rgba(245,158,11,0.08)",   border: "rgba(245,158,11,0.2)",  faIcon: faClock },
-  approved:  { label: "Approved",  color: "#60a5fa", bg: "rgba(59,130,246,0.08)",   border: "rgba(59,130,246,0.2)",  faIcon: faCircleCheck },
-  completed: { label: "Completed", color: "#22c55e", bg: "rgba(34,197,94,0.08)",    border: "rgba(34,197,94,0.2)",   faIcon: faCircleCheck },
-  rejected:  { label: "Rejected",  color: "#f87171", bg: "rgba(239,68,68,0.08)",    border: "rgba(239,68,68,0.2)",   faIcon: faCircleXmark },
+  pending:   { label: "Pending",   color: "#f59e0b", bg: "rgba(245,158,11,0.08)",   border: "rgba(245,158,11,0.35)",  faIcon: faClock },
+  approved:  { label: "Approved",  color: "#60a5fa", bg: "rgba(59,130,246,0.08)",   border: "rgba(59,130,246,0.35)",  faIcon: faCircleCheck },
+  completed: { label: "Completed", color: "#22c55e", bg: "rgba(34,197,94,0.08)",    border: "rgba(34,197,94,0.35)",   faIcon: faCircleCheck },
+  rejected:  { label: "Rejected",  color: "#f87171", bg: "rgba(239,68,68,0.08)",    border: "rgba(239,68,68,0.35)",   faIcon: faCircleXmark },
 };
 
 function FieldLabel({ children }) {
@@ -47,6 +48,7 @@ function Textarea({ ...props }) {
 }
 
 export default function Withdraw() {
+  useNotificationReadOnView();
   const { user }   = useAuthStore();
   const plan       = user?.plan || "basic";
   const feePercent = PLAN_FEES[plan] ?? 5;
@@ -116,7 +118,7 @@ export default function Withdraw() {
       `}</style>
 
       {/* ── Header ── */}
-        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
           <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter: "blur(20px)" }} />
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
           <div className="relative">
@@ -139,9 +141,9 @@ export default function Withdraw() {
               </div>
             ))
           ) : [
-            { label: "Available Balance", value: balance !== null ? `$${Number(balance).toLocaleString()}` : "—", sub: `${plan} plan · ${feePercent}% fee`, icon: faWallet,      iconColor: "#22c55e", bg: "var(--card-green)", border: "rgba(34,197,94,0.15)" },
-            { label: "Pending",           value: `$${pendingAmount.toLocaleString()}`,                                 sub: "Being processed",                    icon: faClock,       iconColor: "#f59e0b", bg: "var(--card-amber)", border: "rgba(245,158,11,0.15)" },
-            { label: "Total Withdrawn",   value: `$${totalWithdrawn.toLocaleString()}`,                                sub: "All time",                           icon: faCircleCheck, iconColor: "#22c55e", bg: "var(--card-blue)", border: "rgba(34,197,94,0.15)" },
+            { label: "Available Balance", value: balance !== null ? `$${Number(balance).toLocaleString()}` : "—", sub: `${plan} plan · ${feePercent}% fee`, icon: faWallet,      iconColor: "#22c55e", bg: "var(--card-green)", border: "rgba(34,197,94,0.30)" },
+            { label: "Pending",           value: `$${pendingAmount.toLocaleString()}`,                                 sub: "Being processed",                    icon: faClock,       iconColor: "#f59e0b", bg: "var(--card-amber)", border: "rgba(245,158,11,0.30)" },
+            { label: "Total Withdrawn",   value: `$${totalWithdrawn.toLocaleString()}`,                                sub: "All time",                           icon: faCircleCheck, iconColor: "#22c55e", bg: "var(--card-blue)", border: "rgba(34,197,94,0.30)" },
           ].map(s => (
             <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.35)" }}>
               <div className="flex items-center justify-between mb-3">
@@ -205,7 +207,7 @@ export default function Withdraw() {
 
             {/* Upgrade hint */}
             {plan !== "elite" && (
-              <div className="flex items-start gap-2.5 rounded-xl p-3.5" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.12)" }}>
+              <div className="flex items-start gap-2.5 rounded-xl p-3.5" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.28)" }}>
                 <FontAwesomeIcon icon={faCircleInfo} style={{ fontSize: "13px", color: "#22c55e", flexShrink: 0, marginTop: "1px" }} />
                 <p className="text-xs" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif" }}>
                   Upgrade to <span style={{ color: "#22c55e", fontWeight: 700 }}>Elite</span> to reduce your fee to 2%.{" "}
@@ -245,7 +247,7 @@ export default function Withdraw() {
               </div>
             )}
             {method === "paystack" && (
-              <div className="rounded-xl p-3.5 flex items-center gap-2.5" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)" }}>
+              <div className="rounded-xl p-3.5 flex items-center gap-2.5" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.30)" }}>
                 <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "14px", color: "#22c55e" }} />
                 <p className="text-sm" style={{ color: "var(--text-secondary)", fontFamily: "'DM Sans',sans-serif" }}>
                   Funds sent to <span className="text-white font-bold">{user?.email}</span>

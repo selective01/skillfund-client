@@ -15,18 +15,19 @@ import {
 } from "recharts";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  active:    { label:"Active",    color:"#22c55e", bg:"rgba(34,197,94,0.08)",    border:"rgba(34,197,94,0.2)",    faIcon:faHeartPulse   },
-  pending:   { label:"Pending",   color:"#f59e0b", bg:"rgba(245,158,11,0.08)",   border:"rgba(245,158,11,0.2)",   faIcon:faClock        },
-  completed: { label:"Completed", color:"#60a5fa", bg:"rgba(59,130,246,0.08)",   border:"rgba(59,130,246,0.2)",   faIcon:faCircleCheck  },
-  disputed:  { label:"Disputed",  color:"#f87171", bg:"rgba(239,68,68,0.08)",    border:"rgba(239,68,68,0.2)",    faIcon:faCircleExclamation },
-  cancelled: { label:"Cancelled", color:"#6b7280", bg:"rgba(255,255,255,0.04)",  border:"rgba(255,255,255,0.08)", faIcon:faCircleXmark  },
+  active:    { label:"Active",    color:"#22c55e", bg:"rgba(34,197,94,0.08)",    border:"rgba(34,197,94,0.35)",    faIcon:faHeartPulse   },
+  pending:   { label:"Pending",   color:"#f59e0b", bg:"rgba(245,158,11,0.08)",   border:"rgba(245,158,11,0.35)",   faIcon:faClock        },
+  completed: { label:"Completed", color:"#60a5fa", bg:"rgba(59,130,246,0.08)",   border:"rgba(59,130,246,0.35)",   faIcon:faCircleCheck  },
+  disputed:  { label:"Disputed",  color:"#f87171", bg:"rgba(239,68,68,0.08)",    border:"rgba(239,68,68,0.35)",    faIcon:faCircleExclamation },
+  cancelled: { label:"Cancelled", color:"#6b7280", bg:"rgba(255,255,255,0.18)",  border:"rgba(255,255,255,0.2)", faIcon:faCircleXmark  },
 };
 const PIE_COLORS = ["#22c55e","#3b82f6","#a855f7","#f59e0b","#ef4444","#06b6d4"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const CHART_STYLE = { contentStyle:{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"12px" }, labelStyle:{ color:"#fff", fontFamily:"'Syne',sans-serif", fontSize:"12px" } };
+const CHART_STYLE = { contentStyle:{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)", borderRadius:"12px" }, labelStyle:{ color:"#fff", fontFamily:"'Syne',sans-serif", fontSize:"12px" } };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 const fmt = val => { const n = parseFloat(val)||0; return n>=1000 ? `$${(n/1000).toFixed(1)}k` : `$${n.toFixed(0)}`; };
@@ -45,15 +46,15 @@ const DS_STYLES = `
 `;
 
 const CARD_THEMES = [
-  { bg:"linear-gradient(135deg,#0f2e10,#091e09)", border:"rgba(34,197,94,0.15)",  accent:"#22c55e" },
-  { bg:"linear-gradient(135deg,#0f2244,#091830)", border:"rgba(59,130,246,0.15)", accent:"#3b82f6" },
-  { bg:"linear-gradient(135deg,#220f44,#180930)", border:"rgba(168,85,247,0.15)", accent:"#a855f7" },
-  { bg:"linear-gradient(135deg,#3d2200,#2a1600)", border:"rgba(245,158,11,0.15)", accent:"#f59e0b" },
+  { bg:"linear-gradient(135deg,#0f2e10,#091e09)", border:"rgba(34,197,94,0.30)",  accent:"#22c55e" },
+  { bg:"linear-gradient(135deg,#0f2244,#091830)", border:"rgba(59,130,246,0.30)", accent:"#3b82f6" },
+  { bg:"linear-gradient(135deg,#220f44,#180930)", border:"rgba(168,85,247,0.30)", accent:"#a855f7" },
+  { bg:"linear-gradient(135deg,#3d2200,#2a1600)", border:"rgba(245,158,11,0.30)", accent:"#f59e0b" },
 ];
 
 function PageHeader({ title, subtitle, accentLabel, accentIcon }) {
   return (
-    <div className="ie-in relative rounded-3xl p-6 mb-6 overflow-hidden" style={{ background:"linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border:"1px solid rgba(34,197,94,0.2)", boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
+    <div className="ie-in relative rounded-3xl p-6 mb-6 overflow-hidden" style={{ background:"linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border:"1px solid rgba(34,197,94,0.35)", boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
       <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background:"radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter:"blur(20px)" }} />
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage:"linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize:"32px 32px" }} />
       <div className="relative">
@@ -112,7 +113,7 @@ function ViewToggle({ view, setView, isCreator }) {
     { key: "earnings", label: "Earnings", faIcon: faChartBar },
   ];
   return (
-    <div className="flex gap-1 p-1 rounded-2xl" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+    <div className="flex gap-1 p-1 rounded-2xl" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
       {tabs.map(t => {
         const isActive = view === t.key;
         return (
@@ -130,9 +131,9 @@ function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {Array.from({length:4}).map((_,i) => (
-        <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
-          <div className="h-3 rounded-full w-1/2 mb-5" style={{ background:"rgba(255,255,255,0.1)" }} />
-          <div className="h-8 rounded-full w-1/3" style={{ background:"rgba(255,255,255,0.1)" }} />
+        <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
+          <div className="h-3 rounded-full w-1/2 mb-5" style={{ background:"rgba(255,255,255,0.2)" }} />
+          <div className="h-8 rounded-full w-1/3" style={{ background:"rgba(255,255,255,0.2)" }} />
         </div>
       ))}
     </div>
@@ -143,12 +144,12 @@ function ListSkeleton() {
   return (
     <div className="space-y-3">
       {Array.from({length:3}).map((_,i) => (
-        <div key={i} className="rounded-xl p-4 animate-pulse" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.1)" }}>
+        <div key={i} className="rounded-xl p-4 animate-pulse" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl" style={{ background:"rgba(255,255,255,0.1)" }} />
+            <div className="w-10 h-10 rounded-xl" style={{ background:"rgba(255,255,255,0.2)" }} />
             <div className="flex-1 space-y-1.5">
-              <div className="h-3.5 rounded-full w-1/3" style={{ background:"rgba(255,255,255,0.1)" }} />
-              <div className="h-3 rounded-full w-1/4" style={{ background:"rgba(255,255,255,0.1)" }} />
+              <div className="h-3.5 rounded-full w-1/3" style={{ background:"rgba(255,255,255,0.2)" }} />
+              <div className="h-3 rounded-full w-1/4" style={{ background:"rgba(255,255,255,0.2)" }} />
             </div>
           </div>
         </div>
@@ -172,6 +173,7 @@ function EmptyBox({ faIcon, iconColor="#9ca3af", title, message, btnLabel, onBtn
 // MAIN EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 export default function InvestmentsEarnings() {
+  useNotificationReadOnView();
   const { user } = useAuthStore();
   return user?.role === "investor" ? <InvestorView /> : <CreatorView />;
 }
@@ -269,7 +271,7 @@ function InvestorView() {
             <Section title="Monthly Returns" accentColor="#22c55e">
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={monthlyReturnData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
                   <XAxis dataKey="month" tick={{ fill:"#9ca3af", fontSize:11 }} />
                   <YAxis tick={{ fill:"#9ca3af", fontSize:11 }} tickFormatter={v=>`$${v}`} />
                   <Tooltip {...CHART_STYLE} formatter={v=>[`$${v}`,"Returns"]} />
@@ -297,7 +299,7 @@ function InvestorView() {
               <Section title="Monthly Returns" accentColor="#22c55e">
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={monthlyReturnData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
                     <XAxis dataKey="month" tick={{ fill:"#9ca3af", fontSize:11 }} />
                     <YAxis tick={{ fill:"#9ca3af", fontSize:11 }} tickFormatter={v=>`$${v}`} />
                     <Tooltip {...CHART_STYLE} formatter={v=>[`$${v}`,"Returns"]} />
@@ -328,9 +330,9 @@ function InvestorView() {
           )}
           <Section title="My Investments" accentColor="#22c55e"
             action={
-              <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.1)" }}>
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
                 {["all","active","pending","completed"].map(tab=>(
-                  <button key={tab} onClick={()=>setActiveTab(tab)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:activeTab===tab?"rgba(34,197,94,0.12)":"transparent", border:activeTab===tab?"1px solid rgba(34,197,94,0.2)":"1px solid transparent", color:activeTab===tab?"#22c55e":"#9ca3af" }}>
+                  <button key={tab} onClick={()=>setActiveTab(tab)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:activeTab===tab?"rgba(34,197,94,0.12)":"transparent", border:activeTab===tab?"1px solid rgba(34,197,94,0.35)":"1px solid transparent", color:activeTab===tab?"#22c55e":"#9ca3af" }}>
                     {tab}
                   </button>
                 ))}
@@ -384,19 +386,19 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.1)" }}>
+        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
           <div className="pt-3">
             <div className="flex justify-between mb-1.5 text-xs">
               <span style={{ color:"#6b7280" }}>Returns received</span>
               <span className="font-bold text-white">${totalReturns.toLocaleString()} / ${projectedTotal.toLocaleString()} ({progressPct}%)</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.1)" }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.2)" }}>
               <div className="h-full rounded-full transition-all duration-700" style={{ width:`${progressPct}%`, background:"linear-gradient(90deg,#16a34a,#22c55e,#4ade80)" }} />
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[{label:"Invested",value:`$${amount.toLocaleString()}`},{label:"Profit Share",value:`${profitShare}%`},{label:"Duration",value:`${duration}mo`},{label:"Projected ROI",value:`$${projectedTotal.toLocaleString()}`}].map(d=>(
-              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
                 <p className="text-xs mb-1" style={{ color:"#9ca3af", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
                 <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>{d.value}</p>
               </div>
@@ -407,7 +409,7 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
               <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>EARNINGS HISTORY</p>
               <div className="space-y-1.5 max-h-40 overflow-y-auto">
                 {inv.earnings.map((e,i)=>(
-                  <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+                  <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
                     <span style={{ color:"#6b7280" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
                     <span style={{ color:"#6b7280" }}>Earned: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
                     <span style={{ color:"#22c55e", fontWeight:700 }}>+${parseFloat(e.investorShare||0).toLocaleString()}</span>
@@ -418,15 +420,15 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
             </div>
           )}
           <div className="flex gap-2 flex-wrap pt-1">
-            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e" }}>
+            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.35)", color:"#22c55e" }}>
               <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"12px" }} /> Milestones
             </button>
-            <button onClick={()=>navigate(`/messages?userId=${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#6b7280" }}
-              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
+            <button onClick={()=>navigate(`/messages?userId=${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               Message Creator
             </button>
-            <button onClick={()=>navigate(`/creators/${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#6b7280" }}
-              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
+            <button onClick={()=>navigate(`/creators/${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize:"12px" }} /> View Profile
             </button>
           </div>
@@ -445,9 +447,9 @@ function EarningsList({ earnings, type }) {
         const avatar = type==="investor" ? e.creatorAvatar : e.investorAvatar;
         const net    = type==="creator" ? (parseFloat(e.creatorIncome)||0)-(parseFloat(e.investorShare)||0)-(parseFloat(e.platformFee)||0) : null;
         return (
-          <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.1)" }}
-            onMouseEnter={ev=>ev.currentTarget.style.borderColor="rgba(34,197,94,0.2)"} onMouseLeave={ev=>ev.currentTarget.style.borderColor="rgba(255,255,255,0.1)"}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:type==="investor"?"rgba(34,197,94,0.12)":"rgba(59,130,246,0.12)", border:`1px solid ${type==="investor"?"rgba(34,197,94,0.2)":"rgba(59,130,246,0.2)"}`, color:type==="investor"?"#22c55e":"#3b82f6" }}>
+          <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}
+            onMouseEnter={ev=>ev.currentTarget.style.borderColor="rgba(34,197,94,0.35)"} onMouseLeave={ev=>ev.currentTarget.style.borderColor="rgba(255,255,255,0.2)"}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:type==="investor"?"rgba(34,197,94,0.12)":"rgba(59,130,246,0.12)", border:`1px solid ${type==="investor"?"rgba(34,197,94,0.35)":"rgba(59,130,246,0.35)"}`, color:type==="investor"?"#22c55e":"#3b82f6" }}>
               {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -463,7 +465,7 @@ function EarningsList({ earnings, type }) {
                 {type==="investor" ? `+$${parseFloat(e.investorShare||0).toLocaleString()}` : `$${Math.max(0,net).toFixed(0)}`}
               </p>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif", background:e.isPaid?"rgba(34,197,94,0.08)":"rgba(245,158,11,0.08)", border:e.isPaid?"1px solid rgba(34,197,94,0.2)":"1px solid rgba(245,158,11,0.2)", color:e.isPaid?"#22c55e":"#f59e0b" }}>
+            <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif", background:e.isPaid?"rgba(34,197,94,0.08)":"rgba(245,158,11,0.08)", border:e.isPaid?"1px solid rgba(34,197,94,0.35)":"1px solid rgba(245,158,11,0.35)", color:e.isPaid?"#22c55e":"#f59e0b" }}>
               <FontAwesomeIcon icon={e.isPaid?faCircleCheck:faClock} style={{ fontSize:"10px" }} />
               {e.isPaid?"Paid":"Pending"}
             </span>
@@ -555,7 +557,7 @@ function CreatorView() {
       {view==="earnings" && (
         <div className="ie-in space-y-4" style={{ animationDelay:".12s" }}>
           {!loading && unreported.length>0 && (
-            <div className="rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap" style={{ background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.2)" }}>
+            <div className="rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap" style={{ background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.35)" }}>
               <div className="flex items-center gap-3">
                 <FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize:"16px", color:"#f59e0b", flexShrink:0 }} />
                 <div>
@@ -565,7 +567,7 @@ function CreatorView() {
                   <p className="text-xs" style={{ color:"rgba(245,158,11,0.7)", fontFamily:"'DM Sans',sans-serif" }}>Keep your investors informed.</p>
                 </div>
               </div>
-              <button onClick={()=>setView("investments")} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(245,158,11,0.12)", border:"1px solid rgba(245,158,11,0.2)", color:"#f59e0b" }}>
+              <button onClick={()=>setView("investments")} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(245,158,11,0.12)", border:"1px solid rgba(245,158,11,0.35)", color:"#f59e0b" }}>
                 Go to Investments <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize:"11px" }} />
               </button>
             </div>
@@ -574,7 +576,7 @@ function CreatorView() {
             <Section title="Monthly Earnings Overview" accentColor="#22c55e">
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={earningsChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
                   <XAxis dataKey="month" tick={{ fill:"#9ca3af", fontSize:11 }} />
                   <YAxis tick={{ fill:"#9ca3af", fontSize:11 }} tickFormatter={v=>`$${v}`} />
                   <Tooltip {...CHART_STYLE} />
@@ -592,9 +594,9 @@ function CreatorView() {
             action={
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faFilter} style={{ fontSize:"11px", color:"#9ca3af" }} />
-                <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.1)" }}>
+                <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
                   {["all","paid","pending"].map(f=>(
-                    <button key={f} onClick={()=>setEarningsFilter(f)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:earningsFilter===f?"rgba(34,197,94,0.12)":"transparent", border:earningsFilter===f?"1px solid rgba(34,197,94,0.2)":"1px solid transparent", color:earningsFilter===f?"#22c55e":"#9ca3af" }}>
+                    <button key={f} onClick={()=>setEarningsFilter(f)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:earningsFilter===f?"rgba(34,197,94,0.12)":"transparent", border:earningsFilter===f?"1px solid rgba(34,197,94,0.35)":"1px solid transparent", color:earningsFilter===f?"#22c55e":"#9ca3af" }}>
                       {f}
                     </button>
                   ))}
@@ -637,7 +639,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
   return (
     <div className="rounded-xl overflow-hidden transition-all" style={{ background:"#0a1209", border:`1px solid ${sc.border}` }}>
       <div className="flex items-center gap-3 p-4 cursor-pointer" onClick={onToggle}>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1px solid rgba(59,130,246,0.2)", color:"#3b82f6" }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1px solid rgba(59,130,246,0.35)", color:"#3b82f6" }}>
           {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
@@ -657,7 +659,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
         </div>
         <StatusBadge status={inv.status} />
         {inv.status==="active" && !alreadyReported && (
-          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", color:"#f59e0b" }}>
+          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.35)", color:"#f59e0b" }}>
             <FontAwesomeIcon icon={faClock} style={{ fontSize:"9px" }} /> Report due
           </span>
         )}
@@ -667,10 +669,10 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.1)" }}>
+        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
           <div className="pt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[{label:"Amount Received",value:`$${amount.toLocaleString()}`},{label:"Profit Share",value:`${profitShare}%`},{label:"Duration",value:`${duration}mo`},{label:"Monthly Payout",value:`$${monthlyPayout.toFixed(0)}`}].map(d=>(
-              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
                 <p className="text-xs mb-1" style={{ color:"#9ca3af", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
                 <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>{d.value}</p>
               </div>
@@ -679,11 +681,11 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
 
           {inv.status==="active" && (
             alreadyReported
-              ? <div className="flex items-center gap-2.5 rounded-xl p-3.5" style={{ background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.2)" }}>
+              ? <div className="flex items-center gap-2.5 rounded-xl p-3.5" style={{ background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.35)" }}>
                   <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"14px", color:"#22c55e" }} />
                   <span className="text-sm font-bold" style={{ color:"#22c55e", fontFamily:"'Syne',sans-serif" }}>Reported for {MONTHS[month-1]} {year}</span>
                 </div>
-              : <button onClick={e=>{e.stopPropagation();onReport();}} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e" }}>
+              : <button onClick={e=>{e.stopPropagation();onReport();}} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.35)", color:"#22c55e" }}>
                   <FontAwesomeIcon icon={faFileLines} style={{ fontSize:"13px" }} /> Report {MONTHS[month-1]} {year} Earnings
                 </button>
           )}
@@ -699,7 +701,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
                 {[...inv.earnings].reverse().map((e,i)=>{
                   const net=(parseFloat(e.creatorIncome)||0)-(parseFloat(e.investorShare)||0)-(parseFloat(e.platformFee)||0);
                   return (
-                    <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+                    <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
                       <span style={{ color:"#6b7280" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
                       <span style={{ color:"#6b7280" }}>Income: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
                       <span style={{ color:"#f87171", fontWeight:700 }}>-${parseFloat(e.investorShare||0).toLocaleString()}</span>
@@ -712,10 +714,10 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
           )}
 
           {/* Investor profile */}
-          <div className="rounded-xl p-4" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.1)" }}>
+          <div className="rounded-xl p-4" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
             <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>INVESTOR PROFILE</p>
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-base overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1.5px solid rgba(59,130,246,0.2)", color:"#3b82f6" }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-base overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1.5px solid rgba(59,130,246,0.35)", color:"#3b82f6" }}>
                 {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0 space-y-1">
@@ -730,7 +732,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
                 {investor.profile?.industriesOfInterest?.length>0 && (
                   <div className="flex flex-wrap gap-1 pt-1">
                     {investor.profile.industriesOfInterest.slice(0,4).map(ind=>(
-                      <span key={ind} className="text-xs capitalize px-2 py-0.5 rounded-full" style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#6b7280" }}>{ind}</span>
+                      <span key={ind} className="text-xs capitalize px-2 py-0.5 rounded-full" style={{ background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}>{ind}</span>
                     ))}
                   </div>
                 )}
@@ -739,11 +741,11 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
           </div>
 
           <div className="flex gap-2 flex-wrap">
-            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#6b7280" }}
-              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
+            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+              onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"12px" }} /> Milestones
             </button>
-            <button onClick={()=>navigate(`/messages?userId=${investor._id||inv.investorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e" }}>
+            <button onClick={()=>navigate(`/messages?userId=${investor._id||inv.investorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.35)", color:"#22c55e" }}>
               Message Investor
             </button>
           </div>
@@ -774,7 +776,7 @@ function ReportForm({ inv, onReported, onClose }) {
   };
 
   return (
-    <div className="rounded-2xl p-5 space-y-4" style={{ background:"#070d08", border:"1px solid rgba(34,197,94,0.2)" }}>
+    <div className="rounded-2xl p-5 space-y-4" style={{ background:"#070d08", border:"1px solid rgba(34,197,94,0.35)" }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCalendarDays} style={{ fontSize:"13px", color:"#22c55e" }} />
@@ -787,14 +789,14 @@ function ReportForm({ inv, onReported, onClose }) {
         <input type="number" value={income} onChange={e=>setIncome(e.target.value)} placeholder="e.g. 800" className="ie-inp" />
       </div>
       {income&&parseFloat(income)>0 && (
-        <div className="rounded-xl p-3.5 space-y-2" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.1)" }}>
+        <div className="rounded-xl p-3.5 space-y-2" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
           {[{label:"Your total income",value:`$${parseFloat(income).toLocaleString()}`,color:"#9ca3af"},{label:`Investor share (${profitShare}%)`,value:`-$${investorShare}`,color:"#f87171"},{label:"Platform fee (1%)",value:`-$${platformFee}`,color:"#f87171"}].map(r=>(
             <div key={r.label} className="flex justify-between text-sm">
               <span style={{ color:"#9ca3af", fontFamily:"'DM Sans',sans-serif" }}>{r.label}</span>
               <span style={{ color:r.color, fontFamily:"'Syne',sans-serif", fontWeight:700 }}>{r.value}</span>
             </div>
           ))}
-          <div className="flex justify-between text-sm pt-2" style={{ borderTop:"1px solid rgba(255,255,255,0.1)" }}>
+          <div className="flex justify-between text-sm pt-2" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
             <span className="font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>Your net earnings</span>
             <span className="font-black" style={{ fontFamily:"'Fraunces',serif", color:"#22c55e", fontSize:"1.05rem" }}>${yourNet}</span>
           </div>
@@ -809,7 +811,7 @@ function ReportForm({ inv, onReported, onClose }) {
           {submitting?<FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize:"12px" }} />:<FontAwesomeIcon icon={faFileLines} style={{ fontSize:"12px" }} />}
           {submitting?"Submitting...":"Submit Report"}
         </button>
-        <button onClick={onClose} className="px-4 py-3 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#6b7280" }}>Cancel</button>
+        <button onClick={onClose} className="px-4 py-3 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}>Cancel</button>
       </div>
     </div>
   );

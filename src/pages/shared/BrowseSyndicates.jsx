@@ -24,12 +24,12 @@ const CATEGORY_EMOJI = {
 };
 
 const CARD_THEMES = [
-  { card: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.18)",  barColor: "#22c55e", statBg: "rgba(34,197,94,0.08)",  glow: "rgba(34,197,94,0.12)"  },
-  { card: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(59,130,246,0.18)", barColor: "#3b82f6", statBg: "rgba(59,130,246,0.08)", glow: "rgba(59,130,246,0.12)" },
-  { card: "linear-gradient(135deg,#220f44,#180930)", border: "rgba(168,85,247,0.18)", barColor: "#a855f7", statBg: "rgba(168,85,247,0.08)", glow: "rgba(168,85,247,0.12)" },
-  { card: "linear-gradient(135deg,#0f3d38,#092820)", border: "rgba(20,184,166,0.18)", barColor: "#14b8a6", statBg: "rgba(20,184,166,0.08)", glow: "rgba(20,184,166,0.12)" },
-  { card: "linear-gradient(135deg,#3d0f22,#280918)", border: "rgba(244,63,94,0.18)",  barColor: "#f43f5e", statBg: "rgba(244,63,94,0.08)",  glow: "rgba(244,63,94,0.12)"  },
-  { card: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.18)", barColor: "#f59e0b", statBg: "rgba(245,158,11,0.08)", glow: "rgba(245,158,11,0.12)" },
+  { card: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.30)",  barColor: "#22c55e", statBg: "rgba(34,197,94,0.08)",  glow: "rgba(34,197,94,0.12)"  },
+  { card: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(59,130,246,0.35)", barColor: "#3b82f6", statBg: "rgba(59,130,246,0.08)", glow: "rgba(59,130,246,0.12)" },
+  { card: "linear-gradient(135deg,#220f44,#180930)", border: "rgba(168,85,247,0.35)", barColor: "#a855f7", statBg: "rgba(168,85,247,0.08)", glow: "rgba(168,85,247,0.12)" },
+  { card: "linear-gradient(135deg,#0f3d38,#092820)", border: "rgba(20,184,166,0.30)", barColor: "#14b8a6", statBg: "rgba(20,184,166,0.08)", glow: "rgba(20,184,166,0.12)" },
+  { card: "linear-gradient(135deg,#3d0f22,#280918)", border: "rgba(244,63,94,0.35)",  barColor: "#f43f5e", statBg: "rgba(244,63,94,0.08)",  glow: "rgba(244,63,94,0.12)"  },
+  { card: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.35)", barColor: "#f59e0b", statBg: "rgba(245,158,11,0.08)", glow: "rgba(245,158,11,0.12)" },
 ];
 
 function SyndicateCard({ syndicate, onClick, index }) {
@@ -51,7 +51,7 @@ function SyndicateCard({ syndicate, onClick, index }) {
       <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl opacity-60" style={{ background: `linear-gradient(90deg, transparent, ${theme.barColor}, transparent)` }} />
 
       {isHot && (
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b", fontFamily: "'Syne',sans-serif" }}>
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(245,158,11,0.30)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b", fontFamily: "'Syne',sans-serif" }}>
           <FontAwesomeIcon icon={faFire} style={{ fontSize: "9px" }} /> HOT
         </div>
       )}
@@ -73,7 +73,7 @@ function SyndicateCard({ syndicate, onClick, index }) {
         <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "#6b7280" }}>{syndicate.story}</p>
 
         <div className="space-y-1.5">
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.18)" }}>
             <div className="h-full rounded-full transition-all duration-700" style={{ width: `${fundingPct}%`, background: `linear-gradient(90deg, ${theme.barColor}99, ${theme.barColor})` }} />
           </div>
           <div className="flex justify-between text-xs" style={{ fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>
@@ -96,7 +96,7 @@ function SyndicateCard({ syndicate, onClick, index }) {
           ))}
         </div>
 
-        <div className="flex items-center justify-between pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="flex items-center justify-between pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.18)" }}>
           <p className="text-xs" style={{ color: "#9ca3af" }}>
             Min. <span className="font-bold" style={{ color: "#9ca3af" }}>${syndicate.minInvestment.toLocaleString()}</span>
           </p>
@@ -113,21 +113,21 @@ function SyndicateCard({ syndicate, onClick, index }) {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl p-5 space-y-4 animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+    <div className="rounded-2xl p-5 space-y-4 animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
+        <div className="w-10 h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />
         <div className="flex-1 space-y-2">
-          <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
-          <div className="h-2 rounded-full w-1/2" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.2)" }} />
+          <div className="h-2 rounded-full w-1/2" style={{ background: "rgba(255,255,255,0.2)" }} />
         </div>
       </div>
       <div className="space-y-1.5">
-        <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-        <div className="h-2 rounded-full w-4/5" style={{ background: "rgba(255,255,255,0.1)" }} />
+        <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
+        <div className="h-2 rounded-full w-4/5" style={{ background: "rgba(255,255,255,0.2)" }} />
       </div>
-      <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+      <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
       <div className="grid grid-cols-3 gap-2">
-        {[0,1,2].map(i => <div key={i} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
+        {[0,1,2].map(i => <div key={i} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />)}
       </div>
     </div>
   );
@@ -217,7 +217,7 @@ export default function BrowseSyndicates() {
 
       {/* ── Header Banner ── */}
       <div className="syn-in mb-6" style={{ animationDelay: "0s" }}>
-        <div className="relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+        <div className="relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
           <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%)", filter: "blur(24px)" }} />
           <div className="absolute inset-0 pointer-events-none rounded-3xl" style={{ backgroundImage: "linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
           <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -231,7 +231,7 @@ export default function BrowseSyndicates() {
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               {!loading && (
-                <div className="text-center px-4 py-2 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
+                <div className="text-center px-4 py-2 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.35)" }}>
                   <p className="font-black text-white text-lg leading-none mb-0.5" style={{ fontFamily: "'Fraunces',serif" }}>{total}</p>
                   <p className="text-xs font-bold" style={{ fontFamily: "'Syne',sans-serif", color: "#3b82f6" }}>ACTIVE</p>
                 </div>
@@ -252,7 +252,7 @@ export default function BrowseSyndicates() {
           <FontAwesomeIcon icon={faSearch} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#5a8a63", fontSize: "12px", pointerEvents: "none" }} />
           <input
             className="syn-search w-full text-sm text-white rounded-xl px-4 py-3 transition-all"
-            style={{ paddingLeft: "2.2rem", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }}
+            style={{ paddingLeft: "2.2rem", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif" }}
             placeholder="Search campaigns, skills, creators..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -261,7 +261,7 @@ export default function BrowseSyndicates() {
         <div className="relative">
           <select
             className="syn-select syn-input text-sm text-white rounded-xl px-4 py-3 pr-9 cursor-pointer"
-            style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}
+            style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}
             value={sort}
             onChange={e => setSort(e.target.value)}
           >
@@ -272,7 +272,7 @@ export default function BrowseSyndicates() {
         <button
           onClick={() => setShowFilters(v => !v)}
           className="flex items-center gap-2 font-bold text-sm px-4 py-3 rounded-xl transition-all"
-          style={{ fontFamily: "'Syne',sans-serif", background: showFilters ? "rgba(34,197,94,0.1)" : "#070d08", border: showFilters ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(255,255,255,0.1)", color: showFilters ? "#22c55e" : "#6b7280" }}
+          style={{ fontFamily: "'Syne',sans-serif", background: showFilters ? "rgba(34,197,94,0.1)" : "#070d08", border: showFilters ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(255,255,255,0.2)", color: showFilters ? "#22c55e" : "#6b7280" }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "12px" }} />
           Filters
@@ -282,7 +282,7 @@ export default function BrowseSyndicates() {
 
       {/* ── Filter Panel ── */}
       {showFilters && (
-        <div className="slide-down rounded-2xl p-5 mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="slide-down rounded-2xl p-5 mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="sm:col-span-2">
             <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}>CATEGORY</p>
             <div className="flex flex-wrap gap-1.5">
@@ -291,7 +291,7 @@ export default function BrowseSyndicates() {
                   key={c}
                   onClick={() => setCategory(c)}
                   className="cat-pill text-xs px-3 py-1.5 rounded-full font-bold capitalize"
-                  style={{ fontFamily: "'Syne',sans-serif", background: category === c ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.04)", border: category === c ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(255,255,255,0.1)", color: category === c ? "#22c55e" : "#6b7280" }}
+                  style={{ fontFamily: "'Syne',sans-serif", background: category === c ? "rgba(34,197,94,0.30)" : "rgba(255,255,255,0.18)", border: category === c ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(255,255,255,0.2)", color: category === c ? "#22c55e" : "#6b7280" }}
                 >
                   {c === "all" ? "All" : `${CATEGORY_EMOJI[c]} ${c}`}
                 </button>
@@ -303,11 +303,11 @@ export default function BrowseSyndicates() {
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "10px", pointerEvents: "none" }} />
-                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Min" value={minGoal} onChange={e => setMinGoal(e.target.value)} />
+                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Min" value={minGoal} onChange={e => setMinGoal(e.target.value)} />
               </div>
               <div className="relative flex-1">
                 <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "10px", pointerEvents: "none" }} />
-                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Max" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} />
+                <input type="number" className="syn-input w-full text-sm text-white rounded-xl py-2.5 transition-all" style={{ paddingLeft: "1.4rem", paddingRight: "8px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif" }} placeholder="Max" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} />
               </div>
             </div>
             {hasFilters && (
@@ -333,8 +333,8 @@ export default function BrowseSyndicates() {
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : syndicates.length === 0 ? (
-        <div className="rounded-2xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)" }}>
+        <div className="rounded-2xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.30)" }}>
             <FontAwesomeIcon icon={faUsers} style={{ fontSize: "24px", color: "#3b82f6" }} />
           </div>
           <p className="font-black text-white text-lg mb-1" style={{ fontFamily: "'Fraunces',serif" }}>No campaigns found</p>

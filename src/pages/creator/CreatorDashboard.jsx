@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
@@ -7,12 +7,13 @@ import {
   faChartLine, faCoins, faHandshake, faArrowTrendUp,
   faCircleNotch, faArrowRight, faCalendarCheck,
   faTriangleExclamation, faCircleCheck, faClockRotateLeft,
+  faTimeline, faBullhorn, faPlus, faImage, faXmark, faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 
 const C = {
   bg: "#0b0f0c", card: "#111812", border: "rgba(34,197,94,0.18)",
   green: "#22c55e", dim: "#16a34a", text: "#e2e8f0", sub: "#9ca3af", muted: "#4b5563",
-  font: "'DM Sans', sans-serif", display: "'Fraunces', serif", syne: "'Syne', sans-serif",
+  font: "'DM Sans', sans-serif", display: "'Fraunces', serif", ui: "'Plus Jakarta Sans', sans-serif",
   radius: "16px",
 };
 
@@ -137,14 +138,14 @@ export default function CreatorDashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
         {/* Monthly net earnings chart */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: C.radius, padding: "20px" }}>
-          <p style={{ fontFamily: C.syne, fontSize: "13px", fontWeight: 700, color: C.text, margin: "0 0 4px" }}>Net Earnings</p>
+          <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: "0 0 4px" }}>Net Earnings</p>
           <p style={{ fontFamily: C.font, fontSize: "11px", color: C.sub, margin: "0 0 20px" }}>Last 6 months after investor share</p>
           <BarChart data={chartData} color={C.green} />
         </div>
 
         {/* Investor share chart */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: C.radius, padding: "20px" }}>
-          <p style={{ fontFamily: C.syne, fontSize: "13px", fontWeight: 700, color: C.text, margin: "0 0 4px" }}>Investor Payouts</p>
+          <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: "0 0 4px" }}>Investor Payouts</p>
           <p style={{ fontFamily: C.font, fontSize: "11px", color: C.sub, margin: "0 0 20px" }}>Last 6 months paid to investors</p>
           <BarChart data={last6.map(slot => ({
             label: slot.label,
@@ -159,7 +160,7 @@ export default function CreatorDashboard() {
           <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <FontAwesomeIcon icon={faHandshake} style={{ fontSize: "13px", color: C.green }} />
-              <p style={{ fontFamily: C.syne, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>Active Deals</p>
+              <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>Active Deals</p>
             </div>
             <span style={{ fontFamily: C.font, fontSize: "12px", color: C.sub }}>{activeInvs.length} deal{activeInvs.length !== 1 ? "s" : ""}</span>
           </div>
@@ -173,7 +174,7 @@ export default function CreatorDashboard() {
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 {/* Avatar */}
-                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: `${C.green}15`, border: `1px solid ${C.green}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.syne, fontWeight: 700, fontSize: "14px", color: C.green, flexShrink: 0, overflow: "hidden" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: `${C.green}15`, border: `1px solid ${C.green}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.ui, fontWeight: 700, fontSize: "14px", color: C.green, flexShrink: 0, overflow: "hidden" }}>
                   {inv.investor?.avatar ? <img src={inv.investor.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : inv.investor?.name?.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -205,7 +206,7 @@ export default function CreatorDashboard() {
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <FontAwesomeIcon icon={faCalendarCheck} style={{ fontSize: "13px", color: C.sub }} />
-            <p style={{ fontFamily: C.syne, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>All Investments</p>
+            <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>All Investments</p>
           </div>
           <span style={{ fontFamily: C.font, fontSize: "12px", color: C.sub }}>{investments.length} total</span>
         </div>
@@ -237,7 +238,7 @@ export default function CreatorDashboard() {
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "14px 20px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: `${C.green}15`, border: `1px solid ${C.green}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.syne, fontSize: "12px", fontWeight: 700, color: C.green, flexShrink: 0, overflow: "hidden" }}>
+                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: `${C.green}15`, border: `1px solid ${C.green}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.ui, fontSize: "12px", fontWeight: 700, color: C.green, flexShrink: 0, overflow: "hidden" }}>
                             {inv.investor?.avatar ? <img src={inv.investor.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : inv.investor?.name?.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -276,6 +277,249 @@ export default function CreatorDashboard() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Growth Timeline */}
+      <GrowthTimeline />
+
+      {/* Campaign Update Feed */}
+      <CampaignUpdateFeed />
+
+    </div>
+  );
+}
+
+// ─── Growth Timeline ─────────────────────────────────────────────────────────
+function GrowthTimeline() {
+  const [entries, setEntries]   = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [title, setTitle]       = useState("");
+  const [content, setContent]   = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/growth-timeline");
+      setEntries(res.data.entries || []);
+    } catch { /* no timeline yet */ }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) return toast.error("Title and content required");
+    setSubmitting(true);
+    try {
+      const form = new FormData();
+      form.append("title", title);
+      form.append("content", content);
+      mediaFiles.forEach(f => form.append("media", f));
+      await api.post("/growth-timeline", form, { headers: { "Content-Type": "multipart/form-data" } });
+      toast.success("Milestone posted!");
+      setShowForm(false); setTitle(""); setContent(""); setMediaFiles([]); load();
+    } catch { toast.error("Failed to post milestone"); }
+    finally { setSubmitting(false); }
+  };
+
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const fmtDate = d => { const dt = new Date(d); return `${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`; };
+
+  return (
+    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: C.radius, overflow: "hidden" }}>
+      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <FontAwesomeIcon icon={faTimeline} style={{ fontSize: "13px", color: C.green }} />
+          <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>Growth Timeline</p>
+        </div>
+        <button onClick={() => setShowForm(v => !v)}
+          style={{ display: "flex", alignItems: "center", gap: "6px", background: `${C.green}15`, border: `1px solid ${C.green}30`, borderRadius: "10px", padding: "6px 12px", fontFamily: C.ui, fontSize: "12px", fontWeight: 700, color: C.green, cursor: "pointer" }}>
+          <FontAwesomeIcon icon={faPlus} style={{ fontSize: "10px" }} /> Post Milestone
+        </button>
+      </div>
+
+      {showForm && (
+        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(34,197,94,0.03)" }}>
+          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Milestone title (e.g. Machine delivered!)" maxLength={120}
+            style={{ width: "100%", background: "#0a1209", border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
+          <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Tell your investors what you achieved..." rows={3}
+            style={{ width: "100%", background: "#0a1209", border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button onClick={() => fileRef.current?.click()}
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
+              <FontAwesomeIcon icon={faImage} style={{ fontSize: "11px" }} />
+              {mediaFiles.length > 0 ? `${mediaFiles.length} file(s)` : "Attach photos"}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*,video/*" multiple style={{ display: "none" }}
+              onChange={e => setMediaFiles(Array.from(e.target.files))} />
+            <div style={{ flex: 1 }} />
+            <button onClick={() => { setShowForm(false); setTitle(""); setContent(""); setMediaFiles([]); }}
+              style={{ background: "transparent", border: "none", color: C.sub, cursor: "pointer", padding: "6px 8px" }}>
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
+            <button onClick={handleSubmit} disabled={submitting}
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: C.green, border: "none", borderRadius: "9px", padding: "7px 14px", fontFamily: C.ui, fontSize: "12px", fontWeight: 700, color: "#000", cursor: "pointer", opacity: submitting ? 0.7 : 1 }}>
+              {submitting ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "11px" }} /> : <FontAwesomeIcon icon={faPaperPlane} style={{ fontSize: "11px" }} />}
+              Post
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ padding: "20px" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "32px", color: C.sub, fontFamily: C.font, fontSize: "13px" }}>
+            <FontAwesomeIcon icon={faCircleNotch} spin style={{ color: C.green, marginRight: "8px" }} />Loading...
+          </div>
+        ) : entries.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "32px" }}>
+            <FontAwesomeIcon icon={faTimeline} style={{ fontSize: "28px", color: C.muted, marginBottom: "12px", display: "block" }} />
+            <p style={{ fontFamily: C.font, fontSize: "13px", color: C.sub, margin: 0 }}>No milestone posts yet. Share your first win!</p>
+          </div>
+        ) : (
+          <div style={{ position: "relative", paddingLeft: "28px" }}>
+            <div style={{ position: "absolute", left: "8px", top: "12px", bottom: "12px", width: "2px", background: `linear-gradient(180deg, ${C.green}60, transparent)` }} />
+            {entries.map((e, i) => (
+              <div key={e._id || i} style={{ position: "relative", marginBottom: i < entries.length - 1 ? "24px" : 0 }}>
+                <div style={{ position: "absolute", left: "-24px", top: "4px", width: "10px", height: "10px", borderRadius: "50%", background: C.green, border: `2px solid ${C.dim}` }} />
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>{e.title}</p>
+                  <span style={{ fontFamily: C.font, fontSize: "11px", color: C.sub, whiteSpace: "nowrap", marginLeft: "12px" }}>{fmtDate(e.createdAt)}</span>
+                </div>
+                <p style={{ fontFamily: C.font, fontSize: "12px", color: C.sub, margin: "0 0 8px", lineHeight: 1.6 }}>{e.content}</p>
+                {e.mediaFiles?.length > 0 && (
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {e.mediaFiles.map((url, mi) => (
+                      <img key={mi} src={url} alt="milestone" style={{ width: "72px", height: "72px", objectFit: "cover", borderRadius: "8px", border: `1px solid ${C.border}` }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Campaign Update Feed ─────────────────────────────────────────────────────
+function CampaignUpdateFeed() {
+  const [updates, setUpdates]       = useState([]);
+  const [campaignId, setCampaignId] = useState(null);
+  const [loading, setLoading]       = useState(true);
+  const [showForm, setShowForm]     = useState(false);
+  const [title, setTitle]           = useState("");
+  const [content, setContent]       = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const camRes = await api.get("/campaigns/my-campaign");
+      const cid = camRes.data.campaign?._id;
+      setCampaignId(cid);
+      if (cid) {
+        const updRes = await api.get(`/campaigns/${cid}/updates`);
+        setUpdates(updRes.data.updates || []);
+      }
+    } catch { /* no campaign yet */ }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) return toast.error("Title and content required");
+    if (!campaignId) return toast.error("No active campaign found");
+    setSubmitting(true);
+    try {
+      const form = new FormData();
+      form.append("title", title);
+      form.append("content", content);
+      mediaFiles.forEach(f => form.append("media", f));
+      await api.post(`/campaigns/${campaignId}/updates`, form, { headers: { "Content-Type": "multipart/form-data" } });
+      toast.success("Update posted!");
+      setShowForm(false); setTitle(""); setContent(""); setMediaFiles([]); load();
+    } catch { toast.error("Failed to post update"); }
+    finally { setSubmitting(false); }
+  };
+
+  const fmtDate = d => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+  if (!loading && !campaignId) return null;
+
+  return (
+    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: C.radius, overflow: "hidden" }}>
+      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <FontAwesomeIcon icon={faBullhorn} style={{ fontSize: "13px", color: "#f59e0b" }} />
+          <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>Campaign Updates</p>
+        </div>
+        <button onClick={() => setShowForm(v => !v)}
+          style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.30)", borderRadius: "10px", padding: "6px 12px", fontFamily: C.ui, fontSize: "12px", fontWeight: 700, color: "#f59e0b", cursor: "pointer" }}>
+          <FontAwesomeIcon icon={faPlus} style={{ fontSize: "10px" }} /> Post Update
+        </button>
+      </div>
+
+      {showForm && (
+        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(245,158,11,0.03)" }}>
+          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Update title" maxLength={120}
+            style={{ width: "100%", background: "#0a1209", border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
+          <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Share your latest progress with investors..." rows={3}
+            style={{ width: "100%", background: "#0a1209", border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button onClick={() => fileRef.current?.click()}
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
+              <FontAwesomeIcon icon={faImage} style={{ fontSize: "11px" }} />
+              {mediaFiles.length > 0 ? `${mediaFiles.length} file(s)` : "Attach photos"}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*,video/*" multiple style={{ display: "none" }}
+              onChange={e => setMediaFiles(Array.from(e.target.files))} />
+            <div style={{ flex: 1 }} />
+            <button onClick={() => { setShowForm(false); setTitle(""); setContent(""); setMediaFiles([]); }}
+              style={{ background: "transparent", border: "none", color: C.sub, cursor: "pointer", padding: "6px 8px" }}>
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
+            <button onClick={handleSubmit} disabled={submitting}
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f59e0b", border: "none", borderRadius: "9px", padding: "7px 14px", fontFamily: C.ui, fontSize: "12px", fontWeight: 700, color: "#000", cursor: "pointer", opacity: submitting ? 0.7 : 1 }}>
+              {submitting ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "11px" }} /> : <FontAwesomeIcon icon={faPaperPlane} style={{ fontSize: "11px" }} />}
+              Post
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "32px", color: C.sub, fontFamily: C.font, fontSize: "13px" }}>
+            <FontAwesomeIcon icon={faCircleNotch} spin style={{ color: "#f59e0b", marginRight: "8px" }} />Loading...
+          </div>
+        ) : updates.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "32px" }}>
+            <FontAwesomeIcon icon={faBullhorn} style={{ fontSize: "28px", color: C.muted, marginBottom: "12px", display: "block" }} />
+            <p style={{ fontFamily: C.font, fontSize: "13px", color: C.sub, margin: 0 }}>No campaign updates yet. Keep investors engaged with regular posts.</p>
+          </div>
+        ) : updates.map((u, i) => (
+          <div key={u._id || i} style={{ borderBottom: i < updates.length - 1 ? `1px solid ${C.border}` : "none", paddingBottom: i < updates.length - 1 ? "16px" : 0 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "6px" }}>
+              <p style={{ fontFamily: C.ui, fontSize: "13px", fontWeight: 700, color: C.text, margin: 0 }}>{u.title}</p>
+              <span style={{ fontFamily: C.font, fontSize: "11px", color: C.sub, whiteSpace: "nowrap", marginLeft: "12px" }}>{fmtDate(u.createdAt)}</span>
+            </div>
+            <p style={{ fontFamily: C.font, fontSize: "12px", color: C.sub, margin: "0 0 8px", lineHeight: 1.6 }}>{u.content}</p>
+            {u.mediaFiles?.length > 0 && (
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {u.mediaFiles.map((url, mi) => (
+                  <img key={mi} src={url} alt="update" style={{ width: "72px", height: "72px", objectFit: "cover", borderRadius: "8px", border: `1px solid ${C.border}` }} />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

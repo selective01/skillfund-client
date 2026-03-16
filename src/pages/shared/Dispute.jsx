@@ -9,6 +9,7 @@ import {
 import api from "../../utils/api";
 import useAuthStore from "../../store/authStore";
 import toast from "react-hot-toast";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const REASONS = [
   "Creator not reporting earnings",
@@ -42,13 +43,14 @@ function StatusPill({ status }) {
 }
 
 function DisputeCard({ dispute, currentUserId }) {
+  useNotificationReadOnView();
   const [expanded, setExpanded] = useState(false);
   const isFiler   = dispute.filedBy?._id === currentUserId || dispute.filedBy?._id?.toString() === currentUserId;
   const other     = isFiler ? dispute.filedAgainst : dispute.filedBy;
   const s         = STATUS_CONFIG[dispute.status] || STATUS_CONFIG.open;
 
   return (
-    <div className="rounded-2xl overflow-hidden transition-all" style={{ background: "#070d08", border: `1px solid ${expanded ? s.border : "rgba(255,255,255,0.08)"}` }}>
+    <div className="rounded-2xl overflow-hidden transition-all" style={{ background: "#070d08", border: `1px solid ${expanded ? s.border : "rgba(255,255,255,0.2)"}` }}>
       {/* Card header */}
       <button className="w-full flex items-start gap-4 p-5 text-left" onClick={() => setExpanded(p => !p)}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
@@ -69,7 +71,7 @@ function DisputeCard({ dispute, currentUserId }) {
 
       {/* Expanded detail */}
       {expanded && (
-        <div className="px-5 pb-5 space-y-4 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+        <div className="px-5 pb-5 space-y-4 border-t" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
           <div className="pt-4">
             <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "6px" }}>Description</p>
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#9ca3af", lineHeight: 1.7 }}>{dispute.description}</p>
@@ -80,7 +82,7 @@ function DisputeCard({ dispute, currentUserId }) {
               <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "8px" }}>Evidence ({dispute.evidence.length})</p>
               <div className="flex flex-wrap gap-2">
                 {dispute.evidence.map((ev, i) => (
-                  <a key={i} href={ev.url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6", fontFamily: "'Syne',sans-serif" }}>
+                  <a key={i} href={ev.url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.35)", color: "#3b82f6", fontFamily: "'Syne',sans-serif" }}>
                     <FontAwesomeIcon icon={faEye} style={{ fontSize: "10px" }} /> File {i + 1}
                   </a>
                 ))}
@@ -89,7 +91,7 @@ function DisputeCard({ dispute, currentUserId }) {
           )}
 
           {dispute.status === "resolved" && dispute.resolution && (
-            <div className="rounded-xl p-4" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)" }}>
+            <div className="rounded-xl p-4" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.30)" }}>
               <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#22c55e", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "6px" }}>Resolution</p>
               <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#9ca3af", lineHeight: 1.7 }}>{dispute.resolution}</p>
               {dispute.refundAmount > 0 && (
@@ -124,7 +126,7 @@ function EvidenceDropZone({ files, onAdd, onRemove }) {
     <div>
       <div className="flex flex-wrap gap-2 mb-3">
         {files.map((f, i) => (
-          <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}>
+          <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.35)" }}>
             <span style={{ fontFamily: "'DM Sans',sans-serif", color: "#9ca3af", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
             <button onClick={() => onRemove(i)} style={{ color: "#ef4444" }}><FontAwesomeIcon icon={faTrash} style={{ fontSize: "10px" }} /></button>
           </div>
@@ -133,7 +135,7 @@ function EvidenceDropZone({ files, onAdd, onRemove }) {
       {files.length < 5 && (
         <button type="button" onClick={() => inputRef.current?.click()}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all"
-          style={{ fontFamily: "'Syne',sans-serif", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}>
+          style={{ fontFamily: "'Syne',sans-serif", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
           <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "13px" }} />
           Add evidence ({files.length}/5)
         </button>
@@ -207,7 +209,7 @@ export default function Dispute() {
     }
   };
 
-  const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: "12px", fontSize: "14px", color: "#fff", outline: "none", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "'DM Sans',sans-serif", transition: "border-color .2s" };
+  const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: "12px", fontSize: "14px", color: "#fff", outline: "none", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif", transition: "border-color .2s" };
   const labelStyle = { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: ".08em", display: "block", marginBottom: "8px" };
 
   return (
@@ -219,12 +221,12 @@ export default function Dispute() {
       `}</style>
 
       {/* Header */}
-      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#1a0f0f,#0f0a0a,#0a0606)", border: "1px solid rgba(239,68,68,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#1a0f0f,#0f0a0a,#0a0606)", border: "1px solid rgba(239,68,68,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10" style={{ background: "radial-gradient(circle,#ef4444,transparent)", transform: "translate(30%,-30%)" }} />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.25)" }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(239,68,68,0.30)", border: "1px solid rgba(239,68,68,0.25)" }}>
                 <FontAwesomeIcon icon={faScaleBalanced} style={{ fontSize: "14px", color: "#ef4444" }} />
               </div>
               <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#ef4444", textTransform: "uppercase", letterSpacing: ".1em" }}>Dispute Center</span>
@@ -236,7 +238,7 @@ export default function Dispute() {
           </div>
           {!showForm && (
             <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-black flex-shrink-0 transition-all hover:scale-105"
-              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444" }}>
+              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "rgba(239,68,68,0.30)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444" }}>
               <FontAwesomeIcon icon={faPlus} style={{ fontSize: "12px" }} /> File Dispute
             </button>
           )}
@@ -245,7 +247,7 @@ export default function Dispute() {
 
       {/* Form */}
       {showForm && (
-        <div className="rounded-2xl p-6 space-y-5" style={{ background: "#070d08", border: "1px solid rgba(239,68,68,0.2)" }}>
+        <div className="rounded-2xl p-6 space-y-5" style={{ background: "#070d08", border: "1px solid rgba(239,68,68,0.35)" }}>
           <div className="flex items-center justify-between mb-2">
             <p className="font-black" style={{ fontFamily: "'Fraunces',serif", fontSize: "18px", color: "#fff" }}>File a Dispute</p>
             <button onClick={() => setShowForm(false)} style={{ color: "#6b7280" }}>
@@ -254,7 +256,7 @@ export default function Dispute() {
           </div>
 
           {/* Warning */}
-          <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.35)" }}>
             <FontAwesomeIcon icon={faTriangleExclamation} style={{ fontSize: "13px", color: "#f59e0b", marginTop: "2px", flexShrink: 0 }} />
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "12px", color: "#9ca3af", lineHeight: 1.6 }}>
               Please try to resolve issues directly with the other party first. Disputes are reviewed by our admin team and may take up to 48 hours.
@@ -265,7 +267,7 @@ export default function Dispute() {
           <div>
             <label style={labelStyle}>Investment <span style={{ color: "#ef4444" }}>*</span></label>
             {investments.length === 0 ? (
-              <div className="rounded-xl p-4 text-center" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="rounded-xl p-4 text-center" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}>
                 <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#6b7280" }}>No active investments to dispute.</p>
               </div>
             ) : (
@@ -291,7 +293,7 @@ export default function Dispute() {
               {REASONS.map(r => (
                 <button key={r} type="button" onClick={() => setReason(r)}
                   className="text-left px-4 py-3 rounded-xl text-sm font-bold transition-all"
-                  style={{ fontFamily: "'Syne',sans-serif", background: reason === r ? "rgba(239,68,68,0.1)" : "#0a1209", border: `1px solid ${reason === r ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.08)"}`, color: reason === r ? "#ef4444" : "#6b7280" }}>
+                  style={{ fontFamily: "'Syne',sans-serif", background: reason === r ? "rgba(239,68,68,0.1)" : "#0a1209", border: `1px solid ${reason === r ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.2)"}`, color: reason === r ? "#ef4444" : "#6b7280" }}>
                   {reason === r && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "11px", marginRight: "6px" }} />}
                   {r}
                 </button>
@@ -324,7 +326,7 @@ export default function Dispute() {
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button onClick={() => setShowForm(false)} className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
-              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#6b7280" }}>
+              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}>
               <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Cancel
             </button>
             <button onClick={handleSubmit} disabled={submitting || !investmentId || !reason || description.length < 30}
@@ -345,7 +347,7 @@ export default function Dispute() {
           <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "20px", color: "#22c55e" }} />
         </div>
       ) : disputes.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="rounded-2xl p-10 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(107,114,128,0.1)", border: "1px solid rgba(107,114,128,0.2)" }}>
             <FontAwesomeIcon icon={faScaleBalanced} style={{ fontSize: "22px", color: "#6b7280" }} />
           </div>

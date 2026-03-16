@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import useThemeStore from "../../store/useThemeStore";
 
-export default function Layout({ children, title = "Dashboard" }) {
+export default function Layout({ children, title = "Dashboard", noPadding = false }) {
   const { theme } = useThemeStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -29,10 +29,14 @@ export default function Layout({ children, title = "Dashboard" }) {
           onMenuClick={() => setSidebarOpen((v) => !v)}
           sidebarOpen={sidebarOpen}
         />
-        <main className="pt-16 min-h-screen">
-          <div className="p-6">
-            {children}
-          </div>
+        {/* pt-16 clears the fixed header. No extra top padding so content
+            starts flush against the header line on every page. */}
+        <main className="pt-16">
+          {noPadding ? children : (
+            <div className="px-4 lg:px-6 py-4">
+              {children}
+            </div>
+          )}
         </main>
       </div>
 

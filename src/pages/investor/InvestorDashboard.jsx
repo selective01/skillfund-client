@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const C = {
-  bg: "#0b0f0c", card: "#111812", border: "rgba(34,197,94,0.18)",
+  bg: "#0b0f0c", card: "#111812", border: "rgba(34,197,94,0.30)",
   green: "#22c55e", dim: "#16a34a", text: "#e2e8f0", sub: "#9ca3af", muted: "#4b5563",
   font: "'DM Sans', sans-serif", display: "'Fraunces', serif", syne: "'Syne', sans-serif",
   radius: "16px",
@@ -42,7 +42,7 @@ function BarChart({ data, color = "#22c55e" }) {
     <div style={{ display: "flex", alignItems: "flex-end", gap: "5px", height: "80px" }}>
       {data.map((d, i) => (
         <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-          <div style={{ width: "100%", height: `${Math.max(4, Math.round((d.value / max) * 70))}px`, background: d.value > 0 ? `linear-gradient(180deg, ${color}, ${color}88)` : "rgba(255,255,255,0.1)", borderRadius: "4px 4px 0 0", transition: "height .6s ease" }} />
+          <div style={{ width: "100%", height: `${Math.max(4, Math.round((d.value / max) * 70))}px`, background: d.value > 0 ? `linear-gradient(180deg, ${color}, ${color}88)` : "rgba(255,255,255,0.2)", borderRadius: "4px 4px 0 0", transition: "height .6s ease" }} />
           <p style={{ fontFamily: C.font, fontSize: "9px", color: C.sub, margin: 0 }}>{d.label}</p>
         </div>
       ))}
@@ -187,7 +187,7 @@ export default function InvestorDashboard() {
               <div key={inv._id}
                 onClick={() => navigate(`/investments/${inv._id}/milestones`)}
                 style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px 20px", borderBottom: idx < activeInvs.length - 1 ? `1px solid ${C.border}` : "none", cursor: "pointer" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.18)"}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 {/* Creator avatar */}
                 <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#8b5cf615", border: "1px solid #8b5cf625", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.syne, fontWeight: 700, fontSize: "15px", color: "#8b5cf6", flexShrink: 0, overflow: "hidden" }}>
@@ -203,7 +203,7 @@ export default function InvestorDashboard() {
                     ${fmt(inv.amount)} invested · {inv.profitSharePercentage}% share · ends {fmtDate(inv.endDate)}
                   </p>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <div style={{ flex: 1, height: "4px", borderRadius: "3px", background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                    <div style={{ flex: 1, height: "4px", borderRadius: "3px", background: "rgba(255,255,255,0.2)", overflow: "hidden" }}>
                       <div style={{ height: "100%", width: `${progressPct}%`, background: `linear-gradient(90deg, ${C.green}, ${C.dim})`, borderRadius: "3px", transition: "width .8s ease" }} />
                     </div>
                     <p style={{ fontFamily: C.font, fontSize: "10px", color: C.sub, margin: 0, whiteSpace: "nowrap" }}>{inv.monthsReported}/{inv.duration} mo</p>
@@ -255,7 +255,7 @@ export default function InvestorDashboard() {
                     <tr key={inv._id}
                       onClick={() => navigate(`/investments/${inv._id}/milestones`)}
                       style={{ borderBottom: `1px solid ${C.border}`, cursor: "pointer", transition: "background .1s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.18)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       {/* Creator */}
                       <td style={{ padding: "14px 20px" }}>
@@ -280,7 +280,7 @@ export default function InvestorDashboard() {
                       {/* Progress */}
                       <td style={{ padding: "14px 20px", minWidth: "120px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <div style={{ flex: 1, height: "4px", borderRadius: "3px", background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                          <div style={{ flex: 1, height: "4px", borderRadius: "3px", background: "rgba(255,255,255,0.2)", overflow: "hidden" }}>
                             <div style={{ height: "100%", width: `${progressPct}%`, background: C.green, borderRadius: "3px" }} />
                           </div>
                           <p style={{ fontFamily: C.font, fontSize: "10px", color: C.sub, margin: 0, whiteSpace: "nowrap" }}>{inv.monthsReported}/{inv.duration}</p>

@@ -9,7 +9,7 @@ import {
   faChevronDown, faChevronUp, faCircleNotch,
   faMagnifyingGlass, faEye, faBan,
   faTriangleExclamation, faWallet,
-  faReceipt, faCircleHalfStroke,
+  faReceipt, faMessage,
 } from "@fortawesome/free-solid-svg-icons";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -677,6 +677,103 @@ function WithdrawalsSection() {
 // ══════════════════════════════════════════════════════════════════════════════
 // DISPUTES
 // ══════════════════════════════════════════════════════════════════════════════
+// ── ChatViewer ─────────────────────────────────────────────────────────────
+function ChatViewer({ adminApi, conversationId }) {
+  const [messages, setMessages] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await adminApi.get(`/admin/conversations/${conversationId}/messages`);
+        setMessages(res.data.messages || []);
+        setParticipants(res.data.conversation?.participants || []);
+      } catch { toast.error("Failed to load conversation"); }
+      finally { setLoading(false); }
+    };
+    load();
+  }, [adminApi, conversationId]);
+
+  const fmtTime = (d) => new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+
+  return (
+    <div style={{ marginTop: "10px", border: "1px solid #e0e7ff", borderRadius: "12px", overflow: "hidden", background: "#f8f9ff" }}>
+      {/* Header */}
+      <div style={{ padding: "10px 14px", background: "#eef2ff", borderBottom: "1px solid #e0e7ff", display: "flex", alignItems: "center", gap: "8px" }}>
+        <FontAwesomeIcon icon={faMessage} style={{ fontSize: "12px", color: "#6366f1" }} />
+        <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: "12px", color: "#4338ca" }}>Conversation Log</span>
+        <span style={{ marginLeft: "auto", fontFamily: T.font, fontSize: "11px", color: "#6366f1" }}>
+          {participants.map(p => p.name).join(" ↔ ")}
+        </span>
+      </div>
+
+      {/* Messages */}
+      <div style={{ maxHeight: "320px", overflowY: "auto", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <FontAwesomeIcon icon={faCircleNotch} spin style={{ color: "#6366f1", fontSize: "20px" }} />
+          </div>
+        ) : messages.length === 0 ? (
+          <p style={{ textAlign: "center", color: T.muted, fontSize: "12px", padding: "20px 0", fontFamily: T.font }}>No messages in this conversation.</p>
+        ) : (
+          messages.map((msg) => {
+            const senderName = msg.sender?.name || "Unknown";
+            const senderRole = msg.sender?.role || "";
+            const isProposal = msg.type === "proposal";
+            return (
+              <div key={msg._id} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                {/* Avatar */}
+                <div style={{
+                  width: "28px", height: "28px", borderRadius: "8px", flexShrink: 0,
+                  background: senderRole === "investor" ? "#ede9fe" : "#dcfce7",
+                  border: `1px solid ${senderRole === "investor" ? "#c4b5fd" : "#86efac"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                }}>
+                  {msg.sender?.avatar
+                    ? <img src={msg.sender.avatar} alt={senderName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <span style={{ fontFamily: T.font, fontWeight: 800, fontSize: "11px", color: senderRole === "investor" ? "#7c3aed" : "#16a34a" }}>{senderName.charAt(0).toUpperCase()}</span>
+                  }
+                </div>
+
+                {/* Bubble */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "3px" }}>
+                    <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: "11px", color: T.text }}>{senderName}</span>
+                    <span style={{ fontFamily: T.font, fontSize: "10px", color: T.muted, textTransform: "capitalize" }}>{senderRole}</span>
+                    <span style={{ fontFamily: T.font, fontSize: "10px", color: T.muted, marginLeft: "auto" }}>{fmtTime(msg.createdAt)}</span>
+                  </div>
+                  <div style={{
+                    background: isProposal ? "#fffbeb" : "#fff",
+                    border: `1px solid ${isProposal ? "#fde68a" : "#e2e8f0"}`,
+                    borderRadius: "10px", padding: "8px 11px",
+                  }}>
+                    {isProposal && msg.proposalId ? (
+                      <div>
+                        <p style={{ fontFamily: T.font, fontWeight: 700, fontSize: "11px", color: "#d97706", margin: "0 0 4px" }}>💼 Investment Proposal</p>
+                        <p style={{ fontFamily: T.font, fontSize: "11px", color: T.text, margin: 0 }}>
+                          ${msg.proposalId.amount?.toLocaleString()} · {msg.proposalId.profitSharePercentage}% share · {msg.proposalId.duration}mo
+                          <span style={{ marginLeft: "8px", fontWeight: 700, color: msg.proposalId.status === "accepted" ? "#16a34a" : msg.proposalId.status === "rejected" ? "#ef4444" : "#f59e0b" }}>
+                            [{msg.proposalId.status}]
+                          </span>
+                        </p>
+                      </div>
+                    ) : (
+                      <p style={{ fontFamily: T.font, fontSize: "12px", color: T.text, margin: 0, lineHeight: 1.55, wordBreak: "break-word" }}>{msg.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DisputesSection() {
   const adminApi = useAdminApi();
   const [items, setItems]             = useState([]);
@@ -686,6 +783,7 @@ function DisputesSection() {
   const [resolutions, setResolutions] = useState({});
   const [actionLoading, setActionLoading] = useState({});
   const [search, setSearch]           = useState("");
+  const [chatConvId, setChatConvId]   = useState(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -791,6 +889,21 @@ function DisputesSection() {
                       ))}
                     </div>
 
+                    {/* View Conversation Button */}
+                    {item.conversationId && (
+                      <div style={{ marginBottom: "12px" }}>
+                        <ActionBtn
+                          onClick={() => setChatConvId(chatConvId === item.conversationId ? null : item.conversationId)}
+                          icon={faMessage}
+                          label={chatConvId === item.conversationId ? "Hide Conversation" : "View Conversation"}
+                          color="#6366f1" bg="#eef2ff" border="#e0e7ff"
+                        />
+                        {chatConvId === item.conversationId && (
+                          <ChatViewer adminApi={adminApi} conversationId={item.conversationId} />
+                        )}
+                      </div>
+                    )}
+
                     {(item.status === "open" || item.status === "under_review") && (
                       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                         <textarea
@@ -806,7 +919,7 @@ function DisputesSection() {
                               onClick={() => handleResolve(item._id, "under_review")}
                               disabled={!!actionLoading[`under_review_${item._id}`]}
                               loading={actionLoading[`under_review_${item._id}`]}
-                              icon={faCircleHalfStroke} label="Mark Reviewing"
+                              icon={faEye} label="Mark Reviewing"
                               color="#f59e0b" bg="#fffbeb" border="#fde68a"
                             />
                           )}
@@ -918,7 +1031,8 @@ function TransactionsSection() {
               </thead>
               <tbody>
                 {items.map(item => {
-                  const user = item.user || {};
+                  // adminController populates as "userId" not "user"
+                  const user = item.userId || item.user || {};
                   const tc = TYPE[item.type] || { color: T.muted, bg: T.subtle, border: "#e2e8f0", label: item.type || "Other" };
                   const amt = parseFloat(item.amount) || 0;
                   return (
@@ -934,7 +1048,7 @@ function TransactionsSection() {
                       </td>
                       <td style={{ padding: "12px 16px" }}>
                         <span style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 700, color: amt >= 0 ? "#16a34a" : "#f43f5e" }}>
-                          ${Math.abs(amt).toLocaleString()}
+                          {item.currency === "ngn" ? "₦" : "$"}{Math.abs(amt).toLocaleString()}
                         </span>
                       </td>
                       <td style={{ padding: "12px 16px" }}>
@@ -944,6 +1058,142 @@ function TransactionsSection() {
                       </td>
                       <td style={{ padding: "12px 16px" }}>
                         <span style={{ fontFamily: T.font, fontSize: "12px", color: T.muted }}>{formatDate(item.createdAt)}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPORTS
+// ══════════════════════════════════════════════════════════════════════════════
+export function AdminReports() {
+  const adminApi = useAdminApi();
+  const [reports, setReports]     = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [statusFilter, setStatus] = useState("all");
+  const [actionLoading, setAL]    = useState({});
+
+  const fetchReports = useCallback(async () => {
+    setLoading(true);
+    try {
+      const p = new URLSearchParams();
+      if (statusFilter !== "all") p.set("status", statusFilter);
+      const res = await adminApi.get(`/admin/reports?${p}`);
+      setReports(res.data.reports || []);
+    } catch { toast.error("Failed to load reports"); }
+    finally { setLoading(false); }
+  }, [adminApi, statusFilter]);
+
+  useEffect(() => { fetchReports(); }, [fetchReports]);
+
+  const handleStatus = async (id, status) => {
+    setAL(p => ({ ...p, [id]: status }));
+    try {
+      await adminApi.put(`/admin/reports/${id}/status`, { status });
+      toast.success(`Report marked as ${status}`);
+      setReports(prev => prev.map(r => r._id === id ? { ...r, status } : r));
+    } catch { toast.error("Failed to update report"); }
+    finally { setAL(p => ({ ...p, [id]: null })); }
+  };
+
+  const STATUS_TABS = [
+    { key: "all",       label: "All",       color: "#6366f1" },
+    { key: "pending",   label: "Pending",   color: "#f59e0b" },
+    { key: "reviewed",  label: "Reviewed",  color: "#16a34a" },
+    { key: "dismissed", label: "Dismissed", color: "#9ea3ae" },
+  ];
+
+  const STATUS_BADGE = {
+    pending:   { label: "Pending",   color: "#f59e0b", bg: "#fffbeb", border: "#fde68a" },
+    reviewed:  { label: "Reviewed",  color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
+    dismissed: { label: "Dismissed", color: "#9ea3ae", bg: "#f5f6fa", border: "#e2e8f0" },
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div>
+          <h2 style={{ fontFamily: T.font, fontSize: "18px", fontWeight: 800, color: T.text, margin: 0 }}>User Reports</h2>
+          <p style={{ fontFamily: T.font, fontSize: "13px", color: T.muted, margin: "4px 0 0" }}>
+            Reports submitted by users from the messages page
+          </p>
+        </div>
+        <FilterTabs options={STATUS_TABS} active={statusFilter} onChange={setStatus} />
+      </div>
+
+      {loading ? <Skeleton rows={5} cols={4} /> : reports.length === 0 ? (
+        <Empty message="No reports found" />
+      ) : (
+        <Card>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: T.border }}>
+                  {["Reporter", "Reported User", "Reason", "Status", "Date", "Actions"].map(h => (
+                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontFamily: T.font, fontSize: "11px", fontWeight: 700, color: T.muted, textTransform: "uppercase", letterSpacing: ".06em", whiteSpace: "nowrap" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {reports.map(r => {
+                  const sb = STATUS_BADGE[r.status] || STATUS_BADGE.pending;
+                  return (
+                    <tr key={r._id} style={{ borderBottom: T.border, transition: "background .1s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = T.subtle}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      {/* Reporter */}
+                      <td style={{ padding: "12px 16px" }}>
+                        <p style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 600, color: T.text, margin: 0 }}>{r.reporter?.name || "—"}</p>
+                        <p style={{ fontFamily: T.font, fontSize: "11px", color: T.muted, margin: 0 }}>{r.reporter?.email}</p>
+                      </td>
+                      {/* Reported */}
+                      <td style={{ padding: "12px 16px" }}>
+                        <p style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 600, color: T.text, margin: 0 }}>{r.reported?.name || "—"}</p>
+                        <p style={{ fontFamily: T.font, fontSize: "11px", color: T.muted, margin: 0 }}>{r.reported?.email}</p>
+                        <span style={{ fontFamily: T.font, fontSize: "10px", fontWeight: 600, textTransform: "capitalize", color: r.reported?.role === "creator" ? "#16a34a" : "#0ea5e9" }}>{r.reported?.role}</span>
+                      </td>
+                      {/* Reason */}
+                      <td style={{ padding: "12px 16px", maxWidth: "220px" }}>
+                        <p style={{ fontFamily: T.font, fontSize: "12px", color: T.text, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.reason || "Reported from messages"}</p>
+                      </td>
+                      {/* Status */}
+                      <td style={{ padding: "12px 16px" }}>
+                        <Badge label={sb.label} color={sb.color} bg={sb.bg} border={sb.border} />
+                      </td>
+                      {/* Date */}
+                      <td style={{ padding: "12px 16px" }}>
+                        <span style={{ fontFamily: T.font, fontSize: "12px", color: T.muted }}>{formatDate(r.createdAt)}</span>
+                      </td>
+                      {/* Actions */}
+                      <td style={{ padding: "12px 16px" }}>
+                        <div style={{ display: "flex", gap: "6px" }}>
+                          {r.status !== "reviewed" && (
+                            <button
+                              disabled={!!actionLoading[r._id]}
+                              onClick={() => handleStatus(r._id, "reviewed")}
+                              style={{ padding: "6px 12px", borderRadius: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#16a34a", fontFamily: T.font, fontWeight: 700, fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
+                              <FontAwesomeIcon icon={actionLoading[r._id] === "reviewed" ? faCircleNotch : faCircleCheck} spin={actionLoading[r._id] === "reviewed"} style={{ fontSize: "11px" }} />
+                              Review
+                            </button>
+                          )}
+                          {r.status !== "dismissed" && (
+                            <button
+                              disabled={!!actionLoading[r._id]}
+                              onClick={() => handleStatus(r._id, "dismissed")}
+                              style={{ padding: "6px 12px", borderRadius: "8px", background: T.subtle, border: T.border, color: T.muted, fontFamily: T.font, fontWeight: 700, fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
+                              <FontAwesomeIcon icon={actionLoading[r._id] === "dismissed" ? faCircleNotch : faCircleXmark} spin={actionLoading[r._id] === "dismissed"} style={{ fontSize: "11px" }} />
+                              Dismiss
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

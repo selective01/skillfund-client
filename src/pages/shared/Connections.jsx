@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const TABS = [
   { key: "connections", label: "Connections",  faIcon: faUsers,                 color: "#22c55e" },
@@ -21,21 +22,22 @@ const DS = {
   bg:     "#040806",
   card:   "#070d08",
   input:  "#0a1209",
-  border: "#1a2e1d",
+  border: "#2d5235",
   text:   { primary: "#fff", secondary: "#9ca3af", muted: "#6b7280", dim: "#4a5568", ghost: "#2d4a31" },
   accent: "#22c55e",
 };
 
 const CARD_THEMES = [
-  { bg: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.15)",   accent: "#22c55e"  },
-  { bg: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(59,130,246,0.15)",  accent: "#3b82f6"  },
-  { bg: "linear-gradient(135deg,#220f44,#180930)", border: "rgba(168,85,247,0.15)",  accent: "#a855f7"  },
-  { bg: "linear-gradient(135deg,#0f3d38,#092820)", border: "rgba(20,184,166,0.15)",  accent: "#14b8a6"  },
+  { bg: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.30)",   accent: "#22c55e"  },
+  { bg: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(59,130,246,0.30)",  accent: "#3b82f6"  },
+  { bg: "linear-gradient(135deg,#220f44,#180930)", border: "rgba(168,85,247,0.30)",  accent: "#a855f7"  },
+  { bg: "linear-gradient(135deg,#0f3d38,#092820)", border: "rgba(20,184,166,0.30)",  accent: "#14b8a6"  },
   { bg: "linear-gradient(135deg,#3d0f22,#280918)", border: "rgba(244,63,94,0.15)",   accent: "#f43f5e"  },
-  { bg: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.15)",  accent: "#f59e0b"  },
+  { bg: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.30)",  accent: "#f59e0b"  },
 ];
 
 export default function Connections() {
+  useNotificationReadOnView();
   const { user }   = useAuthStore();
   const navigate   = useNavigate();
   const [activeTab, setActiveTab] = useState("connections");
@@ -58,8 +60,9 @@ export default function Connections() {
       } else {
         const all = data.data || data || [];
         setConnections(all.filter(c => c.status === "accepted"));
-        setReceived(all.filter(c => c.status === "pending" && c.receiverId === (user?._id || user?.id)));
-        setSent(all.filter(c => c.status === "pending" && c.senderId === (user?._id || user?.id)));
+        const myId = user?._id || user?.id;
+        setReceived(all.filter(c => c.status === "pending" && String(c.receiver?._id) === String(myId)));
+        setSent(all.filter(c => c.status === "pending" && String(c.sender?._id) === String(myId)));
       }
     } catch {
       toast.error("Failed to load connections");
@@ -73,7 +76,7 @@ export default function Connections() {
   const handleAccept = async (connectionId) => {
     setActionLoading(p => ({ ...p, [`accept_${connectionId}`]: true }));
     try {
-      await api.put(`/connections/accept/${connectionId}`);
+      await api.post("/connections/accept", { connectionId });
       toast.success("Connection accepted!");
       const accepted = received.find(c => c._id === connectionId);
       if (accepted) {
@@ -90,7 +93,7 @@ export default function Connections() {
   const handleReject = async (connectionId, isSent = false) => {
     setActionLoading(p => ({ ...p, [`reject_${connectionId}`]: true }));
     try {
-      await api.put(`/connections/reject/${connectionId}`);
+      await api.post("/connections/reject", { connectionId });
       toast.success(isSent ? "Request cancelled" : "Request declined");
       if (isSent) setSent(p => p.filter(c => c._id !== connectionId));
       else setReceived(p => p.filter(c => c._id !== connectionId));
@@ -105,7 +108,7 @@ export default function Connections() {
     if (!window.confirm("Remove this connection?")) return;
     setActionLoading(p => ({ ...p, [`remove_${connectionId}`]: true }));
     try {
-      await api.put(`/connections/reject/${connectionId}`);
+      await api.post("/connections/reject", { connectionId });
       toast.success("Connection removed");
       setConnections(p => p.filter(c => c._id !== connectionId));
     } catch (error) {
@@ -120,7 +123,7 @@ export default function Connections() {
     if (conn.sender?._id && conn.sender._id !== myId) return conn.sender;
     if (conn.receiver?._id && conn.receiver._id !== myId) return conn.receiver;
     if (conn.user) return conn.user;
-    return { _id: conn.senderId === myId ? conn.receiverId : conn.senderId, name: conn.name || "User", avatar: conn.avatar || null, role: conn.role || null, isVerified: conn.isVerified || false, profile: conn.profile || null };
+    return { _id: String(conn.sender?._id) === String(myId) ? conn.receiver?._id : conn.sender?._id, name: conn.name || "User", avatar: conn.avatar || null, role: conn.role || null, isVerified: conn.isVerified || false, profile: conn.profile || null };
   };
 
   const filterBySearch = list => {
@@ -152,7 +155,7 @@ export default function Connections() {
 
       {/* ── Header ── */}
         <div className="cn-in" style={{ animationDelay: "0s" }}>
-          <div className="relative rounded-3xl overflow-hidden p-6" style={{ background: "linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+          <div className="relative rounded-3xl overflow-hidden p-6" style={{ background: "linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
             <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter: "blur(20px)" }} />
             <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
             <div className="relative flex items-center justify-between flex-wrap gap-3">
@@ -201,7 +204,7 @@ export default function Connections() {
                   {count > 0 && (
                     <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{
                       fontFamily: "'Fraunces',serif",
-                      background: isActive ? `${tab.color}22` : "rgba(255,255,255,0.05)",
+                      background: isActive ? `${tab.color}22` : "rgba(255,255,255,0.18)",
                       color:      isActive ? tab.color : "#4a5568",
                     }}>
                       {count}
@@ -233,17 +236,17 @@ export default function Connections() {
               {activeTab === "connections" && (
                 tabData.connections.length === 0
                   ? <EmptyState icon={faUsers} title={search ? "No results found" : "No connections yet"} message={search ? "Try a different search term." : user?.role === "investor" ? "Browse creators and send connection requests." : "When investors connect with you, they'll appear here."} action={user?.role === "investor" && !search ? { label: "Browse Creators", path: "/browse" } : null} navigate={navigate} />
-                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.connections.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="connected" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onRemove={handleRemove} onMessage={() => navigate(`/messages?userId=${other._id}`)} onViewProfile={() => navigate(`/creators/${other._id}`)} currentUserRole={user?.role} />; })}</div>
+                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.connections.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="connected" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onRemove={handleRemove} onMessage={() => navigate(`/messages?userId=${other._id}`)} onViewProfile={() => navigate(`/profile/${other._id}`)} currentUserRole={user?.role} />; })}</div>
               )}
               {activeTab === "received" && (
                 tabData.received.length === 0
                   ? <EmptyState icon={faClock} iconColor="#f59e0b" title={search ? "No results found" : "No pending requests"} message={search ? "Try a different search term." : "Connection requests will appear here."} />
-                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.received.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="received" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onAccept={handleAccept} onReject={id => handleReject(id, false)} onViewProfile={() => navigate(`/creators/${other._id}`)} currentUserRole={user?.role} />; })}</div>
+                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.received.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="received" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onAccept={handleAccept} onReject={id => handleReject(id, false)} onViewProfile={() => navigate(`/profile/${other._id}`)} currentUserRole={user?.role} />; })}</div>
               )}
               {activeTab === "sent" && (
                 tabData.sent.length === 0
                   ? <EmptyState icon={faArrowUpRightFromSquare} iconColor="#3b82f6" title={search ? "No results found" : "No sent requests"} message={search ? "Try a different search term." : "Requests you've sent will appear here."} action={user?.role === "investor" && !search ? { label: "Browse Creators", path: "/browse" } : null} navigate={navigate} />
-                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.sent.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="sent" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onReject={id => handleReject(id, true)} onViewProfile={() => navigate(`/creators/${other._id}`)} currentUserRole={user?.role} />; })}</div>
+                  : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{tabData.sent.map((conn, i) => { const other = getOtherUser(conn); return <ConnectionCard key={conn._id} person={other} connectionId={conn._id} type="sent" theme={CARD_THEMES[i % CARD_THEMES.length]} actionLoading={actionLoading} onReject={id => handleReject(id, true)} onViewProfile={() => navigate(`/profile/${other._id}`)} currentUserRole={user?.role} />; })}</div>
               )}
             </>
           )}
@@ -288,12 +291,12 @@ function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAc
           </div>
         </div>
         {type === "sent" && (
-          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.2)", color: "#f59e0b" }}>
+          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.35)", color: "#f59e0b" }}>
             <FontAwesomeIcon icon={faClock} style={{ fontSize: "9px" }} /> Pending
           </span>
         )}
         {type === "connected" && (
-          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
+          <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e" }}>
             <FontAwesomeIcon icon={faUserCheck} style={{ fontSize: "9px" }} /> Connected
           </span>
         )}
@@ -321,13 +324,13 @@ function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAc
             <button onClick={() => onAccept(connectionId)} disabled={acceptLoading || rejectLoading} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-60 hover:scale-[1.02]" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
               {acceptLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "12px" }} /> : <><FontAwesomeIcon icon={faCheck} style={{ fontSize: "11px" }} /> Accept</>}
             </button>
-            <button onClick={() => onReject(connectionId)} disabled={rejectLoading || acceptLoading} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
+            <button onClick={() => onReject(connectionId)} disabled={rejectLoading || acceptLoading} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", color: "#f87171" }}>
               {rejectLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "12px" }} /> : <><FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Decline</>}
             </button>
           </>
         )}
         {type === "sent" && (
-          <button onClick={() => onReject(connectionId)} disabled={rejectLoading} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
+          <button onClick={() => onReject(connectionId)} disabled={rejectLoading} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", color: "#f87171" }}>
             {rejectLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "12px" }} /> : <><FontAwesomeIcon icon={faUserXmark} style={{ fontSize: "11px" }} /> Cancel</>}
           </button>
         )}
@@ -337,14 +340,14 @@ function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAc
               <FontAwesomeIcon icon={faMessage} style={{ fontSize: "11px" }} /> Message
             </button>
             {currentUserRole === "investor" && (
-              <button onClick={onViewProfile} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid #1a2e1d", color: "#6b7280" }}
+              <button onClick={onViewProfile} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid #1a2e1d", color: "#6b7280" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = `${theme.accent}33`; e.currentTarget.style.color = theme.accent; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a2e1d"; e.currentTarget.style.color = "#6b7280"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#2d5235"; e.currentTarget.style.color = "#6b7280"; }}
               >
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: "11px" }} />
               </button>
             )}
-            <button onClick={() => onRemove(connectionId)} disabled={removeLoading} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-60" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)", color: "#f87171" }}>
+            <button onClick={() => onRemove(connectionId)} disabled={removeLoading} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-60" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.30)", color: "#f87171" }}>
               {removeLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "11px" }} /> : <FontAwesomeIcon icon={faUserMinus} style={{ fontSize: "11px" }} />}
             </button>
           </>
@@ -360,17 +363,17 @@ function ConnectionsSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="rounded-2xl p-5 animate-pulse space-y-4" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl" style={{ background: "#1a2e1d" }} />
+            <div className="w-11 h-11 rounded-xl" style={{ background: "#2d5235" }} />
             <div className="flex-1 space-y-2">
-              <div className="h-3.5 rounded-full w-1/2" style={{ background: "#1a2e1d" }} />
-              <div className="h-3 rounded-full w-1/3" style={{ background: "#1a2e1d" }} />
+              <div className="h-3.5 rounded-full w-1/2" style={{ background: "#2d5235" }} />
+              <div className="h-3 rounded-full w-1/3" style={{ background: "#2d5235" }} />
             </div>
           </div>
-          <div className="h-3 rounded-full w-full" style={{ background: "#1a2e1d" }} />
-          <div className="h-3 rounded-full w-2/3" style={{ background: "#1a2e1d" }} />
+          <div className="h-3 rounded-full w-full" style={{ background: "#2d5235" }} />
+          <div className="h-3 rounded-full w-2/3" style={{ background: "#2d5235" }} />
           <div className="flex gap-2">
-            <div className="flex-1 h-9 rounded-xl" style={{ background: "#1a2e1d" }} />
-            <div className="w-9 h-9 rounded-xl" style={{ background: "#1a2e1d" }} />
+            <div className="flex-1 h-9 rounded-xl" style={{ background: "#2d5235" }} />
+            <div className="w-9 h-9 rounded-xl" style={{ background: "#2d5235" }} />
           </div>
         </div>
       ))}

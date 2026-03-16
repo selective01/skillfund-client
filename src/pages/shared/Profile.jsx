@@ -22,6 +22,7 @@ import { faInstagram, faXTwitter, faLinkedin } from "@fortawesome/free-brands-sv
 
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const SKILL_CATEGORIES = [
   { value: "fashion",     label: "Fashion & Tailoring" },
@@ -50,6 +51,7 @@ const TABS = [
 ];
 
 export default function Profile() {
+  useNotificationReadOnView();
   const { user, updateUser } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
@@ -249,7 +251,7 @@ export default function Profile() {
       `}</style>
 
       {/* ── Header card ── */}
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "20px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "20px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
         {/* Avatar */}
         <div className="relative" style={{ flexShrink: 0 }}>
           <div
@@ -286,10 +288,10 @@ export default function Profile() {
             {user?.email}
           </p>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
               {user?.role}
             </span>
-            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
               {user?.plan} Plan
             </span>
           </div>
@@ -325,7 +327,7 @@ export default function Profile() {
       </div>
 
       {/* ── Tab content ── */}
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px" }}>
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px" }}>
 
         {/* Profile Tab */}
         {activeTab === "profile" && (
@@ -415,7 +417,7 @@ export default function Profile() {
                   </div>
 
                   {/* Accepting investments toggle */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "16px", padding: "14px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "16px", padding: "14px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px" }}>
                     <div>
                       <p style={{ color: "#fff", fontWeight: 700, fontSize: "14px", margin: "0 0 2px", fontFamily: "'Syne', sans-serif" }}>Accepting Investments</p>
                       <p style={{ color: "#9ca3af", fontSize: "12px", margin: 0 }}>Allow investors to send you proposals</p>
@@ -423,7 +425,7 @@ export default function Profile() {
                     <button
                       onClick={() => setForm((p) => ({ ...p, isAcceptingInvestments: !p.isAcceptingInvestments }))}
                       className="sf-toggle"
-                      style={{ background: form.isAcceptingInvestments ? "#22c55e" : "rgba(255,255,255,0.1)" }}
+                      style={{ background: form.isAcceptingInvestments ? "#22c55e" : "rgba(255,255,255,0.2)" }}
                     >
                       <div className="sf-toggle-thumb" style={{ left: form.isAcceptingInvestments ? "23px" : "3px" }} />
                     </button>
@@ -502,12 +504,12 @@ export default function Profile() {
             </div>
 
             {!profile?.portfolio?.length ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", border: "2px dashed rgba(255,255,255,0.1)", borderRadius: "16px" }}>
+              <div style={{ textAlign: "center", padding: "60px 20px", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: "16px" }}>
                 <FontAwesomeIcon icon={faImages} style={{ color: "#5a8a63", fontSize: "36px", marginBottom: "12px" }} />
                 <p style={{ color: "#9ca3af", fontSize: "14px", marginBottom: "16px" }}>No portfolio items yet</p>
                 <button
                   onClick={() => portfolioInputRef.current?.click()}
-                  style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e", borderRadius: "10px", padding: "8px 20px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
+                  style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", borderRadius: "10px", padding: "8px 20px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
                 >
                   Upload first item
                 </button>
@@ -515,7 +517,7 @@ export default function Profile() {
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px" }}>
                 {profile.portfolio.map((item) => (
-                  <div key={item._id} style={{ position: "relative", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", background: "#0a1209", aspectRatio: "1" }} className="group">
+                  <div key={item._id} style={{ position: "relative", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.2)", background: "#0a1209", aspectRatio: "1" }} className="group">
                     <img src={item.imageUrl} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%)", opacity: 0, transition: "opacity .2s", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "12px" }}
                       onMouseEnter={e => e.currentTarget.style.opacity = 1}
@@ -535,7 +537,7 @@ export default function Profile() {
                 {/* Locked slots */}
                 {typeof portfolioLimit === "number" &&
                   Array.from({ length: Math.max(0, portfolioLimit - (profile.portfolio.length || 0)) }).map((_, i) => (
-                    <div key={`slot-${i}`} style={{ borderRadius: "14px", border: "2px dashed rgba(255,255,255,0.1)", aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                    <div key={`slot-${i}`} style={{ borderRadius: "14px", border: "2px dashed rgba(255,255,255,0.2)", aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px" }}>
                       <FontAwesomeIcon icon={faPlus} style={{ color: "#5a8a63", fontSize: "18px" }} />
                       <span style={{ color: "#5a8a63", fontSize: "11px", fontFamily: "'Syne', sans-serif" }}>Empty slot</span>
                     </div>
@@ -546,7 +548,7 @@ export default function Profile() {
 
             {/* Plan upgrade prompt */}
             {user?.plan !== "elite" && (
-              <div style={{ marginTop: "20px", padding: "14px 16px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ marginTop: "20px", padding: "14px 16px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.30)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <FontAwesomeIcon icon={faLock} style={{ color: "#22c55e", fontSize: "13px" }} />
                   <span style={{ color: "#9ca3af", fontSize: "13px", fontFamily: "'DM Sans', sans-serif" }}>
@@ -597,7 +599,7 @@ export default function Profile() {
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 function Section({ title, children }) {
   return (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.2)", paddingTop: "20px" }}>
       <h4 style={{ color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px", display: "flex", alignItems: "center" }}>
         {title}
       </h4>
@@ -610,7 +612,7 @@ function Section({ title, children }) {
 function ProfileSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
         <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "#0a1209", flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
           <div style={{ height: "20px", background: "#0a1209", borderRadius: "6px", width: "160px", marginBottom: "8px" }} />
@@ -618,7 +620,7 @@ function ProfileSkeleton() {
           <div style={{ height: "22px", background: "#0a1209", borderRadius: "999px", width: "80px" }} />
         </div>
       </div>
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "24px", height: "320px" }} />
+      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px", height: "320px" }} />
     </div>
   );
 }

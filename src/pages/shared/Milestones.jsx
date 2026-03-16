@@ -1,50 +1,268 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  CheckCircle, Clock, Lock, AlertTriangle, ChevronDown, ChevronUp,
-  Upload, X, FileText, Image as ImageIcon, Video, Plus, Trash2, DollarSign,
-  ArrowLeft, RefreshCw, Eye,
-} from "lucide-react";
+  faArrowLeft, faCircleCheck, faClock, faLock,
+  faTriangleExclamation, faChevronDown, faChevronUp,
+  faUpload, faXmark, faFileLines, faImage, faVideo,
+  faPlus, faTrash, faDollarSign, faEye, faRotate,
+  faVault, faShieldHalved, faArrowTrendDown,
+  faCircleNotch, faHandHoldingDollar, faRightFromBracket,
+  faHourglassHalf, faScaleBalanced,
+} from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
-import Layout from "../../components/layout/Layout";
 import api from "../../utils/api";
 import useAuthStore from "../../store/authStore";
 
-// ─── Status config ──────────────────────────────────────────────────────────
-const STATUS = {
-  locked:           { label: "Locked",           color: "text-gray-400",    bg: "bg-white/8",       icon: Lock },
-  proof_submitted:  { label: "Proof Submitted",  color: "text-yellow-400",  bg: "bg-yellow-500/20",  icon: Clock },
-  approved:         { label: "Approved",          color: "text-primary-400", bg: "bg-primary-500/20", icon: CheckCircle },
-  auto_released:    { label: "Auto-Released",     color: "text-blue-400",    bg: "bg-blue-500/20",    icon: RefreshCw },
-  disputed:         { label: "Disputed",          color: "text-red-400",     bg: "bg-red-500/20",     icon: AlertTriangle },
-  completed:        { label: "Completed",         color: "text-primary-400", bg: "bg-primary-500/20", icon: CheckCircle },
+// ── Design tokens ─────────────────────────────────────────────────────────────
+const C = {
+  bg:      "#040806",
+  card:    "#070d08",
+  input:   "#0a1209",
+  border:  "rgba(255,255,255,0.2)",
+  accent:  "#22c55e",
+  text:    "#f1f5f9",
+  muted:   "#9ca3af",
+  dim:     "#5a8a63",
 };
 
-// ─── Countdown timer component ──────────────────────────────────────────────
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
+  @keyframes msIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .ms-in  { animation: msIn .3s ease forwards; opacity:0; }
+  .ms-inp { background:${C.input}; border:1px solid ${C.border}; color:${C.text}; border-radius:12px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .2s; resize:none; box-sizing:border-box; }
+  .ms-inp::placeholder { color:${C.dim}; }
+  .ms-inp:focus { border-color:rgba(34,197,94,0.4); }
+`;
+
+// ── Status config ─────────────────────────────────────────────────────────────
+const STATUS = {
+  locked:          { label:"Locked",          color:"#6b7280", bg:"rgba(107,114,128,0.1)", border:"rgba(107,114,128,0.2)", icon:faLock          },
+  proof_submitted: { label:"Proof Submitted", color:"#f59e0b", bg:"rgba(245,158,11,0.1)",  border:"rgba(245,158,11,0.35)",  icon:faHourglassHalf },
+  approved:        { label:"Approved",        color:"#22c55e", bg:"rgba(34,197,94,0.1)",   border:"rgba(34,197,94,0.35)",   icon:faCircleCheck   },
+  auto_released:   { label:"Auto-Released",   color:"#3b82f6", bg:"rgba(59,130,246,0.1)",  border:"rgba(59,130,246,0.35)",  icon:faRotate        },
+  disputed:        { label:"Disputed",        color:"#ef4444", bg:"rgba(239,68,68,0.1)",   border:"rgba(239,68,68,0.35)",   icon:faScaleBalanced },
+  completed:       { label:"Completed",       color:"#22c55e", bg:"rgba(34,197,94,0.1)",   border:"rgba(34,197,94,0.35)",   icon:faCircleCheck   },
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const fmt  = (n) => `$${(parseFloat(n) || 0).toLocaleString()}`;
+const fmtD = (d) => new Date(d).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" });
+
+// ── Countdown ─────────────────────────────────────────────────────────────────
 function Countdown({ autoReleaseAt }) {
   const [remaining, setRemaining] = useState("");
-
   useEffect(() => {
     const calc = () => {
       const diff = new Date(autoReleaseAt) - new Date();
-      if (diff <= 0) { setRemaining("Auto-releasing..."); return; }
+      if (diff <= 0) { setRemaining("Auto-releasing…"); return; }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      setRemaining(`${h}h ${m}m remaining`);
+      setRemaining(`${h}h ${m}m`);
     };
     calc();
     const t = setInterval(calc, 60000);
     return () => clearInterval(t);
   }, [autoReleaseAt]);
-
   return (
-    <span className="text-xs text-yellow-400 flex items-center gap-1">
-      <Clock size={12} /> {remaining}
+    <span style={{ display:"flex", alignItems:"center", gap:"4px", fontSize:"10px", color:"#f59e0b" }}>
+      <FontAwesomeIcon icon={faClock} style={{ fontSize:"9px" }} /> {remaining} to auto-release
     </span>
   );
 }
 
-// ─── Single milestone card ──────────────────────────────────────────────────
+// ── EscrowPanel (investor only) ───────────────────────────────────────────────
+function EscrowPanel({ investment, milestones, summary, onRefresh }) {
+  const [showRefund, setShowRefund]     = useState(false);
+  const [refundReason, setRefundReason] = useState("");
+  const [refundLoading, setRefundLoading] = useState(false);
+
+  const totalAmount    = summary?.totalAmount    || investment.amount || 0;
+  const releasedAmount = summary?.completedAmount || 0;
+  const heldAmount     = totalAmount - releasedAmount;
+  const releasedPct    = totalAmount > 0 ? Math.round((releasedAmount / totalAmount) * 100) : 0;
+
+  const counts = {
+    completed: milestones.filter(m => ["approved","auto_released","completed"].includes(m.status)).length,
+    pending:   milestones.filter(m => m.status === "proof_submitted").length,
+    disputed:  milestones.filter(m => m.status === "disputed").length,
+    locked:    milestones.filter(m => m.status === "locked").length,
+  };
+
+  const handleRefundRequest = async () => {
+    if (!refundReason.trim()) { toast.error("Please provide a reason for the refund request"); return; }
+    setRefundLoading(true);
+    try {
+      await api.post(`/investments/${investment._id}/refund-request`, { reason: refundReason });
+      toast.success("Refund request submitted — admin will review within 48 hours.");
+      setShowRefund(false);
+      setRefundReason("");
+      onRefresh();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit refund request");
+    } finally { setRefundLoading(false); }
+  };
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+
+      {/* ── Vault card ── */}
+      <div style={{ background:"linear-gradient(135deg,#0a1f0c,#040806)", border:"1px solid rgba(34,197,94,0.35)", borderRadius:"20px", padding:"20px", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", top:"-30px", right:"-30px", width:"120px", height:"120px", borderRadius:"50%", background:"radial-gradient(circle,rgba(34,197,94,0.07),transparent 70%)", pointerEvents:"none" }} />
+
+        <div style={{ display:"flex", alignItems:"center", gap:"12px", marginBottom:"18px" }}>
+          <div style={{ width:"40px", height:"40px", borderRadius:"12px", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.35)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <FontAwesomeIcon icon={faVault} style={{ fontSize:"17px", color:C.accent }} />
+          </div>
+          <div style={{ flex:1 }}>
+            <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"14px", color:C.text, margin:0 }}>Escrow Vault</p>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.dim, margin:0 }}>SkillFund-protected fund holding</p>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <p style={{ fontFamily:"'Fraunces',serif", fontWeight:900, fontSize:"24px", color:C.accent, margin:0 }}>{fmt(heldAmount)}</p>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"10px", color:C.dim, margin:0 }}>currently held</p>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ marginBottom:"14px" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"5px" }}>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.muted }}>{fmt(releasedAmount)} released</span>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.muted }}>{fmt(totalAmount)} total</span>
+          </div>
+          <div style={{ height:"8px", background:"rgba(255,255,255,0.18)", borderRadius:"999px", overflow:"hidden" }}>
+            <div style={{ height:"100%", borderRadius:"999px", background:"linear-gradient(90deg,#22c55e,#4ade80)", width:`${releasedPct}%`, transition:"width .6s ease" }} />
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", marginTop:"4px" }}>
+            <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:C.accent }}>{releasedPct}% released</span>
+            <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:C.muted }}>{100-releasedPct}% held</span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"8px" }}>
+          {[
+            { label:"Released", value:counts.completed, color:C.accent   },
+            { label:"Pending",  value:counts.pending,   color:"#f59e0b"  },
+            { label:"Disputed", value:counts.disputed,  color:"#ef4444"  },
+            { label:"Locked",   value:counts.locked,    color:C.muted    },
+          ].map(({ label, value, color }) => (
+            <div key={label} style={{ background:"rgba(0,0,0,0.3)", borderRadius:"10px", padding:"8px", textAlign:"center", border:"1px solid rgba(255,255,255,0.18)" }}>
+              <p style={{ fontFamily:"'Fraunces',serif", fontWeight:900, fontSize:"20px", color, margin:0 }}>{value}</p>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"10px", color:C.muted, margin:0 }}>{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Fund release timeline ── */}
+      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"16px" }}>
+        <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"11px", color:C.muted, textTransform:"uppercase", letterSpacing:".08em", margin:"0 0 12px" }}>
+          Fund Release Timeline
+        </p>
+        <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+          {milestones.map((m, idx) => {
+            const isDone    = ["approved","auto_released","completed"].includes(m.status);
+            const isPending = m.status === "proof_submitted";
+            const sc = STATUS[m.status] || STATUS.locked;
+            const pct = totalAmount > 0 ? Math.round((m.amount / totalAmount) * 100) : 0;
+            return (
+              <div key={m._id} style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+                <div style={{ width:"26px", height:"26px", borderRadius:"8px", flexShrink:0, background:sc.bg, border:`1px solid ${sc.border}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <FontAwesomeIcon icon={sc.icon} style={{ fontSize:"10px", color:sc.color }} />
+                </div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"3px" }}>
+                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"11px", color: isDone ? C.text : C.muted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                      M{idx+1}: {m.title}
+                    </span>
+                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"11px", color:sc.color, flexShrink:0, marginLeft:"8px" }}>{fmt(m.amount)}</span>
+                  </div>
+                  <div style={{ height:"4px", background:"rgba(255,255,255,0.18)", borderRadius:"999px", overflow:"hidden" }}>
+                    <div style={{ height:"100%", borderRadius:"999px", width: isDone ? `${pct}%` : isPending ? `${Math.round(pct*0.5)}%` : "0%", background: isDone ? "linear-gradient(90deg,#22c55e,#4ade80)" : "#f59e0b", transition:"width .5s ease" }} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Investor protections ── */}
+      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"14px 16px" }}>
+        <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"11px", color:C.muted, textTransform:"uppercase", letterSpacing:".08em", margin:"0 0 10px" }}>
+          Your Protections
+        </p>
+        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+          {[
+            { icon:faShieldHalved,   color:"#22c55e", label:"rgba(34,197,94,0.1)",   text:"Funds only release after milestone proof is approved by you" },
+            { icon:faHourglassHalf,  color:"#f59e0b", label:"rgba(245,158,11,0.1)",  text:"72-hour review window before any auto-release occurs" },
+            { icon:faScaleBalanced,  color:"#3b82f6", label:"rgba(59,130,246,0.1)",  text:"Dispute any milestone — SkillFund admin mediates within 48h" },
+            { icon:faArrowTrendDown, color:"#a855f7", label:"rgba(168,85,247,0.1)",  text:"Refund request available if creator breaches the agreement" },
+          ].map(({ icon, color, label, text }) => (
+            <div key={text} style={{ display:"flex", gap:"10px", alignItems:"flex-start" }}>
+              <div style={{ width:"22px", height:"22px", borderRadius:"6px", background:label, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:"1px" }}>
+                <FontAwesomeIcon icon={icon} style={{ fontSize:"10px", color }} />
+              </div>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, margin:0, lineHeight:1.65 }}>{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Refund / early exit ── */}
+      {investment.status === "active" && (
+        <div style={{ background:C.card, border:"1px solid rgba(239,68,68,0.30)", borderRadius:"16px", padding:"14px 16px" }}>
+          {!showRefund ? (
+            <button
+              onClick={() => setShowRefund(true)}
+              style={{ width:"100%", display:"flex", alignItems:"center", gap:"8px", background:"none", border:"none", cursor:"pointer", padding:0 }}
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize:"13px", color:"#ef4444" }} />
+              <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"13px", color:"#ef4444" }}>Request Refund / Early Exit</span>
+              <FontAwesomeIcon icon={faChevronDown} style={{ fontSize:"10px", color:"#ef4444", marginLeft:"auto" }} />
+            </button>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                <FontAwesomeIcon icon={faTriangleExclamation} style={{ fontSize:"13px", color:"#f59e0b" }} />
+                <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"13px", color:C.text, margin:0 }}>Refund / Early Exit Request</p>
+              </div>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, margin:0, lineHeight:1.65 }}>
+                Submitting a refund request will notify the SkillFund admin team. Only funds from unstarted milestones are eligible for refund. Admin will review within 48 hours.
+              </p>
+              <textarea
+                className="ms-inp"
+                rows={3}
+                placeholder="Explain why you're requesting a refund (e.g. creator has not responded, funds misused, agreement breached)..."
+                value={refundReason}
+                onChange={e => setRefundReason(e.target.value)}
+              />
+              <div style={{ display:"flex", gap:"8px" }}>
+                <button
+                  onClick={handleRefundRequest}
+                  disabled={refundLoading}
+                  style={{ flex:1, padding:"10px 0", borderRadius:"11px", cursor:"pointer", background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", color:"#ef4444", fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:refundLoading?0.7:1 }}
+                >
+                  <FontAwesomeIcon icon={refundLoading ? faCircleNotch : faHandHoldingDollar} spin={refundLoading} style={{ fontSize:"11px" }} />
+                  {refundLoading ? "Submitting…" : "Submit Refund Request"}
+                </button>
+                <button
+                  onClick={() => { setShowRefund(false); setRefundReason(""); }}
+                  style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── MilestoneCard ─────────────────────────────────────────────────────────────
 function MilestoneCard({ milestone, isCreator, onRefresh }) {
   const [expanded, setExpanded]           = useState(false);
   const [proofNotes, setProofNotes]       = useState("");
@@ -53,222 +271,171 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
   const [showDispute, setShowDispute]     = useState(false);
   const [loading, setLoading]             = useState(false);
 
-  const cfg = STATUS[milestone.status] || STATUS.locked;
-  const Icon = cfg.icon;
-  const isDone = ["approved", "auto_released", "completed"].includes(milestone.status);
+  const sc     = STATUS[milestone.status] || STATUS.locked;
+  const isDone = ["approved","auto_released","completed"].includes(milestone.status);
 
   const handleFileChange = (e) => {
-    const selected = Array.from(e.target.files);
-    if (files.length + selected.length > 5) {
-      toast.error("Maximum 5 files per milestone");
-      return;
-    }
-    setFiles((prev) => [...prev, ...selected]);
+    const sel = Array.from(e.target.files);
+    if (files.length + sel.length > 5) { toast.error("Maximum 5 files per milestone"); return; }
+    setFiles(prev => [...prev, ...sel]);
+  };
+  const removeFile = (i) => setFiles(prev => prev.filter((_,idx) => idx !== i));
+
+  const fileIcon = (file) => {
+    if (file.type?.startsWith("video/") || file.type === "video") return <FontAwesomeIcon icon={faVideo}     style={{ fontSize:"11px", color:"#3b82f6" }} />;
+    if (file.type === "document" || file.name?.endsWith(".pdf"))   return <FontAwesomeIcon icon={faFileLines} style={{ fontSize:"11px", color:"#f97316" }} />;
+    return <FontAwesomeIcon icon={faImage} style={{ fontSize:"11px", color:C.accent }} />;
   };
 
-  const removeFile = (i) => setFiles((prev) => prev.filter((_, idx) => idx !== i));
-
   const handleSubmitProof = async () => {
-    if (files.length === 0 && !proofNotes.trim()) {
-      toast.error("Please upload at least one file or add proof notes");
-      return;
-    }
+    if (files.length === 0 && !proofNotes.trim()) { toast.error("Please upload at least one file or add proof notes"); return; }
     setLoading(true);
     try {
       const form = new FormData();
-      files.forEach((f) => form.append("proofFiles", f));
+      files.forEach(f => form.append("proofFiles", f));
       form.append("proofNotes", proofNotes);
-      await api.post(`/milestones/${milestone._id}/proof`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post(`/milestones/${milestone._id}/proof`, form, { headers:{ "Content-Type":"multipart/form-data" } });
       toast.success("Proof submitted! Investor has 72 hours to review.");
       onRefresh();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to submit proof");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to submit proof"); }
+    finally { setLoading(false); }
   };
 
   const handleApprove = async () => {
     setLoading(true);
     try {
       await api.put(`/milestones/${milestone._id}/approve`);
-      toast.success(`Milestone approved — $${milestone.amount} released!`);
+      toast.success(`Milestone approved — ${fmt(milestone.amount)} released!`);
       onRefresh();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to approve");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to approve"); }
+    finally { setLoading(false); }
   };
 
   const handleDispute = async () => {
-    if (!disputeReason.trim()) {
-      toast.error("Please provide a reason for the dispute");
-      return;
-    }
+    if (!disputeReason.trim()) { toast.error("Please provide a reason for the dispute"); return; }
     setLoading(true);
     try {
       await api.put(`/milestones/${milestone._id}/dispute`, { reason: disputeReason });
       toast.success("Dispute raised. Admin will review within 48 hours.");
       setShowDispute(false);
       onRefresh();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to raise dispute");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fileIcon = (file) => {
-    if (file.type?.startsWith("video/") || file.type === "video") return <Video size={14} className="text-blue-400" />;
-    if (file.type === "document" || file.name?.endsWith(".pdf")) return <FileText size={14} className="text-orange-400" />;
-    return <ImageIcon size={14} className="text-primary-400" />;
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to raise dispute"); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className={`card border ${isDone ? "border-primary-500/30" : milestone.status === "disputed" ? "border-red-500/30" : milestone.status === "proof_submitted" ? "border-yellow-500/30" : "border-white/10"}`}>
-      {/* ── Header row ── */}
+    <div style={{ background:C.card, border:`1px solid ${isDone ? "rgba(34,197,94,0.35)" : milestone.status === "disputed" ? "rgba(239,68,68,0.35)" : milestone.status === "proof_submitted" ? "rgba(245,158,11,0.35)" : C.border}`, borderRadius:"16px", overflow:"hidden" }}>
+      {/* Header */}
       <div
-        className="flex items-center justify-between cursor-pointer"
-        onClick={() => setExpanded((v) => !v)}
+        style={{ display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px", cursor:"pointer" }}
+        onClick={() => setExpanded(v => !v)}
       >
-        <div className="flex items-center gap-3">
-          {/* Order badge */}
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isDone ? "bg-primary-500/20 text-primary-400" : "bg-white/8 text-gray-400"}`}>
-            {milestone.order}
-          </div>
-          <div>
-            <p className="font-semibold text-dark-100">{milestone.title}</p>
-            <p className="text-xs text-gray-400">${milestone.amount.toLocaleString()}</p>
-          </div>
+        <div style={{ width:"30px", height:"30px", borderRadius:"9px", flexShrink:0, background:sc.bg, border:`1px solid ${sc.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"12px", color:sc.color }}>
+          {milestone.order}
         </div>
-
-        <div className="flex items-center gap-3">
-          <span className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${cfg.bg} ${cfg.color}`}>
-            <Icon size={11} /> {cfg.label}
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"13px", color:C.text, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{milestone.title}</p>
+          <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.dim, margin:0 }}>{fmt(milestone.amount)}</p>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:"8px", flexShrink:0 }}>
+          <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", padding:"3px 9px", borderRadius:"999px", background:sc.bg, color:sc.color, border:`1px solid ${sc.border}`, display:"flex", alignItems:"center", gap:"4px" }}>
+            <FontAwesomeIcon icon={sc.icon} style={{ fontSize:"9px" }} /> {sc.label}
           </span>
           {milestone.status === "proof_submitted" && milestone.autoReleaseAt && (
             <Countdown autoReleaseAt={milestone.autoReleaseAt} />
           )}
-          {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+          <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} style={{ fontSize:"11px", color:C.muted }} />
         </div>
       </div>
 
-      {/* ── Expanded content ── */}
+      {/* Body */}
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
-          <p className="text-sm text-gray-400">{milestone.description}</p>
+        <div style={{ borderTop:`1px solid ${C.border}`, padding:"16px", display:"flex", flexDirection:"column", gap:"14px" }}>
+          {milestone.description && (
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"13px", color:C.muted, margin:0, lineHeight:1.65 }}>{milestone.description}</p>
+          )}
 
-          {/* Proof files already submitted */}
+          {/* Submitted proof */}
           {milestone.proofFiles?.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Proof Submitted</p>
-              <div className="space-y-1">
+              <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:C.muted, textTransform:"uppercase", letterSpacing:".07em", marginBottom:"8px" }}>Proof Submitted</p>
+              <div style={{ display:"flex", flexDirection:"column", gap:"4px" }}>
                 {milestone.proofFiles.map((f, i) => (
-                  <a
-                    key={f.url || i}
-                    href={f.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-primary-400 hover:text-primary-300"
-                  >
-                    {fileIcon(f)} <Eye size={13} /> {f.originalName || `File ${i + 1}`}
+                  <a key={f.url || i} href={f.url} target="_blank" rel="noopener noreferrer"
+                    style={{ display:"flex", alignItems:"center", gap:"7px", fontSize:"12px", color:C.accent, textDecoration:"none", padding:"6px 10px", background:"rgba(34,197,94,0.05)", border:"1px solid rgba(34,197,94,0.12)", borderRadius:"8px" }}>
+                    {fileIcon(f)} <FontAwesomeIcon icon={faEye} style={{ fontSize:"10px" }} /> {f.originalName || `File ${i+1}`}
                   </a>
                 ))}
               </div>
-              {milestone.proofNotes && (
-                <p className="mt-2 text-sm text-gray-400 italic">"{milestone.proofNotes}"</p>
-              )}
+              {milestone.proofNotes && <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, fontStyle:"italic", marginTop:"8px" }}>"{milestone.proofNotes}"</p>}
             </div>
           )}
 
           {/* Admin note */}
           {milestone.adminNote && (
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-              <p className="text-xs font-semibold text-blue-400 mb-1">Admin Note</p>
-              <p className="text-sm text-gray-400">{milestone.adminNote}</p>
+            <div style={{ background:"rgba(59,130,246,0.07)", border:"1px solid rgba(59,130,246,0.18)", borderRadius:"10px", padding:"10px 12px" }}>
+              <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:"#3b82f6", marginBottom:"4px" }}>Admin Note</p>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, margin:0 }}>{milestone.adminNote}</p>
             </div>
           )}
 
-          {/* ── Creator actions ── */}
+          {/* Creator: submit proof */}
           {isCreator && milestone.status === "locked" && (
-            <div className="space-y-3">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Submit Proof</p>
-
-              {/* File upload */}
-              <label className="flex items-center gap-2 cursor-pointer border border-dashed border-white/10 rounded-lg p-3 hover:border-primary-500/50 transition-colors">
-                <Upload size={16} className="text-gray-400" />
-                <span className="text-sm text-gray-400">Upload files (photos, receipts, video)</span>
-                <input type="file" multiple accept="image/*,video/*,.pdf" className="hidden" onChange={handleFileChange} />
+            <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+              <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:C.muted, textTransform:"uppercase", letterSpacing:".07em", margin:0 }}>Submit Proof</p>
+              <label style={{ display:"flex", alignItems:"center", gap:"8px", cursor:"pointer", border:"1px dashed rgba(255,255,255,0.2)", borderRadius:"12px", padding:"12px" }}>
+                <FontAwesomeIcon icon={faUpload} style={{ fontSize:"14px", color:C.muted }} />
+                <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"13px", color:C.muted }}>Upload files (photos, receipts, video)</span>
+                <input type="file" multiple accept="image/*,video/*,.pdf" style={{ display:"none" }} onChange={handleFileChange} />
               </label>
-
               {files.length > 0 && (
-                <div className="space-y-1">
-                  {files.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between bg-white/8 rounded px-3 py-1.5">
-                      <span className="text-xs text-gray-400 truncate">{f.name}</span>
-                      <button onClick={() => removeFile(i)} className="text-gray-400 hover:text-red-400 ml-2">
-                        <X size={13} />
+                <div style={{ display:"flex", flexDirection:"column", gap:"4px" }}>
+                  {files.map((f,i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:C.input, borderRadius:"8px", padding:"6px 10px" }}>
+                      <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{f.name}</span>
+                      <button onClick={() => removeFile(i)} style={{ background:"none", border:"none", cursor:"pointer", color:C.muted, marginLeft:"8px", flexShrink:0 }}>
+                        <FontAwesomeIcon icon={faXmark} style={{ fontSize:"12px" }} />
                       </button>
                     </div>
                   ))}
                 </div>
               )}
-
-              <textarea
-                className="input-field text-sm resize-none"
-                rows={3}
-                placeholder="Describe what you did and how the funds were used..."
-                value={proofNotes}
-                onChange={(e) => setProofNotes(e.target.value)}
-              />
-
-              <button
-                onClick={handleSubmitProof}
-                disabled={loading}
-                className="btn-primary w-full text-sm"
-              >
-                {loading ? "Submitting..." : "Submit Proof"}
+              <textarea className="ms-inp" rows={3} placeholder="Describe what you did and how the funds were used..." value={proofNotes} onChange={e => setProofNotes(e.target.value)} />
+              <button onClick={handleSubmitProof} disabled={loading}
+                style={{ width:"100%", padding:"11px 0", borderRadius:"12px", cursor:"pointer", background:"linear-gradient(135deg,#22c55e,#16a34a)", border:"none", color:"#000", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"13px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:loading?0.7:1 }}>
+                <FontAwesomeIcon icon={loading ? faCircleNotch : faUpload} spin={loading} style={{ fontSize:"12px" }} />
+                {loading ? "Submitting…" : "Submit Proof"}
               </button>
             </div>
           )}
 
-          {/* ── Investor actions ── */}
+          {/* Investor: approve or dispute */}
           {!isCreator && milestone.status === "proof_submitted" && (
-            <div className="space-y-3">
+            <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
               {!showDispute ? (
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleApprove}
-                    disabled={loading}
-                    className="btn-primary flex-1 text-sm"
-                  >
-                    {loading ? "Processing..." : `Approve & Release $${milestone.amount}`}
+                <div style={{ display:"flex", gap:"8px" }}>
+                  <button onClick={handleApprove} disabled={loading}
+                    style={{ flex:1, padding:"11px 0", borderRadius:"12px", cursor:"pointer", background:"linear-gradient(135deg,#22c55e,#16a34a)", border:"none", color:"#000", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:loading?0.7:1 }}>
+                    <FontAwesomeIcon icon={loading ? faCircleNotch : faCircleCheck} spin={loading} style={{ fontSize:"11px" }} />
+                    {loading ? "Processing…" : `Approve & Release ${fmt(milestone.amount)}`}
                   </button>
-                  <button
-                    onClick={() => setShowDispute(true)}
-                    className="flex-1 text-sm border border-red-500/40 text-red-400 rounded-lg px-4 py-2 hover:bg-red-500/10 transition-colors"
-                  >
+                  <button onClick={() => setShowDispute(true)}
+                    style={{ flex:1, padding:"11px 0", borderRadius:"12px", cursor:"pointer", background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)", color:"#ef4444", fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"12px" }}>
                     Dispute
                   </button>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-red-400">Dispute Reason</p>
-                  <textarea
-                    className="input-field text-sm resize-none border-red-500/30"
-                    rows={3}
-                    placeholder="Explain why you are disputing this proof submission..."
-                    value={disputeReason}
-                    onChange={(e) => setDisputeReason(e.target.value)}
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={handleDispute} disabled={loading} className="flex-1 text-sm bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg px-4 py-2 hover:bg-red-500/30 transition-colors">
-                      {loading ? "Submitting..." : "Submit Dispute"}
+                <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+                  <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px", color:"#ef4444", margin:0 }}>Dispute Reason</p>
+                  <textarea className="ms-inp" rows={3} placeholder="Explain why you are disputing this proof submission..." value={disputeReason} onChange={e => setDisputeReason(e.target.value)} style={{ borderColor:"rgba(239,68,68,0.3)" }} />
+                  <div style={{ display:"flex", gap:"8px" }}>
+                    <button onClick={handleDispute} disabled={loading}
+                      style={{ flex:1, padding:"10px 0", borderRadius:"11px", cursor:"pointer", background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", color:"#ef4444", fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px" }}>
+                      <FontAwesomeIcon icon={loading ? faCircleNotch : faScaleBalanced} spin={loading} style={{ fontSize:"11px" }} />
+                      {loading ? "Submitting…" : "Submit Dispute"}
                     </button>
-                    <button onClick={() => setShowDispute(false)} className="flex-1 text-sm border border-white/10 text-gray-400 rounded-lg px-4 py-2 hover:bg-white/8 transition-colors">
+                    <button onClick={() => setShowDispute(false)}
+                      style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}>
                       Cancel
                     </button>
                   </div>
@@ -277,11 +444,10 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
             </div>
           )}
 
-          {/* Approved / done state */}
+          {/* Done timestamp */}
           {isDone && milestone.approvedAt && (
-            <p className="text-xs text-gray-400">
-              {milestone.status === "auto_released" ? "Auto-released" : "Approved"} on{" "}
-              {new Date(milestone.approvedAt).toLocaleDateString()}
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.dim, margin:0 }}>
+              {milestone.status === "auto_released" ? "Auto-released" : "Approved"} on {fmtD(milestone.approvedAt)}
             </p>
           )}
         </div>
@@ -290,136 +456,98 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
   );
 }
 
-// ─── Create milestones form (creator, first time) ───────────────────────────
+// ── CreateMilestonesForm ──────────────────────────────────────────────────────
 function CreateMilestonesForm({ investment, onCreated }) {
-  const [rows, setRows] = useState([{ title: "", description: "", amount: "" }]);
+  const [rows, setRows]       = useState([{ title:"", description:"", amount:"" }]);
   const [loading, setLoading] = useState(false);
 
   const totalEntered = rows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
-  const remaining = investment.amount - totalEntered;
+  const remaining    = investment.amount - totalEntered;
 
-  const addRow = () => setRows((prev) => [...prev, { title: "", description: "", amount: "" }]);
-  const removeRow = (i) => setRows((prev) => prev.filter((_, idx) => idx !== i));
-  const updateRow = (i, field, val) =>
-    setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, [field]: val } : r)));
+  const addRow    = () => setRows(prev => [...prev, { title:"", description:"", amount:"" }]);
+  const removeRow = (i) => setRows(prev => prev.filter((_,idx) => idx !== i));
+  const updateRow = (i, field, val) => setRows(prev => prev.map((r,idx) => idx === i ? { ...r, [field]:val } : r));
 
   const handleSubmit = async () => {
-    if (rows.some((r) => !r.title || !r.description || !r.amount)) {
-      toast.error("Please fill in all milestone fields");
-      return;
-    }
-    if (Math.abs(remaining) > 1) {
-      toast.error(`Milestone amounts must total exactly $${investment.amount}`);
-      return;
-    }
+    if (rows.some(r => !r.title || !r.description || !r.amount)) { toast.error("Please fill in all milestone fields"); return; }
+    if (Math.abs(remaining) > 1) { toast.error(`Milestone amounts must total exactly ${fmt(investment.amount)}`); return; }
     setLoading(true);
     try {
       await api.post("/milestones", {
         investmentId: investment._id,
-        milestones: rows.map((r) => ({ ...r, amount: parseFloat(r.amount) })),
+        milestones: rows.map(r => ({ ...r, amount: parseFloat(r.amount) })),
       });
       toast.success("Milestones created successfully!");
       onCreated();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create milestones");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to create milestones"); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg p-4">
-        <p className="text-sm text-primary-400 font-medium">
-          Break your ${ investment.amount.toLocaleString()} funding into milestones. Each milestone
-          unlocks its funds when you submit proof and the investor approves.
+    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+      <div style={{ background:"rgba(34,197,94,0.05)", border:"1px solid rgba(34,197,94,0.30)", borderRadius:"14px", padding:"14px 16px" }}>
+        <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"13px", color:C.accent, margin:0, lineHeight:1.65 }}>
+          Break your <strong>{fmt(investment.amount)}</strong> funding into milestones. Each milestone unlocks its funds when you submit proof and the investor approves.
         </p>
       </div>
 
-      {/* Budget tracker */}
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-400">Total budget: <span className="text-dark-100 font-medium">${investment.amount.toLocaleString()}</span></span>
-        <span className={remaining < 0 ? "text-red-400" : remaining === 0 ? "text-primary-400" : "text-yellow-400"}>
-          {remaining < 0 ? `Over by $${Math.abs(remaining).toFixed(2)}` : remaining === 0 ? "✓ Fully allocated" : `$${remaining.toFixed(2)} remaining`}
-        </span>
-      </div>
-
       {/* Budget bar */}
-      <div className="h-2 bg-white/8 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${totalEntered > investment.amount ? "bg-red-500" : "bg-primary-500"}`}
-          style={{ width: `${Math.min((totalEntered / investment.amount) * 100, 100)}%` }}
-        />
+      <div>
+        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"5px" }}>
+          <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted }}>Total: <strong style={{ color:C.text }}>{fmt(investment.amount)}</strong></span>
+          <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px", color: remaining < 0 ? "#ef4444" : remaining === 0 ? C.accent : "#f59e0b" }}>
+            {remaining < 0 ? `Over by ${fmt(Math.abs(remaining))}` : remaining === 0 ? "✓ Fully allocated" : `${fmt(remaining)} remaining`}
+          </span>
+        </div>
+        <div style={{ height:"7px", background:"rgba(255,255,255,0.18)", borderRadius:"999px", overflow:"hidden" }}>
+          <div style={{ height:"100%", borderRadius:"999px", transition:"width .4s ease", width:`${Math.min((totalEntered/investment.amount)*100,100)}%`, background: totalEntered > investment.amount ? "#ef4444" : "linear-gradient(90deg,#22c55e,#4ade80)" }} />
+        </div>
       </div>
 
-      {/* Milestone rows */}
+      {/* Rows */}
       {rows.map((row, i) => (
-        <div key={i} className="card border border-white/10 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-gray-400">Milestone {i + 1}</p>
+        <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"14px", padding:"14px", display:"flex", flexDirection:"column", gap:"10px" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px", color:C.muted, margin:0 }}>Milestone {i+1}</p>
             {rows.length > 1 && (
-              <button onClick={() => removeRow(i)} className="text-gray-400 hover:text-red-400">
-                <Trash2 size={15} />
+              <button onClick={() => removeRow(i)} style={{ background:"none", border:"none", cursor:"pointer", color:C.muted }}>
+                <FontAwesomeIcon icon={faTrash} style={{ fontSize:"12px" }} />
               </button>
             )}
           </div>
-          <div className="grid grid-cols-1 gap-3">
-            <input
-              className="input-field text-sm"
-              placeholder="Milestone title (e.g. Buy industrial sewing machine)"
-              value={row.title}
-              onChange={(e) => updateRow(i, "title", e.target.value)}
-            />
-            <textarea
-              className="input-field text-sm resize-none"
-              rows={2}
-              placeholder="What will you do / buy with this tranche?"
-              value={row.description}
-              onChange={(e) => updateRow(i, "description", e.target.value)}
-            />
-            <div className="relative">
-              <DollarSign size={14} className="absolute left-3 top-3.5 text-gray-400" />
-              <input
-                type="number"
-                className="input-field text-sm"
-                style={{ paddingLeft: "2rem" }}
-                placeholder="Amount"
-                value={row.amount}
-                onChange={(e) => updateRow(i, "amount", e.target.value)}
-              />
-            </div>
+          <input className="ms-inp" placeholder="Milestone title (e.g. Buy industrial sewing machine)" value={row.title} onChange={e => updateRow(i,"title",e.target.value)} />
+          <textarea className="ms-inp" rows={2} placeholder="What will you do / buy with this tranche?" value={row.description} onChange={e => updateRow(i,"description",e.target.value)} />
+          <div style={{ position:"relative" }}>
+            <FontAwesomeIcon icon={faDollarSign} style={{ position:"absolute", left:"12px", top:"50%", transform:"translateY(-50%)", fontSize:"12px", color:C.dim, pointerEvents:"none" }} />
+            <input type="number" className="ms-inp" style={{ paddingLeft:"28px" }} placeholder="Amount" value={row.amount} onChange={e => updateRow(i,"amount",e.target.value)} />
           </div>
         </div>
       ))}
 
-      <button
-        onClick={addRow}
-        className="w-full border border-dashed border-white/10 rounded-lg py-2.5 text-sm text-gray-400 hover:border-primary-500/50 hover:text-primary-400 transition-colors flex items-center justify-center gap-2"
-      >
-        <Plus size={15} /> Add Milestone
+      <button onClick={addRow}
+        style={{ width:"100%", border:"1px dashed rgba(255,255,255,0.2)", borderRadius:"12px", padding:"10px 0", background:"none", cursor:"pointer", fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"13px", color:C.muted, display:"flex", alignItems:"center", justifyContent:"center", gap:"6px" }}>
+        <FontAwesomeIcon icon={faPlus} style={{ fontSize:"11px" }} /> Add Milestone
       </button>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading || Math.abs(remaining) > 1}
-        className="btn-primary w-full"
-      >
-        {loading ? "Saving..." : "Save Milestones"}
+      <button onClick={handleSubmit} disabled={loading || Math.abs(remaining) > 1}
+        style={{ width:"100%", padding:"12px 0", borderRadius:"12px", cursor: loading || Math.abs(remaining)>1 ? "not-allowed" : "pointer", background: Math.abs(remaining)>1 ? C.input : "linear-gradient(135deg,#22c55e,#16a34a)", border: Math.abs(remaining)>1 ? `1px solid ${C.border}` : "none", color: Math.abs(remaining)>1 ? C.muted : "#000", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"13px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:loading?0.7:1 }}>
+        <FontAwesomeIcon icon={loading ? faCircleNotch : faCircleCheck} spin={loading} style={{ fontSize:"12px" }} />
+        {loading ? "Saving…" : "Save Milestones"}
       </button>
     </div>
   );
 }
 
-// ─── Main page ──────────────────────────────────────────────────────────────
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function Milestones() {
   const { investmentId } = useParams();
-  const navigate          = useNavigate();
-  const { user }          = useAuthStore();
+  const navigate         = useNavigate();
+  const { user }         = useAuthStore();
 
-  const [investment, setInvestment] = useState(null);
-  const [milestones, setMilestones] = useState([]);
-  const [summary, setSummary]       = useState(null);
-  const [loading, setLoading]       = useState(true);
+  const [investment, setInvestment]     = useState(null);
+  const [milestones, setMilestones]     = useState([]);
+  const [summary, setSummary]           = useState(null);
+  const [loading, setLoading]           = useState(true);
   const [noMilestones, setNoMilestones] = useState(false);
 
   const isCreator = user?.role === "creator";
@@ -435,7 +563,6 @@ export default function Milestones() {
       setSummary(milRes.data.summary);
       setNoMilestones((milRes.data.milestones || []).length === 0);
     } catch {
-      // If milestones 404, investment might still be valid
       try {
         const invRes = await api.get(`/investments/${investmentId}`);
         setInvestment(invRes.data.investment);
@@ -444,125 +571,125 @@ export default function Milestones() {
         toast.error("Investment not found");
         navigate("/investments");
       }
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, [investmentId, navigate]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  if (loading) {
-    return (
-      <Layout title="Milestones">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary-500" />
-        </div>
-      </Layout>
-    );
-  }
+  if (loading) return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"200px" }}>
+      <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize:"28px", color:C.accent }} />
+    </div>
+  );
 
   if (!investment) return null;
 
-  const progressPct = summary ? Math.round((summary.completedAmount / summary.totalAmount) * 100) : 0;
+  const progressPct = summary && summary.totalAmount > 0
+    ? Math.round((summary.completedAmount / summary.totalAmount) * 100)
+    : 0;
 
   return (
-    <Layout title="Milestones">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="space-y-6">
+      <style>{STYLES}</style>
 
-        {/* Back */}
-        <button
-          onClick={() => navigate("/investments")}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-400 transition-colors"
-        >
-          <ArrowLeft size={15} /> Back to Investments
-        </button>
+      {/* Back */}
+      <button onClick={() => navigate("/investments")}
+        style={{ display:"flex", alignItems:"center", gap:"6px", background:"none", border:"none", cursor:"pointer", fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"13px", color:C.muted, padding:0 }}>
+        <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize:"12px" }} /> Back to Investments
+      </button>
 
-        {/* Investment summary card */}
-        <div className="card border border-white/10">
-          <div className="flex items-start justify-between flex-wrap gap-3">
-            <div>
-              <h2 className="text-lg font-bold text-dark-100">
-                {isCreator ? investment.investor?.name : investment.creator?.name}
-              </h2>
-              <p className="text-sm text-gray-400">
-                ${investment.amount.toLocaleString()} · {investment.profitSharePercentage}% for {investment.duration} months
-              </p>
-            </div>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium ${investment.status === "active" ? "bg-primary-500/20 text-primary-400" : "bg-white/8 text-gray-400"}`}>
-              {investment.status}
-            </span>
+      {/* Investment summary */}
+      <div style={{ background:"linear-gradient(135deg,#0a1f0c,#040806)", border:"1px solid rgba(34,197,94,0.35)", borderRadius:"20px", padding:"20px", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", top:"-20px", right:"-20px", width:"100px", height:"100px", borderRadius:"50%", background:"radial-gradient(circle,rgba(34,197,94,0.06),transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:"10px", marginBottom: summary && summary.totalAmount > 0 ? "14px" : 0 }}>
+          <div>
+            <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"10px", color:C.dim, textTransform:"uppercase", letterSpacing:".08em", marginBottom:"4px" }}>
+              {isCreator ? "Investor" : "Creator"}
+            </p>
+            <h2 style={{ fontFamily:"'Fraunces',serif", fontWeight:900, fontSize:"1.2rem", color:C.text, margin:"0 0 3px" }}>
+              {isCreator ? investment.investor?.name : investment.creator?.name}
+            </h2>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, margin:0 }}>
+              {fmt(investment.amount)} · {investment.profitSharePercentage}% share · {investment.duration} months
+            </p>
           </div>
-
-          {/* Progress */}
-          {summary && summary.totalAmount > 0 && (
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-xs text-gray-400">
-                <span>${summary.completedAmount.toLocaleString()} released</span>
-                <span>${summary.totalAmount.toLocaleString()} total</span>
-              </div>
-              <div className="h-2 bg-white/8 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary-500 rounded-full transition-all"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <div className="flex gap-4 text-xs text-gray-400">
-                <span><span className="text-primary-400 font-medium">{summary.completedCount}</span> completed</span>
-                <span><span className="text-yellow-400 font-medium">{summary.pendingCount}</span> pending review</span>
-                <span><span className="text-gray-400 font-medium">{summary.lockedCount}</span> locked</span>
-              </div>
-            </div>
-          )}
+          <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"11px", padding:"4px 12px", borderRadius:"999px", background: investment.status === "active" ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.18)", color: investment.status === "active" ? C.accent : C.muted, border: investment.status === "active" ? "1px solid rgba(34,197,94,0.35)" : `1px solid ${C.border}` }}>
+            {investment.status}
+          </span>
         </div>
 
-        {/* Milestones section */}
-        <div className="space-y-4">
-          <h3 className="text-base font-semibold text-dark-100">
-            {noMilestones
-              ? isCreator
-                ? "Set Up Your Milestones"
-                : "Awaiting Milestone Setup"
-              : `Milestones (${milestones.length})`}
-          </h3>
-
-          {/* Creator — no milestones yet */}
-          {noMilestones && isCreator && (
-            <CreateMilestonesForm investment={investment} onCreated={fetchData} />
-          )}
-
-          {/* Investor — waiting */}
-          {noMilestones && !isCreator && (
-            <div className="card border border-white/10 text-center py-10">
-              <Clock size={32} className="text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-400 font-medium">Awaiting milestone setup</p>
-              <p className="text-sm text-gray-300 mt-1">
-                The creator hasn't set up their milestones yet.
-              </p>
+        {summary && summary.totalAmount > 0 && (
+          <>
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"5px" }}>
+              <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.muted }}>{fmt(summary.completedAmount)} released</span>
+              <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.muted }}>{fmt(summary.totalAmount)} total</span>
             </div>
-          )}
-
-          {/* Milestone cards */}
-          {!noMilestones && milestones.map((m) => (
-            <MilestoneCard
-              key={m._id}
-              milestone={m}
-              isCreator={isCreator}
-              onRefresh={fetchData}
-            />
-          ))}
-        </div>
-
-        {/* How it works info box */}
-        {!noMilestones && (
-          <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-400 space-y-1">
-            <p className="font-semibold text-gray-400 mb-2">How milestones work</p>
-            <p>1. Creator completes a milestone task and submits photo/receipt/video proof.</p>
-            <p>2. Investor reviews and approves — funds are released instantly.</p>
-            <p>3. If the investor doesn't respond within 72 hours, funds auto-release.</p>
-            <p>4. If proof is disputed, SkillFund admin mediates within 48 hours.</p>
-          </div>
+            <div style={{ height:"7px", background:"rgba(255,255,255,0.18)", borderRadius:"999px", overflow:"hidden", marginBottom:"8px" }}>
+              <div style={{ height:"100%", background:"linear-gradient(90deg,#22c55e,#4ade80)", borderRadius:"999px", width:`${progressPct}%`, transition:"width .6s ease" }} />
+            </div>
+            <div style={{ display:"flex", gap:"16px" }}>
+              {[
+                { label:"completed",     value:summary.completedCount, color:C.accent   },
+                { label:"pending review",value:summary.pendingCount,   color:"#f59e0b"  },
+                { label:"locked",        value:summary.lockedCount,    color:C.muted    },
+              ].map(({ label, value, color }) => (
+                <span key={label} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"11px", color:C.muted }}>
+                  <span style={{ color, fontWeight:700 }}>{value}</span> {label}
+                </span>
+              ))}
+            </div>
+          </>
         )}
       </div>
-    </Layout>
+
+      {/* Escrow Panel — investor only, after milestones are set up */}
+      {!isCreator && milestones.length > 0 && (
+        <EscrowPanel
+          investment={investment}
+          milestones={milestones}
+          summary={summary}
+          onRefresh={fetchData}
+        />
+      )}
+
+      {/* Milestones list */}
+      <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+        <h3 style={{ fontFamily:"'Fraunces',serif", fontWeight:900, fontSize:"1.05rem", color:C.text, margin:0 }}>
+          {noMilestones
+            ? isCreator ? "Set Up Your Milestones" : "Awaiting Milestone Setup"
+            : `Milestones (${milestones.length})`}
+        </h3>
+
+        {noMilestones && isCreator  && <CreateMilestonesForm investment={investment} onCreated={fetchData} />}
+        {noMilestones && !isCreator && (
+          <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"40px 20px", textAlign:"center" }}>
+            <FontAwesomeIcon icon={faClock} style={{ fontSize:"28px", color:C.muted, marginBottom:"12px", display:"block" }} />
+            <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"14px", color:C.muted, margin:"0 0 4px" }}>Awaiting milestone setup</p>
+            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.dim, margin:0 }}>The creator hasn't set up their milestones yet.</p>
+          </div>
+        )}
+
+        {!noMilestones && milestones.map(m => (
+          <MilestoneCard key={m._id} milestone={m} isCreator={isCreator} onRefresh={fetchData} />
+        ))}
+      </div>
+
+      {/* How it works */}
+      {!noMilestones && (
+        <div style={{ background:"rgba(255,255,255,0.02)", border:`1px solid ${C.border}`, borderRadius:"16px", padding:"16px" }}>
+          <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"12px", color:C.muted, margin:"0 0 10px" }}>How milestones work</p>
+          {[
+            "Creator completes a milestone task and submits photo / receipt / video proof.",
+            "Investor reviews and approves — funds are released instantly.",
+            "If the investor doesn't respond within 72 hours, funds auto-release.",
+            "If proof is disputed, SkillFund admin mediates within 48 hours.",
+          ].map((step, i) => (
+            <p key={i} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.muted, margin:"0 0 5px" }}>
+              <span style={{ color:C.accent, fontWeight:700 }}>{i+1}.</span> {step}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

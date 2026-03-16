@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers, faWallet, faShieldHalved, faTriangleExclamation,
-  faArrowTrendUp, faReceipt, faCircleNotch, faArrowRight,
+  faArrowTrendUp, faReceipt, faCircleNotch, faArrowRight, faFlag,
   faUserPlus, faChartLine, faCoins,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import useAdminAuthStore from "../../store/useAdminAuthStore";
+
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const T = {
   bg: "#ffffff", pageBg: "#f5f6fa", border: "1px solid #eef0f4",
@@ -23,20 +25,23 @@ function Card({ children, style = {}, onClick }) {
   );
 }
 
-function fmt(n) { return (n || 0).toLocaleString(); }
-function fmtMoney(n) { return `$${fmt(n)}`; }
+function fmt(n)    { return (n || 0).toLocaleString(); }
+function fmtUSD(n) { return `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; }
+
 
 export default function AdminDashboard() {
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
   const { adminToken } = useAdminAuthStore();
-  const [data, setData]       = useState(null);
+  const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(false);
 
   useEffect(() => {
-    const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    axios.get(`${BASE}/admin/analytics`, { headers: { Authorization: `Bearer ${adminToken}` } })
+    if (!adminToken) return;
+    axios
+      .get(`${BASE}/admin/analytics`, { headers: { Authorization: `Bearer ${adminToken}` } })
       .then(res => setData(res.data.analytics))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [adminToken]);
 
@@ -47,23 +52,57 @@ export default function AdminDashboard() {
     </div>
   );
 
+  if (error) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "300px", fontFamily: T.font, color: "#f43f5e", fontSize: "14px" }}>
+      Failed to load analytics. Please refresh the page.
+    </div>
+  );
+
+  // USD-only — NGN was the old system
+  const revenueUSD = data?.revenue?.usd || 0;
+
   const STAT_CARDS = [
-    { label: "Total Users",      value: fmt(data?.users?.total),            sub: `+${fmt(data?.users?.newThisMonth)} this month`, icon: faUsers,          color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff", path: "/admin/users" },
-    { label: "Total Revenue",    value: fmtMoney(data?.revenue?.total),     sub: "From successful txns",                          icon: faChartLine,      color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0", path: "/admin/transactions" },
-    { label: "Total Invested",   value: fmtMoney(data?.investments?.totalInvested), sub: `${fmt(data?.investments?.active)} active deals`, icon: faCoins, color: "#0ea5e9", bg: "#f0f9ff", border: "#bae6fd", path: "/admin/transactions" },
-    { label: "Pending Payouts",  value: fmtMoney(data?.pending?.withdrawalAmount), sub: `${fmt(data?.pending?.withdrawals)} requests pending`, icon: faWallet, color: "#f59e0b", bg: "#fffbeb", border: "#fde68a", path: "/admin/withdrawals" },
+    {
+      label: "Total Users",
+      value: fmt(data?.users?.total),
+      sub: `+${fmt(data?.users?.newThisMonth)} this month`,
+      icon: faUsers, color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff",
+      path: "/admin/users",
+    },
+    {
+      label: "Total Revenue",
+      value: fmtUSD(revenueUSD),
+      sub: "From successful transactions",
+      icon: faChartLine, color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0",
+      path: "/admin/transactions",
+    },
+    {
+      label: "Total Invested",
+      value: fmtUSD(data?.investments?.totalInvested),
+      sub: `${fmt(data?.investments?.active)} active deals`,
+      icon: faCoins, color: "#0ea5e9", bg: "#f0f9ff", border: "#bae6fd",
+      path: "/admin/transactions",
+    },
+    {
+      label: "Pending Payouts",
+      value: fmtUSD(data?.pending?.withdrawalAmount),
+      sub: `${fmt(data?.pending?.withdrawals)} requests pending`,
+      icon: faWallet, color: "#f59e0b", bg: "#fffbeb", border: "#fde68a",
+      path: "/admin/withdrawals",
+    },
   ];
 
   const ALERT_CARDS = [
-    { label: "Pending KYC",    value: data?.pending?.verifications, icon: faShieldHalved,        color: "#14b8a6", bg: "#f0fdfa", border: "#99f6e4", path: "/admin/verifications", cta: "Review submissions" },
-    { label: "Open Disputes",  value: data?.pending?.disputes,      icon: faTriangleExclamation, color: "#f43f5e", bg: "#fff1f2", border: "#fecdd3", path: "/admin/disputes",      cta: "View disputes" },
-    { label: "New This Month", value: data?.users?.newThisMonth,    icon: faUserPlus,            color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff", path: "/admin/users",         cta: "View new users" },
-    { label: "Total Investments", value: data?.investments?.total,  icon: faArrowTrendUp,        color: "#8b5cf6", bg: "#f5f3ff", border: "#ddd6fe", path: "/admin/transactions",  cta: "View transactions" },
+    { label: "Pending KYC",       value: data?.pending?.verifications, icon: faShieldHalved,        color: "#14b8a6", bg: "#f0fdfa", border: "#99f6e4", path: "/admin/verifications", cta: "Review submissions" },
+    { label: "Open Disputes",     value: data?.pending?.disputes,      icon: faTriangleExclamation, color: "#f43f5e", bg: "#fff1f2", border: "#fecdd3", path: "/admin/disputes",  cta: "View disputes" },
+    { label: "Pending Reports",   value: data?.pending?.reports,       icon: faFlag,                color: "#f97316", bg: "#fff7ed", border: "#fed7aa", path: "/admin/reports",   cta: "Review reports" },
+    { label: "New This Month",    value: data?.users?.newThisMonth,    icon: faUserPlus,            color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff", path: "/admin/users",     cta: "View new users" },
+    { label: "Total Investments", value: data?.investments?.total,     icon: faArrowTrendUp,        color: "#8b5cf6", bg: "#f5f3ff", border: "#ddd6fe", path: "/admin/transactions", cta: "View transactions" },
   ];
 
-  const planDist = data?.planDistribution || [];
+  const planDist     = data?.planDistribution || [];
   const totalForPlan = planDist.reduce((s, p) => s + p.count, 0) || 1;
-  const PLAN_COLORS = { basic: "#9ea3ae", starter: "#6366f1", pro: "#0ea5e9", elite: "#f59e0b" };
+  const PLAN_COLORS  = { basic: "#9ea3ae", starter: "#6366f1", pro: "#0ea5e9", elite: "#f59e0b" };
 
   const ROLE_SPLIT = [
     { label: "Creators",  value: data?.users?.creators,  color: "#16a34a", bg: "#f0fdf4" },
@@ -73,12 +112,14 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "admFadeUp .3s ease both" }}>
+
       <style>{`@keyframes admFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      {/* ── Stat cards ── */}
+      {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
         {STAT_CARDS.map(s => (
-          <Card key={s.label} onClick={() => navigate(s.path)} style={{ padding: "20px", transition: "box-shadow .15s, transform .15s" }}
+          <Card key={s.label} onClick={() => navigate(s.path)}
+            style={{ padding: "20px", transition: "box-shadow .15s, transform .15s" }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = T.shadow; e.currentTarget.style.transform = "none"; }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px" }}>
@@ -94,10 +135,10 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* ── Middle row: alerts + plan dist ── */}
+      {/* Middle row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
 
-        {/* Alert / action cards */}
+        {/* Needs Attention */}
         <Card style={{ padding: "20px" }}>
           <p style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 700, color: T.text, margin: "0 0 16px" }}>Needs Attention</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -119,11 +160,10 @@ export default function AdminDashboard() {
           </div>
         </Card>
 
-        {/* Plan distribution */}
+        {/* User Breakdown */}
         <Card style={{ padding: "20px" }}>
           <p style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 700, color: T.text, margin: "0 0 16px" }}>User Breakdown</p>
 
-          {/* Role split */}
           <p style={{ fontFamily: T.font, fontSize: "11px", fontWeight: 600, color: T.muted, textTransform: "uppercase", letterSpacing: ".06em", margin: "0 0 8px" }}>By Role</p>
           <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
             {ROLE_SPLIT.map(r => (
@@ -135,7 +175,6 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Plan distribution bars */}
           <p style={{ fontFamily: T.font, fontSize: "11px", fontWeight: 600, color: T.muted, textTransform: "uppercase", letterSpacing: ".06em", margin: "0 0 10px" }}>By Plan</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {["basic", "starter", "pro", "elite"].map(plan => {
@@ -159,16 +198,16 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* ── Quick nav ── */}
+      {/* Quick Actions */}
       <Card style={{ padding: "20px" }}>
         <p style={{ fontFamily: T.font, fontSize: "13px", fontWeight: 700, color: T.text, margin: "0 0 14px" }}>Quick Actions</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px" }}>
           {[
-            { label: "Manage Users",    icon: faUsers,               color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff", path: "/admin/users" },
-            { label: "Review KYC",      icon: faShieldHalved,        color: "#14b8a6", bg: "#f0fdfa", border: "#99f6e4", path: "/admin/verifications" },
-            { label: "Withdrawals",     icon: faWallet,              color: "#8b5cf6", bg: "#f5f3ff", border: "#ddd6fe", path: "/admin/withdrawals" },
-            { label: "Transactions",    icon: faReceipt,             color: "#f59e0b", bg: "#fffbeb", border: "#fde68a", path: "/admin/transactions" },
-            { label: "Disputes",        icon: faTriangleExclamation, color: "#f43f5e", bg: "#fff1f2", border: "#fecdd3", path: "/admin/disputes" },
+            { label: "Manage Users",  icon: faUsers,               color: "#6366f1", bg: "#eef2ff", border: "#e0e7ff", path: "/admin/users" },
+            { label: "Review KYC",   icon: faShieldHalved,        color: "#14b8a6", bg: "#f0fdfa", border: "#99f6e4", path: "/admin/verifications" },
+            { label: "Withdrawals",  icon: faWallet,              color: "#8b5cf6", bg: "#f5f3ff", border: "#ddd6fe", path: "/admin/withdrawals" },
+            { label: "Transactions", icon: faReceipt,             color: "#f59e0b", bg: "#fffbeb", border: "#fde68a", path: "/admin/transactions" },
+            { label: "Disputes",     icon: faTriangleExclamation, color: "#f43f5e", bg: "#fff1f2", border: "#fecdd3", path: "/admin/disputes" },
           ].map(q => (
             <button key={q.label} onClick={() => navigate(q.path)}
               style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 14px", borderRadius: "12px", background: q.bg, border: `1px solid ${q.border}`, cursor: "pointer", transition: "opacity .15s", width: "100%" }}

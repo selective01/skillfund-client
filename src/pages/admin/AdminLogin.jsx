@@ -58,7 +58,7 @@ export default function AdminLogin() {
     const res = await verifyOtp(email, code);
     if (res.success) {
       toast.success("Welcome back");
-      navigate("/admin/users");
+      navigate("/admin/dashboard");
     } else {
       toast.error(res.message);
       setOtp(["", "", "", "", "", ""]);
@@ -83,13 +83,13 @@ export default function AdminLogin() {
       {/* Left branding panel */}
       <div className="hidden lg:flex flex-col justify-between w-5/12 p-12" style={{ background: "linear-gradient(160deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)" }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.22)", border: "1px solid rgba(255,255,255,0.2)" }}>
             <FontAwesomeIcon icon={faArrowTrendUp} style={{ fontSize: "16px", color: "#a5f3fc" }} />
           </div>
           <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: "20px", color: "#fff" }}>SkillFund</span>
         </div>
         <div>
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.15)" }}>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6" style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.22)" }}>
             <FontAwesomeIcon icon={faShieldHalved} style={{ fontSize: "22px", color: "#c7d2fe" }} />
           </div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: "2.2rem", color: "#fff", lineHeight: 1.15 }}>Admin Portal</h1>

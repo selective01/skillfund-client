@@ -124,7 +124,7 @@ export default function BrowseInvestors() {
   const hasActiveFilters = search || industry || minBudget;
 
   const selectStyle = {
-    background: "#070d08", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff",
+    background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", color: "#ffffff",
     borderRadius: "12px", padding: "10px 36px 10px 14px", fontSize: "14px",
     outline: "none", width: "100%", appearance: "none", WebkitAppearance: "none",
     fontFamily: "'DM Sans', sans-serif",
@@ -158,7 +158,7 @@ export default function BrowseInvestors() {
             </p>
           </div>
           {user?.role === "investor" && (
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#f59e0b", fontFamily: "'Syne', sans-serif" }}>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", color: "#f59e0b", fontFamily: "'Syne', sans-serif" }}>
               👋 Switch to creator to connect with investors
             </div>
           )}
@@ -193,7 +193,7 @@ export default function BrowseInvestors() {
           style={{
             fontFamily: "'Syne', sans-serif",
             background: showFilters || hasActiveFilters ? "rgba(59,130,246,0.1)" : "#070d08",
-            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : "rgba(255,255,255,0.1)"}`,
+            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : "rgba(255,255,255,0.2)"}`,
             color: showFilters || hasActiveFilters ? "#3b82f6" : "#9ca3af",
           }}
         >
@@ -204,7 +204,7 @@ export default function BrowseInvestors() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
             {hasActiveFilters && (
@@ -303,10 +303,10 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
   return (
     <div
       className="group rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-1"
-      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", position: "relative", overflow: "visible" }}
+      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.18)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/investors/${id}`)}
       onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 16px 48px rgba(0,0,0,0.5)"; e.currentTarget.style.borderColor = "rgba(59,130,246,0.25)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; }}
     >
       {/* Cover strip */}
       <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: "rgba(0,0,0,0.2)" }}>
@@ -356,7 +356,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
             { faIcon: faChartBar,     color: "#a855f7", label: "Total Invested", value: totalInvested > 0 ? `$${Number(totalInvested).toLocaleString()}` : "—" },
             { faIcon: faShield,       color: "#f59e0b", label: "Duration",       value: duration      > 0 ? `${duration}mo`                            : "—" },
           ].map(({ faIcon, color, label, value }) => (
-            <div key={label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.05)" }}>
+            <div key={label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.18)" }}>
               <div className="flex items-center gap-1 mb-1">
                 <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
               </div>
@@ -369,7 +369,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
         {industries.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {industries.slice(0, 3).map(ind => (
-              <span key={ind} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)", color: "#3b82f6" }}>
+              <span key={ind} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.30)", color: "#3b82f6" }}>
                 {INDUSTRY_EMOJI[ind]} {ind}
               </span>
             ))}
@@ -405,7 +405,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
                 <button
                   onClick={e => onMessage(id, e)}
                   className="flex items-center justify-center px-3 py-2.5 rounded-xl transition-all"
-                  style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
+                  style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
                 >
                   <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} />
                 </button>
@@ -415,7 +415,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
               <button
                 onClick={e => onMessage(id, e)}
                 className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold py-2.5 rounded-xl transition-all whitespace-nowrap"
-                style={{ fontFamily: "'Syne', sans-serif", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
+                style={{ fontFamily: "'Syne', sans-serif", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
               >
                 <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} /> Message
               </button>
@@ -433,18 +433,18 @@ function InvestorsGridSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="h-24" style={{ background: "#0a1209" }} />
           <div className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3 rounded-full w-1/3" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3 rounded-full w-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3 rounded-full w-1/3" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3 rounded-full w-full" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.2)" }} />
             <div className="grid grid-cols-2 gap-2">
-              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
+              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />)}
             </div>
-            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />
           </div>
         </div>
       ))}
@@ -455,7 +455,7 @@ function InvestorsGridSkeleton() {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onClear, hasFilters }) {
   return (
-    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
       <div className="text-5xl mb-4">💼</div>
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>No investors found</h3>
       <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#9ca3af" }}>

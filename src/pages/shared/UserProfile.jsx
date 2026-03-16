@@ -10,6 +10,7 @@ import {
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import { ScoreCard } from "../../components/layout/Scorebadge";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const CATEGORY_EMOJI = {
@@ -27,6 +28,7 @@ const VERIFICATION_BADGES = [
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function UserProfile() {
+  useNotificationReadOnView();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
@@ -83,7 +85,7 @@ export default function UserProfile() {
 
   if (!profileData) {
     return (
-        <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <Shield size={40} className="mx-auto mb-4" style={{ color: "#5a8a63" }} />
           <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>Profile not found</h3>
           <p className="text-sm mb-6" style={{ color: "#9ca3af" }}>This user doesn't exist or their profile is private.</p>
@@ -113,11 +115,11 @@ export default function UserProfile() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
         .p-card { background:#070d08; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; }
-        .p-stat { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:12px; }
+        .p-stat { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:12px; }
         .p-tab { padding:7px 18px; border-radius:10px; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; transition:all .15s; cursor:pointer; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; }
         .p-tab:hover { color:#9ca3af; border-color:rgba(34,197,94,0.2); }
         .p-tab.on { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
-        .p-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .p-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.2); }
         .p-row:last-child { border-bottom:none; }
         .p-stat-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid #0a1209; }
         .p-stat-row:last-child { border-bottom:none; }
@@ -145,7 +147,7 @@ export default function UserProfile() {
 
       {/* Cover */}
       <div className="relative mb-4">
-        <div className="h-40 rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg,#0f2e10,#091e09)", border: "1px solid rgba(34,197,94,0.15)" }}>
+        <div className="h-40 rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg,#0f2e10,#091e09)", border: "1px solid rgba(34,197,94,0.30)" }}>
           {isCreator && profile.portfolio?.[0]?.imageUrl && (
             <img src={profile.portfolio[0].imageUrl} alt="cover" className="w-full h-full object-cover opacity-30" />
           )}
@@ -157,7 +159,7 @@ export default function UserProfile() {
           <div className="absolute top-4 left-4">
             <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{
               fontFamily: "'Syne', sans-serif",
-              background: isCreator ? "rgba(34,197,94,0.15)" : "rgba(59,130,246,0.15)",
+              background: isCreator ? "rgba(34,197,94,0.30)" : "rgba(59,130,246,0.30)",
               border: `1px solid ${isCreator ? "rgba(34,197,94,0.3)" : "rgba(59,130,246,0.3)"}`,
               color: isCreator ? "#22c55e" : "#3b82f6",
             }}>
@@ -191,7 +193,7 @@ export default function UserProfile() {
                 className="p-btn-sm"
                 style={connectionStatus === "pending"
                   ? { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b" }
-                  : { background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.12)", color: "#9ca3af" }}
+                  : { background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
               >
                 {connectLoading ? <Loader2 size={13} className="animate-spin" />
                   : connectionStatus === "pending" ? <><Clock size={13} /> Pending</>
@@ -199,7 +201,7 @@ export default function UserProfile() {
               </button>
             )}
             {connectionStatus === "accepted" && (
-              <button onClick={() => navigate(`/messages?userId=${id}`)} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.12)", color: "#9ca3af" }}>
+              <button onClick={() => navigate(`/messages?userId=${id}`)} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
                 <MessageSquare size={13} /> Message
               </button>
             )}
@@ -207,7 +209,7 @@ export default function UserProfile() {
         )}
         {isOwnProfile && (
           <div className="absolute bottom-3 right-4">
-            <button onClick={() => navigate("/profile")} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.12)", color: "#9ca3af" }}>
+            <button onClick={() => navigate("/profile")} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
               Edit Profile
             </button>
           </div>
@@ -219,7 +221,7 @@ export default function UserProfile() {
         <div className="flex items-center gap-2 flex-wrap">
           <h1 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.4rem,2.5vw,1.8rem)" }}>{profileData.name}</h1>
           {profileData.isVerified && <BadgeCheck size={20} style={{ color: "#22c55e" }} />}
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full capitalize" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full capitalize" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e" }}>
             {profileData.plan} plan
           </span>
         </div>
@@ -236,7 +238,7 @@ export default function UserProfile() {
         <div className="flex flex-wrap gap-2 mt-3">
           {VERIFICATION_BADGES.map(b =>
             profileData[b.key] ? (
-              <span key={b.key} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
+              <span key={b.key} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e" }}>
                 {b.icon} {b.label}
               </span>
             ) : null
@@ -245,7 +247,7 @@ export default function UserProfile() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
         {tabs.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`p-tab ${activeTab === tab ? "on" : ""}`}>
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -301,7 +303,7 @@ export default function UserProfile() {
                   </div>
                 )}
                 {profile.fundingPurpose && (
-                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}>
                     <p className="text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>FUNDING PURPOSE</p>
                     <p className="text-sm leading-relaxed" style={{ color: "#9ca3af" }}>{profile.fundingPurpose}</p>
                   </div>
@@ -332,11 +334,11 @@ export default function UserProfile() {
                   ))}
                 </div>
                 {profile.industriesOfInterest?.length > 0 && (
-                  <div className="pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div className="pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}>
                     <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>INDUSTRIES OF INTEREST</p>
                     <div className="flex flex-wrap gap-2">
                       {profile.industriesOfInterest.map(ind => (
-                        <span key={ind} className="text-xs px-3 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
+                        <span key={ind} className="text-xs px-3 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.35)", color: "#3b82f6" }}>
                           {CATEGORY_EMOJI[ind]} {ind}
                         </span>
                       ))}
@@ -410,7 +412,7 @@ export default function UserProfile() {
                   onClick={connectionStatus === "accepted" ? () => navigate(`/messages?userId=${id}`) : handleConnect}
                   disabled={connectLoading || connectionStatus === "pending"}
                   className="p-btn-green"
-                  style={connectionStatus === "pending" ? { background: "rgba(245,158,11,0.15)", color: "#f59e0b", boxShadow: "none" } : {}}
+                  style={connectionStatus === "pending" ? { background: "rgba(245,158,11,0.30)", color: "#f59e0b", boxShadow: "none" } : {}}
                 >
                   {connectLoading ? <Loader2 size={14} className="animate-spin" />
                     : connectionStatus === "pending" ? <><Clock size={13} /> Request Sent</>
@@ -439,7 +441,7 @@ export default function UserProfile() {
         profile.portfolio?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {profile.portfolio.map(item => (
-              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
                 <div className="relative h-52 overflow-hidden">
                   <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" />
                 </div>
@@ -451,7 +453,7 @@ export default function UserProfile() {
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl p-12 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="rounded-3xl p-12 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
             <p className="text-sm" style={{ color: "#9ca3af" }}>No portfolio items yet.</p>
           </div>
         )
@@ -475,7 +477,7 @@ export default function UserProfile() {
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
                   fontFamily: "'Syne', sans-serif",
                   background: profileData[b.key] ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.3)",
-                  border: `1px solid ${profileData[b.key] ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}`,
+                  border: `1px solid ${profileData[b.key] ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.2)"}`,
                   color: profileData[b.key] ? "#22c55e" : "#9ca3af",
                 }}>
                   {profileData[b.key] ? "✓ Verified" : "Pending"}
@@ -515,30 +517,30 @@ function DetailRow({ label, value }) {
 function ProfileSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
-      <div className="h-40 rounded-3xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }} />
+      <div className="h-40 rounded-3xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }} />
       <div className="flex items-end gap-4 -mt-10 pl-6">
         <div className="w-20 h-20 rounded-2xl" style={{ background: "#0a1209" }} />
         <div className="space-y-2 pb-2">
-          <div className="h-5 rounded-full w-40" style={{ background: "rgba(255,255,255,0.1)" }} />
-          <div className="h-3 rounded-full w-24" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="h-5 rounded-full w-40" style={{ background: "rgba(255,255,255,0.2)" }} />
+          <div className="h-3 rounded-full w-24" style={{ background: "rgba(255,255,255,0.2)" }} />
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div className="h-3 rounded-full w-1/4" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+            <div className="h-3 rounded-full w-1/4" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.2)" }} />
           </div>
-          <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
             <div className="grid grid-cols-3 gap-3">
-              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />)}
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />)}
             </div>
           </div>
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
-            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-4 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />)}
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-4 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />)}
           </div>
         </div>
       </div>

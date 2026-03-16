@@ -73,12 +73,12 @@ function ActivityFeed() {
     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-64 hidden xl:flex flex-col gap-2" style={{ zIndex: 3 }}>
       <div className="flex items-center gap-2 mb-1 px-1">
         <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-        <span className="text-[#4a5568] text-xs" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, letterSpacing: ".1em" }}>LIVE ACTIVITY</span>
+        <span className="text-[#4a5568] text-xs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, letterSpacing: ".1em" }}>LIVE ACTIVITY</span>
       </div>
       {items.slice(0, 5).map((item, i) => (
         <div
           key={item.id || i}
-          className="bg-[#070d08]/90 border border-[#1a2e1d] rounded-xl px-3 py-2.5 backdrop-blur-sm transition-all duration-500"
+          className="bg-[#070d08]/90 border border-[#2d5235] rounded-xl px-3 py-2.5 backdrop-blur-sm transition-all duration-500"
           style={{ opacity: 1 - i * 0.15, transform: `scale(${1 - i * 0.02})`, transformOrigin: "left center" }}
         >
           <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ function ActivityFeed() {
               <p className="text-[#4a5568] text-xs truncate">in {item.creator}</p>
             </div>
           </div>
-          <p className="text-[#2d4a31] text-xs mt-1" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+          <p className="text-[#2d4a31] text-xs mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
             {item.mins === 0 ? "just now" : `${item.mins} min ago`}
           </p>
         </div>
@@ -109,18 +109,18 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
   const remaining = goal - raised;
 
   return (
-    <div className="group bg-[#070d08] border border-[#1a2e1d] rounded-2xl overflow-hidden hover:border-[#22c55e]/40 transition-all card-hover relative">
+    <div className="group bg-[#070d08] border border-[#2d5235] rounded-2xl overflow-hidden hover:border-[#22c55e]/40 transition-all card-hover relative">
 
       {/* Trending badge */}
       {trending && (
-        <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-[#7c2d12]/90 border border-orange-500/40 rounded-full px-2.5 py-1 text-xs backdrop-blur-sm" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-[#7c2d12]/90 border border-orange-500/40 rounded-full px-2.5 py-1 text-xs backdrop-blur-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
           <FontAwesomeIcon icon={faFire} style={{ fontSize: "11px", color: "#fb923c" }} />
           <span className="text-orange-300">TRENDING</span>
         </div>
       )}
 
       {/* Score badge */}
-      <div className="absolute top-3 right-3 z-10 bg-[#040806]/80 border border-[#22c55e]/30 rounded-lg px-2 py-1 text-xs backdrop-blur-sm" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
+      <div className="absolute top-3 right-3 z-10 bg-[#040806]/80 border border-[#22c55e]/50 rounded-lg px-2 py-1 text-xs backdrop-blur-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
         <span className="text-[#22c55e]">⭐ {score}</span>
       </div>
 
@@ -139,14 +139,14 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
           )}
         </div>
         {videoId && (
-          <div className="absolute bottom-2 left-3 text-xs text-[#4a5568]" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+          <div className="absolute bottom-2 left-3 text-xs text-[#4a5568]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
             🎥 Watch pitch
           </div>
         )}
         {/* FOMO urgency bar */}
         {daysLeft && daysLeft <= 5 && (
           <div className="absolute bottom-0 left-0 right-0 bg-[#7c2d12]/80 border-t border-orange-500/30 px-3 py-1.5 backdrop-blur-sm">
-            <p className="text-orange-300 text-xs font-semibold text-center" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <p className="text-orange-300 text-xs font-semibold text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               🔥 Only ${remaining.toLocaleString()} left · {daysLeft} days remaining
             </p>
           </div>
@@ -157,7 +157,7 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{name}</h3>
+            <h3 className="text-white font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{name}</h3>
             <p className="text-[#4a5568] text-xs mt-0.5">{skill}</p>
           </div>
           <div className="text-right">
@@ -168,11 +168,11 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
 
         {/* Progress bar */}
         <div className="mb-3">
-          <div className="flex justify-between text-xs mb-1.5" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+          <div className="flex justify-between text-xs mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
             <span className="text-[#6b7280]">Raised <span className="text-white">${raised.toLocaleString()}</span></span>
             <span className="text-[#22c55e]">{pct}%</span>
           </div>
-          <div className="h-2 bg-[#0a1a0b] border border-[#1a2e1d] rounded-full overflow-hidden">
+          <div className="h-2 bg-[#0a1a0b] border border-[#2d5235] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000"
               style={{
@@ -193,8 +193,8 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
 
         <button
           onClick={() => {}}
-          className="w-full py-2 rounded-xl text-xs font-bold border border-[#1a2e1d] text-[#9ca3af] hover:border-[#22c55e]/40 hover:text-white transition-all"
-          style={{ fontFamily: "'Syne', sans-serif" }}
+          className="w-full py-2 rounded-xl text-xs font-bold border border-[#2d5235] text-[#9ca3af] hover:border-[#22c55e]/40 hover:text-white transition-all"
+          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           View Profile →
         </button>
@@ -203,8 +203,8 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
       {/* Video modal */}
       {showVideo && videoId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowVideo(false)}>
-          <div className="relative w-full max-w-2xl mx-4 rounded-2xl overflow-hidden border border-[#1a2e1d] shadow-2xl" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowVideo(false)} className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 border border-[#1a2e1d] flex items-center justify-center hover:border-[#22c55e]/40 transition-all">
+          <div className="relative w-full max-w-2xl mx-4 rounded-2xl overflow-hidden border border-[#2d5235] shadow-2xl" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowVideo(false)} className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 border border-[#2d5235] flex items-center justify-center hover:border-[#22c55e]/40 transition-all">
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px", color: "#fff" }} />
             </button>
             <div className="aspect-video bg-[#040806] flex items-center justify-center">
@@ -215,8 +215,8 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
                 title={`${name} pitch video`}
               />
             </div>
-            <div className="bg-[#070d08] border-t border-[#1a2e1d] px-4 py-3">
-              <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{name} — Pitch Video</p>
+            <div className="bg-[#070d08] border-t border-[#2d5235] px-4 py-3">
+              <p className="text-white font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{name} — Pitch Video</p>
               <p className="text-[#4a5568] text-xs mt-0.5">{skill}</p>
             </div>
           </div>
@@ -229,16 +229,16 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
 // ─── Accordion Item ───────────────────────────────────────────────────────────
 function AccordionItem({ faIcon, iconColor = "#22c55e", title, description, isOpen, onToggle, stat }) {
   return (
-    <div onClick={onToggle} className={`rounded-2xl border cursor-pointer transition-all duration-300 ${isOpen ? "card-green shadow-lg shadow-[#22c55e]/5" : "bg-[#080e09] border-[#1a2e1d] hover:border-[#22c55e]/20"}`}>
+    <div onClick={onToggle} className={`rounded-2xl border cursor-pointer transition-all duration-300 ${isOpen ? "card-green shadow-lg shadow-[#22c55e]/5" : "bg-[#080e09] border-[#2d5235] hover:border-[#22c55e]/50"}`}>
       <div className="flex items-center justify-between p-6">
         <div className="flex items-center gap-4">
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${isOpen ? "shadow-lg" : "bg-[#0f1a12] border border-[#1e3a22]"}`} style={isOpen ? { background: iconColor, boxShadow: `0 8px 24px ${iconColor}55` } : {}}>
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${isOpen ? "shadow-lg" : "bg-[#0f1a12] border border-[#2d5a35]"}`} style={isOpen ? { background: iconColor, boxShadow: `0 8px 24px ${iconColor}55` } : {}}>
             <FontAwesomeIcon icon={faIcon} style={{ fontSize: "17px", color: isOpen ? "#000" : iconColor }} />
           </div>
-          <span className={`font-bold text-sm transition-colors ${isOpen ? "text-white" : "text-[#9ca3af]"}`} style={{ fontFamily: "'Syne', sans-serif" }}>{title}</span>
+          <span className={`font-bold text-sm transition-colors ${isOpen ? "text-white" : "text-[#9ca3af]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</span>
         </div>
         <div className="flex items-center gap-3">
-          {isOpen && stat && <span className="text-xs text-[#22c55e] bg-[#22c55e]/10 rounded-full px-2.5 py-1 hidden sm:block font-bold" style={{ fontFamily:"'Syne',sans-serif" }}>{stat}</span>}
+          {isOpen && stat && <span className="text-xs text-[#22c55e] bg-[#22c55e]/10 rounded-full px-2.5 py-1 hidden sm:block font-bold" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{stat}</span>}
           <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} style={{ fontSize: "13px", color: isOpen ? "#22c55e" : "#4a5568" }} className="flex-shrink-0" />
         </div>
       </div>
@@ -258,7 +258,7 @@ function TestimonialCard({ quote, name, role, emoji, color = "card-green" }) {
       <div className="text-3xl text-[#1a2e1d] font-serif mb-3 leading-none">"</div>
       <p className="text-[#9ca3af] text-sm leading-relaxed mb-5">{quote}</p>
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-[#0f1a12] border border-[#1e3a22] flex items-center justify-center text-base">{emoji}</div>
+        <div className="w-9 h-9 rounded-xl bg-[#0f1a12] border border-[#2d5a35] flex items-center justify-center text-base">{emoji}</div>
         <div>
           <p className="text-white text-sm font-semibold">{name}</p>
           <p className="text-[#4a5568] text-xs">{role}</p>
@@ -311,7 +311,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#040806] text-white overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
         @keyframes fadeInUp      { from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)} }
         @keyframes floatSlow     { 0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)} }
@@ -343,12 +343,12 @@ export default function HomePage() {
         .number-gradient{background:linear-gradient(135deg,#4ade80,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .card-hover{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
         .card-hover:hover{transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,0.5)}
-        .card-blue   { background: linear-gradient(135deg, #0f2244 0%, #091830 100%); border-color: #1e3a6f; }
-        .card-purple { background: linear-gradient(135deg, #220f44 0%, #180930 100%); border-color: #4a1e6f; }
-        .card-amber  { background: linear-gradient(135deg, #3d2200 0%, #2a1600 100%); border-color: #7a4800; }
-        .card-teal   { background: linear-gradient(135deg, #0f3d38 0%, #092820 100%); border-color: #1e7068; }
-        .card-rose   { background: linear-gradient(135deg, #3d0f22 0%, #280918 100%); border-color: #6f1e3a; }
-        .card-green  { background: linear-gradient(135deg, #0f2e10 0%, #091e09 100%); border-color: #22c55e44; }
+        .card-blue   { background: linear-gradient(135deg, #0f2244 0%, #091830 100%); border-color: #2a5aa0; }
+        .card-purple { background: linear-gradient(135deg, #220f44 0%, #180930 100%); border-color: #7a3aaa; }
+        .card-amber  { background: linear-gradient(135deg, #3d2200 0%, #2a1600 100%); border-color: #b86e00; }
+        .card-teal   { background: linear-gradient(135deg, #0f3d38 0%, #092820 100%); border-color: #2aada3; }
+        .card-rose   { background: linear-gradient(135deg, #3d0f22 0%, #280918 100%); border-color: #aa2a55; }
+        .card-green  { background: linear-gradient(135deg, #0f2e10 0%, #091e09 100%); border-color: rgba(34,197,94,0.45); }
         .card-blue:hover   { border-color: #3b82f6cc; box-shadow: 0 24px 48px rgba(59,130,246,0.2); }
         .card-purple:hover { border-color: #a855f7cc; box-shadow: 0 24px 48px rgba(168,85,247,0.2); }
         .card-amber:hover  { border-color: #f59e0bcc; box-shadow: 0 24px 48px rgba(245,158,11,0.2); }
@@ -361,7 +361,7 @@ export default function HomePage() {
       `}</style>
 
       {/* ── Navbar ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#040806]/95 backdrop-blur-xl" style={{ borderBottom: "1px solid rgba(34,197,94,0.08)" }}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#040806]/95 backdrop-blur-xl" style={{ borderBottom: "1px solid rgba(34,197,94,0.22)" }}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
 
           {/* Logo */}
@@ -374,7 +374,7 @@ export default function HomePage() {
           </div>
 
           {/* Center nav links */}
-          <div className="hidden lg:flex items-center gap-1 flex-1 justify-center" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+          <div className="hidden lg:flex items-center gap-1 flex-1 justify-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
             {[
               ["#creators",    "Explore Creators"],
               ["#how-it-works","How It Works"],
@@ -391,15 +391,15 @@ export default function HomePage() {
           {/* Right: auth buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {user ? (
-              <button onClick={() => navigate("/dashboard")} className="group flex items-center gap-2 text-sm font-bold bg-[#22c55e] text-black px-5 py-2.5 rounded-full hover:bg-[#16a34a] transition-all shadow-lg shadow-[#22c55e]/20" style={{ fontFamily: "'Syne', sans-serif" }}>
+              <button onClick={() => navigate("/dashboard")} className="group flex items-center gap-2 text-sm font-bold bg-[#22c55e] text-black px-5 py-2.5 rounded-full hover:bg-[#16a34a] transition-all shadow-lg shadow-[#22c55e]/20" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Dashboard <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} className="group-hover:translate-x-0.5 transition-transform" />
               </button>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-bold text-[#6b7280] hover:text-white transition-colors px-4 py-2.5 rounded-full hover:bg-white/5" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <Link to="/login" className="text-sm font-bold text-[#6b7280] hover:text-white transition-colors px-4 py-2.5 rounded-full hover:bg-white/5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   Login
                 </Link>
-                <Link to="/register" className="text-sm font-bold bg-[#22c55e] text-black px-5 py-2.5 rounded-full hover:bg-[#16a34a] transition-all shadow-lg shadow-[#22c55e]/20 whitespace-nowrap" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <Link to="/register" className="text-sm font-bold bg-[#22c55e] text-black px-5 py-2.5 rounded-full hover:bg-[#16a34a] transition-all shadow-lg shadow-[#22c55e]/20 whitespace-nowrap" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   Start Investing
                 </Link>
               </>
@@ -459,8 +459,8 @@ export default function HomePage() {
         <ActivityFeed />
 
         {/* Hero content */}
-        <div className="relative px-6 max-w-5xl mx-auto" style={{ zIndex: 2 }}>
-          <div className="inline-flex items-center gap-2 bg-[#0a1a0b]/80 border border-[#1e3a22] rounded-full px-4 py-1.5 text-xs mb-8 fade-in-up d1 backdrop-blur-sm" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, color: "#4ade80" }}>
+        <div className="relative pt-6 px-6 max-w-5xl mx-auto" style={{ zIndex: 2 }}>
+          <div className="inline-flex items-center gap-2 bg-[#0a1a0b]/80 border border-[#2d5a35] rounded-full px-4 py-1.5 text-xs mb-8 fade-in-up d1 backdrop-blur-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, color: "#4ade80" }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
             AFRICA'S SKILL INVESTMENT PLATFORM
           </div>
@@ -470,15 +470,15 @@ export default function HomePage() {
             <span style={{ WebkitTextStroke: "2px #22c55e", color: "transparent" }}>OF AFRICA</span>
           </h1>
 
-          <p className="text-[#9ca3af] mb-10 fade-in-up d3 mx-auto" style={{ fontSize: "clamp(0.85rem,1.5vw,1.05rem)", maxWidth: "580px", letterSpacing: "0.04em", lineHeight: 1.7, fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+          <p className="text-[#9ca3af] mb-10 fade-in-up d3 mx-auto" style={{ fontSize: "clamp(0.85rem,1.5vw,1.05rem)", maxWidth: "580px", letterSpacing: "0.04em", lineHeight: 1.7, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
             JOIN A COMMUNITY OF INVESTORS FUNDING BOLD SKILLS, BIG DREAMS,<br className="hidden md:block" /> AND THE NEXT GENERATION OF AFRICAN CREATORS.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mb-14 fade-in-up d4">
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "#22c55e", color: "#000" }}>
+            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#22c55e", color: "#000" }}>
               Start Investing
             </button>
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.35)", color: "#fff", backdropFilter: "blur(8px)" }}>
+            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.35)", color: "#fff", backdropFilter: "blur(8px)" }}>
               Explore Campaigns
             </button>
           </div>
@@ -491,15 +491,15 @@ export default function HomePage() {
                   <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#16a34a] to-[#065f30] border-2 border-[#040806] flex items-center justify-center text-white text-xs font-bold">{l}</div>
                 ))}
               </div>
-              <span className="text-[#6b7280] text-sm" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>1,200+ creators funded</span>
+              <span className="text-[#6b7280] text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>1,200+ creators funded</span>
             </div>
             <div className="w-px h-5 bg-[#1a2e1d] hidden sm:block" />
             <div className="flex items-center gap-1.5">
               {Array.from({length:5}).map((_,i)=><FontAwesomeIcon key={i} icon={faStar} style={{ fontSize: "11px", color: "#f59e0b" }} />)}
-              <span className="text-[#6b7280] text-sm ml-1" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>4.9 platform rating</span>
+              <span className="text-[#6b7280] text-sm ml-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>4.9 platform rating</span>
             </div>
             <div className="w-px h-5 bg-[#1a2e1d] hidden sm:block" />
-            <span className="text-[#6b7280] text-sm" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>Paystack · Stripe · USDT</span>
+            <span className="text-[#6b7280] text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Paystack · Stripe · USDT</span>
           </div>
         </div>
 
@@ -519,7 +519,7 @@ export default function HomePage() {
                 <p className="number-gradient font-black mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.6rem,4vw,3rem)", lineHeight:1 }}>
                   {s.display || <Counter end={s.end} suffix={s.suffix} decimals={s.decimals||0}/>}
                 </p>
-                <p className="text-[#6b7280] font-semibold" style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(10px,1.5vw,13px)" }}>{s.label}</p>
+                <p className="text-[#6b7280] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(10px,1.5vw,13px)" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -527,7 +527,7 @@ export default function HomePage() {
         <div className="mt-10 py-4 ticker-wrap">
           <div className="ticker-inner">
             {[...partners,...partners,...partners,...partners].map((p,i)=>(
-              <span key={i} className="inline-flex items-center gap-3 mx-8 text-[#4a5568] text-sm font-semibold flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif" }}>
+              <span key={i} className="inline-flex items-center gap-3 mx-8 text-[#4a5568] text-sm font-semibold flex-shrink-0" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]/50"/>
                 {p}
               </span>
@@ -539,22 +539,22 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════════════
           FEATURED CREATORS — Progress Bars + Video Pitch + FOMO
       ══════════════════════════════════════════════════════════════ */}
-      <section id="creators" className="py-36  relative">
+      <section id="creators" className="py-28  relative">
         <div className="absolute inset-0 section-glow-r pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
-              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>LIVE CAMPAIGNS</p>
+              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>LIVE CAMPAIGNS</p>
               <h2 className="font-black" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>
                 Creators seeking<br /><span className="text-[#22c55e] italic">funding right now</span>
               </h2>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-[#0a1a0b] border border-[#1e3a22] rounded-full px-4 py-2 text-xs" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>
+              <div className="flex items-center gap-2 bg-[#0a1a0b] border border-[#2d5a35] rounded-full px-4 py-2 text-xs" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/>
                 <span className="text-[#6b7280]">{creators.length} active campaigns</span>
               </div>
-              <button onClick={() => navigate("/browse")} className="text-sm font-bold text-[#22c55e] hover:text-[#4ade80] transition-colors flex items-center gap-1" style={{ fontFamily:"'Syne',sans-serif" }}>
+              <button onClick={() => navigate("/browse")} className="text-sm font-bold text-[#22c55e] hover:text-[#4ade80] transition-colors flex items-center gap-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 View all <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
               </button>
             </div>
@@ -567,15 +567,15 @@ export default function HomePage() {
           </div>
 
           {/* Bottom urgency strip */}
-          <div className="mt-8 bg-[#070d08] border border-[#1e3a22] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mt-8 bg-[#070d08] border border-[#2d5a35] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <FontAwesomeIcon icon={faFire} style={{ fontSize: "18px", color: "#fb923c" }} />
               <div>
-                <p className="text-white font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif" }}>3 campaigns closing this week</p>
+                <p className="text-white font-bold text-sm" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>3 campaigns closing this week</p>
                 <p className="text-[#6b7280] text-xs">Don't miss out — investments lock when goals are hit</p>
               </div>
             </div>
-            <button onClick={() => navigate("/register")} className="flex-shrink-0 bg-[#22c55e] text-black font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-[#16a34a] transition-all" style={{ fontFamily:"'Syne',sans-serif" }}>
+            <button onClick={() => navigate("/register")} className="flex-shrink-0 bg-[#22c55e] text-black font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-[#16a34a] transition-all" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
               Invest Now →
             </button>
           </div>
@@ -583,11 +583,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ HOW IT WORKS ══════════ */}
-      <section id="how-it-works" className="py-36  bg-[#030604] relative">
+      <section id="how-it-works" className="py-28  bg-[#030604] relative">
         <div className="absolute inset-0 section-glow-l pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>HOW IT WORKS</p>
+            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>HOW IT WORKS</p>
             <h2 className="font-black mb-4" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2.2rem,4vw,3.5rem)" }}>
               A deal built on<br /><span className="text-[#22c55e] italic">shared success</span>
             </h2>
@@ -605,7 +605,7 @@ export default function HomePage() {
                   <span className="text-3xl">{step.icon}</span>
                   <span className="text-[#1a2e1d] font-black text-4xl" style={{ fontFamily:"'Fraunces',serif" }}>{step.n}</span>
                 </div>
-                <h3 className="text-white font-bold mb-3 text-base" style={{ fontFamily:"'Syne',sans-serif" }}>{step.title}</h3>
+                <h3 className="text-white font-bold mb-3 text-base" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{step.title}</h3>
                 <p className="text-[#6b7280] text-sm leading-relaxed">{step.body}</p>
                 <div className="mt-5 h-0.5 bg-[#0f1a12] rounded-full overflow-hidden">
                   <div className="h-full gradient-bar rounded-full w-0 group-hover:w-full transition-all duration-700"/>
@@ -617,11 +617,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ FEATURES ACCORDION + MOCKUP ══════════ */}
-      <section id="features" className="py-36  relative">
+      <section id="features" className="py-28  relative">
         <div className="absolute inset-0 section-glow-r pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
           <div>
-            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>FEATURES</p>
+            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>FEATURES</p>
             <h2 className="font-black mb-3" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>
               Everything you need.<br /><span className="text-[#4a5568]">Nothing you don't.</span>
             </h2>
@@ -634,11 +634,11 @@ export default function HomePage() {
           </div>
 
           {/* Dashboard mockup */}
-          <div className="bg-[#070d08] border border-[#1a2e1d] rounded-3xl p-6 relative overflow-hidden">
+          <div className="bg-[#070d08] border border-[#2d5235] rounded-3xl p-6 relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-56 h-56 bg-[#22c55e]/6 rounded-full blur-3xl pointer-events-none"/>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-[#4a5568] text-xs mb-1" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>PORTFOLIO VALUE</p>
+                <p className="text-[#4a5568] text-xs mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>PORTFOLIO VALUE</p>
                 <p className="font-black text-4xl" style={{ fontFamily:"'Fraunces',serif" }}>
                   $<Counter end={24850} duration={2500}/>
                   <span className="text-[#22c55e] text-base ml-2 align-middle">+18%</span>
@@ -646,12 +646,12 @@ export default function HomePage() {
               </div>
               <div className="text-right">
                 <p className="text-[#22c55e] font-black text-xl" style={{ fontFamily:"'Fraunces',serif" }}>+$3,420</p>
-                <p className="text-[#4a5568] text-xs" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>TOTAL EARNED</p>
+                <p className="text-[#4a5568] text-xs" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>TOTAL EARNED</p>
               </div>
             </div>
             <div className="flex items-end gap-1 h-20 mb-6 px-1">
               {[35,55,42,70,58,85,65,92,75,88,70,100].map((h,i)=>(
-                <div key={i} className="flex-1 rounded-t-lg" style={{ height:`${h}%`, background:i===11?"linear-gradient(to top,#16a34a,#4ade80)":i>=9?"rgba(34,197,94,0.25)":"#0f1a12", border:"1px solid #1a2e1d" }}/>
+                <div key={i} className="flex-1 rounded-t-lg" style={{ height:`${h}%`, background:i===11?"linear-gradient(to top,#16a34a,#4ade80)":i>=9?"rgba(34,197,94,0.25)":"#0f1a12", border:"1px solid #2d5235" }}/>
               ))}
             </div>
             <div className="space-y-3 mb-5">
@@ -660,8 +660,8 @@ export default function HomePage() {
                 {name:"Kofi – Carpentry", share:12,monthly:95, pct:65},
                 {name:"Ngozi – Photo",    share:20,monthly:240,pct:80},
               ].map(inv=>(
-                <div key={inv.name} className="flex items-center gap-3 bg-[#0a1a0b] border border-[#1a2e1d] rounded-xl p-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#22c55e]/15 border border-[#22c55e]/20 flex items-center justify-center text-[#22c55e] text-xs font-black">{inv.name[0]}</div>
+                <div key={inv.name} className="flex items-center gap-3 bg-[#0a1a0b] border border-[#2d5235] rounded-xl p-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#22c55e]/15 border border-[#22c55e]/40 flex items-center justify-center text-[#22c55e] text-xs font-black">{inv.name[0]}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-white text-xs font-semibold truncate">{inv.name}</span>
@@ -675,7 +675,7 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-2 bg-[#0a1a0b] border border-[#22c55e]/20 rounded-xl p-3">
+            <div className="flex items-center gap-2 bg-[#0a1a0b] border border-[#22c55e]/40 rounded-xl p-3">
               <FontAwesomeIcon icon={faChartBar} style={{ fontSize: "13px", color: "#a855f7" }} />
               <p className="text-[#9ca3af] text-xs">Avg monthly ROI across 3 investments: <span className="text-[#22c55e] font-bold">17.8%</span></p>
             </div>
@@ -684,15 +684,15 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ FOR CREATORS / INVESTORS ══════════ */}
-      <section className="py-36  bg-[#030604]">
+      <section className="py-28  bg-[#030604]">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-6">
           {[
             { emoji:"🎨", tag:"FOR CREATORS", title:"Stop borrowing.", accent:"Start partnering.", body:"Traditional loans saddle you with debt. SkillFund connects you with investors who believe in your skill — sharing your upside with no interest, no deadline pressure.", items:["Set your own terms — share %, duration","Capital released in milestone-based stages","Build your SkillFund credit score over time","Dashboard tracks all earnings and investors"], btnLabel:"Apply as Creator", btnStyle:"bg-[#22c55e] text-black hover:bg-[#16a34a]", color:"card-teal" },
-            { emoji:"💼", tag:"FOR INVESTORS", title:"Back real people.", accent:"Earn real returns.", body:"While stocks fluctuate and savings stagnate, SkillFund gives you direct exposure to Africa's growing skilled economy — one verified creator at a time.", items:["Browse by skill, category, and credit score","Vote on milestones before funds are released","Join Syndicates to pool capital with others","Withdraw via Paystack, Stripe, or USDT"], btnLabel:"Start Investing", btnStyle:"border border-[#22c55e]/30 hover:border-[#22c55e]/60 text-white hover:bg-[#0a1a0b]", color:"card-blue" },
+            { emoji:"💼", tag:"FOR INVESTORS", title:"Back real people.", accent:"Earn real returns.", body:"While stocks fluctuate and savings stagnate, SkillFund gives you direct exposure to Africa's growing skilled economy — one verified creator at a time.", items:["Browse by skill, category, and credit score","Vote on milestones before funds are released","Join Syndicates to pool capital with others","Withdraw via Paystack, Stripe, or USDT"], btnLabel:"Start Investing", btnStyle:"border border-[#22c55e]/50 hover:border-[#22c55e]/60 text-white hover:bg-[#0a1a0b]", color:"card-blue" },
           ].map(card=>(
             <div key={card.tag} className={`border rounded-3xl p-8 transition-all card-hover ${card.color}`}>
-              <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 border border-[#22c55e]/20 flex items-center justify-center mb-5 text-2xl">{card.emoji}</div>
-              <p className="text-[#22c55e] text-xs mb-2" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>{card.tag}</p>
+              <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 border border-[#22c55e]/40 flex items-center justify-center mb-5 text-2xl">{card.emoji}</div>
+              <p className="text-[#22c55e] text-xs mb-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>{card.tag}</p>
               <h3 className="font-black text-2xl mb-3" style={{ fontFamily:"'Fraunces',serif" }}>{card.title}<br/><span className="text-[#22c55e]">{card.accent}</span></h3>
               <p className="text-[#6b7280] text-sm leading-relaxed mb-6">{card.body}</p>
               <div className="space-y-3 mb-7">
@@ -703,7 +703,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <button onClick={()=>navigate("/register")} className={`group flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all ${card.btnStyle}`} style={{ fontFamily:"'Syne',sans-serif" }}>
+              <button onClick={()=>navigate("/register")} className={`group flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all ${card.btnStyle}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 {card.btnLabel} <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} className="group-hover:translate-x-0.5 transition-transform"/>
               </button>
             </div>
@@ -712,11 +712,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ CREATOR SUCCESS STORIES ══════════ */}
-      <section className="py-36 bg-[#030604] relative">
+      <section className="py-28 bg-[#030604] relative">
         <div className="absolute inset-0 section-glow-l pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>SUCCESS STORIES</p>
+            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>SUCCESS STORIES</p>
             <h2 className="font-black mb-3" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>
               What happens after<br /><span className="text-[#22c55e] italic">funding</span>
             </h2>
@@ -740,12 +740,12 @@ export default function HomePage() {
             ].map((story, i) => (
               <div key={i} className={`border rounded-3xl overflow-hidden transition-all card-hover flex flex-col ${story.color} ${story.highlight ? "scale-105 shadow-2xl" : ""}`}>
                 {/* Top colored header */}
-                <div className="p-7 pb-5" style={{ borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+                <div className="p-7 pb-5" style={{ borderBottom:"1px solid rgba(255,255,255,0.18)" }}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">{story.emoji}</div>
                     <div>
                       <p className="text-white font-black text-lg leading-tight" style={{ fontFamily:"'Fraunces',serif" }}>{story.name}</p>
-                      <p className="text-white/50 text-xs mt-0.5" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{story.skill}</p>
+                      <p className="text-white/50 text-xs mt-0.5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>{story.skill}</p>
                     </div>
                   </div>
                   <p className="text-white/80 text-sm leading-relaxed mb-5">{story.tagline}</p>
@@ -753,7 +753,7 @@ export default function HomePage() {
                     <span className="text-[#22c55e] font-black" style={{ fontFamily:"'Fraunces',serif", fontSize:"2.5rem", lineHeight:1 }}>{story.roi}</span>
                     <span className="text-white/40 text-sm mb-1.5 ml-1">/ avg ROI</span>
                   </div>
-                  <div className="flex gap-4 text-xs mt-2" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>
+                  <div className="flex gap-4 text-xs mt-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>
                     <span className="text-white/40">Funded <span className="text-white/70">{story.funded}</span></span>
                     <span className="text-white/40">·</span>
                     <span className="text-white/40">{story.months} months ago</span>
@@ -762,7 +762,7 @@ export default function HomePage() {
 
                 {/* Before list */}
                 <div className="px-7 pt-6 pb-3">
-                  <p className="text-white/40 text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Syne',sans-serif" }}>
+                  <p className="text-white/40 text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                     <span className="w-2 h-2 rounded-full bg-white/20 inline-block"/>BEFORE SKILLFUND
                   </p>
                   <div className="space-y-2.5">
@@ -777,7 +777,7 @@ export default function HomePage() {
 
                 {/* After list */}
                 <div className="px-7 pt-4 pb-6 flex-1">
-                  <p className="text-[#22c55e] text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Syne',sans-serif" }}>
+                  <p className="text-[#22c55e] text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                     <span className="w-2 h-2 rounded-full bg-[#22c55e] inline-block"/>AFTER FUNDING
                   </p>
                   <div className="space-y-2.5">
@@ -793,10 +793,10 @@ export default function HomePage() {
                 {/* Revenue + CTA */}
                 <div className="px-7 pb-7">
                   <div className="rounded-2xl p-4 mb-4 text-center" style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)" }}>
-                    <p className="text-white/50 text-xs mb-1" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>NOW EARNING</p>
+                    <p className="text-white/50 text-xs mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>NOW EARNING</p>
                     <p className="text-[#22c55e] font-black text-2xl" style={{ fontFamily:"'Fraunces',serif" }}>{story.revenue}</p>
                   </div>
-                  <button onClick={()=>navigate("/register")} className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${story.highlight ? "bg-[#22c55e] text-black hover:bg-[#16a34a]" : "bg-white/10 text-white hover:bg-white/15"}`} style={{ fontFamily:"'Syne',sans-serif" }}>
+                  <button onClick={()=>navigate("/register")} className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${story.highlight ? "bg-[#22c55e] text-black hover:bg-[#16a34a]" : "bg-white/10 text-white hover:bg-white/15"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                     Invest in creators like {story.name.split(" ")[0]}
                   </button>
                 </div>
@@ -807,12 +807,12 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ CREATOR PROGRESS FEED ══════════ */}
-      <section className="py-36  relative">
+      <section className="py-28  relative">
         <div className="absolute inset-0 section-glow-r pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>LIVE PROGRESS FEED</p>
+              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>LIVE PROGRESS FEED</p>
               <h2 className="font-black mb-4" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>
                 Watch your investment<br /><span className="text-[#22c55e] italic">grow in real time</span>
               </h2>
@@ -824,9 +824,9 @@ export default function HomePage() {
                   { icon:"📊", title:"Monthly earnings",   body:"Income reports auto-calculate and credit your share every month." },
                 ].map(item => (
                   <div key={item.title} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#0a1a0b] border border-[#1e3a22] flex items-center justify-center text-lg flex-shrink-0">{item.icon}</div>
+                    <div className="w-10 h-10 rounded-xl bg-[#0a1a0b] border border-[#2d5a35] flex items-center justify-center text-lg flex-shrink-0">{item.icon}</div>
                     <div>
-                      <p className="text-white font-bold text-sm mb-1" style={{ fontFamily:"'Syne',sans-serif" }}>{item.title}</p>
+                      <p className="text-white font-bold text-sm mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{item.title}</p>
                       <p className="text-[#6b7280] text-sm">{item.body}</p>
                     </div>
                   </div>
@@ -853,13 +853,13 @@ export default function HomePage() {
                 <div key={i} className={`border rounded-2xl p-5 transition-all card-hover ${creator.color}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#22c55e]/15 border border-[#22c55e]/20 flex items-center justify-center text-lg">{creator.emoji}</div>
+                      <div className="w-9 h-9 rounded-xl bg-[#22c55e]/15 border border-[#22c55e]/40 flex items-center justify-center text-lg">{creator.emoji}</div>
                       <div>
-                        <p className="text-white font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif" }}>{creator.name}</p>
+                        <p className="text-white font-bold text-sm" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{creator.name}</p>
                         <p className="text-[#4a5568] text-xs">{Math.round((creator.raised/creator.funded)*100)}% funded of ${creator.funded.toLocaleString()}</p>
                       </div>
                     </div>
-                    <div className="text-xs text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full px-2.5 py-1" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700 }}>
+                    <div className="text-xs text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/40 rounded-full px-2.5 py-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700 }}>
                       ACTIVE
                     </div>
                   </div>
@@ -873,12 +873,12 @@ export default function HomePage() {
                   <div className="space-y-2">
                     {creator.milestones.map((m, j) => (
                       <div key={j} className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${m.done ? "bg-[#22c55e] border-[#22c55e]" : "border-[#1e3a22] bg-transparent"}`}>
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${m.done ? "bg-[#22c55e] border-[#22c55e]" : "border-[#2d5a35] bg-transparent"}`}>
                           {m.done && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "10px", color: "#000" }} />}
                         </div>
                         <p className={`text-xs ${m.done ? "text-[#9ca3af] line-through" : "text-[#6b7280]"}`}>{m.label}</p>
                         {!m.done && j === creator.milestones.findIndex(x => !x.done) && (
-                          <span className="ml-auto text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 rounded-full px-2 py-0.5 flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>NEXT</span>
+                          <span className="ml-auto text-xs text-orange-400 bg-orange-500/10 border border-orange-500/40 rounded-full px-2 py-0.5 flex-shrink-0" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>NEXT</span>
                         )}
                       </div>
                     ))}
@@ -891,11 +891,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ TESTIMONIALS — Auto-scroll rows ══════════ */}
-      <section id="stories" className="py-36 overflow-hidden">
+      <section id="stories" className="py-28 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 mb-14">
           <div className="grid lg:grid-cols-2 gap-12 items-end">
             <div>
-              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>REAL STORIES</p>
+              <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>REAL STORIES</p>
               <h2 className="font-black" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>Loved and trusted<br/>by our community</h2>
             </div>
             <p className="text-[#6b7280] text-sm leading-relaxed lg:text-right">Real experiences from creators and investors already building something together on SkillFund.</p>
@@ -970,10 +970,10 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ PRICING ══════════ */}
-      <section id="pricing" className="py-36  bg-[#030604]">
+      <section id="pricing" className="py-28  bg-[#030604]">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
-            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, letterSpacing:".12em" }}>PRICING</p>
+            <p className="text-[#22c55e] text-xs mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, letterSpacing:".12em" }}>PRICING</p>
             <h2 className="font-black mb-3" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(2rem,3.5vw,3rem)" }}>Simple, honest pricing</h2>
             <p className="text-[#6b7280]">Start free. Upgrade when you're ready to scale.</p>
           </div>
@@ -985,13 +985,13 @@ export default function HomePage() {
               { name:"Elite",   price:"$60",  fee:"2%", highlight:false, color:"card-purple", features:["All Pro features","Lowest 2% fees","Dedicated manager","Early features"] },
             ].map(plan=>(
               <div key={plan.name} className={`border rounded-2xl p-6 card-hover ${plan.color} ${plan.highlight ? "shadow-2xl shadow-[#22c55e]/10 scale-105" : ""}`}>
-                {plan.highlight&&<div className="text-xs text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full px-2.5 py-0.5 inline-block mb-3" style={{ fontFamily:"'Syne',sans-serif", fontWeight:700 }}>POPULAR</div>}
-                <p className="text-white font-bold mb-1" style={{ fontFamily:"'Syne',sans-serif" }}>{plan.name}</p>
+                {plan.highlight&&<div className="text-xs text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/40 rounded-full px-2.5 py-0.5 inline-block mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700 }}>POPULAR</div>}
+                <p className="text-white font-bold mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{plan.name}</p>
                 <div className="flex items-end gap-1 mb-1">
                   <span className={`font-black text-4xl ${plan.highlight?"number-gradient":"text-white"}`} style={{ fontFamily:"'Fraunces',serif" }}>{plan.price}</span>
                   {plan.price!=="Free"&&<span className="text-[#4a5568] text-sm mb-1.5">/mo</span>}
                 </div>
-                <p className="text-[#22c55e] text-xs mb-5" style={{ fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{plan.fee} withdrawal fee</p>
+                <p className="text-[#22c55e] text-xs mb-5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>{plan.fee} withdrawal fee</p>
                 <div className="space-y-2.5 mb-6">
                   {plan.features.map(f=>(
                     <div key={f} className="flex items-center gap-2">
@@ -1000,7 +1000,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"border border-[#1a2e1d] text-white hover:border-[#22c55e]/30 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Syne',sans-serif" }}>
+                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"border border-[#2d5235] text-white hover:border-[#22c55e]/60 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                   Get started
                 </button>
               </div>
@@ -1020,10 +1020,10 @@ export default function HomePage() {
                 <FontAwesomeIcon icon={faArrowTrendUp} style={{ fontSize: "30px", color: "#000" }} />
               </div>
             </div>
-            <div className="absolute inset-0 rounded-full border border-[#22c55e]/10"/>
-            <div className="absolute inset-6 rounded-full border border-[#22c55e]/5"/>
+            <div className="absolute inset-0 rounded-full border border-[#22c55e]/25"/>
+            <div className="absolute inset-6 rounded-full border border-[#22c55e]/20"/>
             {["👗","💼","🪚","📷","🍞","🔧"].map((emoji,i)=>(
-              <div key={i} className="absolute w-10 h-10 rounded-full bg-[#0a1a0b] border border-[#1e3a22] flex items-center justify-center text-base shadow-xl"
+              <div key={i} className="absolute w-10 h-10 rounded-full bg-[#0a1a0b] border border-[#2d5a35] flex items-center justify-center text-base shadow-xl"
                 style={{ top:"50%",left:"50%",marginTop:"-20px",marginLeft:"-20px",...ORBIT_STYLES[i] }}>
                 {emoji}
               </div>
@@ -1034,10 +1034,10 @@ export default function HomePage() {
           </h2>
           <p className="text-[#6b7280] text-lg mb-10 max-w-lg mx-auto">Join 1,200+ creators and investors already building something real together.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button onClick={()=>navigate("/register")} className="group flex items-center gap-2.5 bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold px-8 py-4 rounded-xl transition-all text-base hover:shadow-2xl hover:shadow-[#22c55e]/25" style={{ fontFamily:"'Syne',sans-serif" }}>
+            <button onClick={()=>navigate("/register")} className="group flex items-center gap-2.5 bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold px-8 py-4 rounded-xl transition-all text-base hover:shadow-2xl hover:shadow-[#22c55e]/25" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
               Create your account <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "15px" }} className="group-hover:translate-x-1 transition-transform"/>
             </button>
-            <Link to="/login" className="text-[#22c55e] font-bold text-base hover:text-[#4ade80] transition-colors underline underline-offset-4" style={{ fontFamily:"'Syne',sans-serif" }}>
+            <Link to="/login" className="text-[#22c55e] font-bold text-base hover:text-[#4ade80] transition-colors underline underline-offset-4" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
               Already have an account? Sign in →
             </Link>
           </div>
@@ -1066,7 +1066,7 @@ export default function HomePage() {
                 { label:"Instagram", icon:"ig", bg:"#2e0d1a", accent:"#f43f5e" },
                 { label:"YouTube",   icon:"▶",  bg:"#2e0d0d", accent:"#ef4444" },
               ].map(s => (
-                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Syne',sans-serif", background:s.bg }}>
+                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", background:s.bg }}>
                   {s.icon}
                 </a>
               ))}
@@ -1085,7 +1085,7 @@ export default function HomePage() {
                 { heading:"Company",      accent:"#a855f7", links:[{ label:"About Us", href:"#" },{ label:"Blog", href:"#" },{ label:"Careers", href:"#" },{ label:"Contact Us", href:"#" },{ label:"Privacy & Terms", href:"#" }] },
               ].map(col => (
                 <div key={col.heading}>
-                  <p className="font-black text-sm mb-5" style={{ fontFamily:"'Syne',sans-serif", color:col.accent }}>{col.heading}</p>
+                  <p className="font-black text-sm mb-5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", color:col.accent }}>{col.heading}</p>
                   <div className="space-y-3">
                     {col.links.map(l => (
                       <a key={l.label} href={l.href} className="block text-[#6b7280] text-sm hover:text-white transition-colors">{l.label}</a>
@@ -1111,7 +1111,7 @@ export default function HomePage() {
                 className="flex-1 bg-[#0a1a0b] rounded-xl px-4 py-3 text-sm text-white placeholder-[#2d4a31] outline-none focus:ring-1 focus:ring-[#22c55e]/40 transition-all"
                 style={{ fontFamily:"'DM Sans',sans-serif" }}
               />
-              <button className="bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold text-sm px-6 py-3 rounded-xl transition-all flex-shrink-0" style={{ fontFamily:"'Syne',sans-serif" }}>
+              <button className="bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold text-sm px-6 py-3 rounded-xl transition-all flex-shrink-0" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 Subscribe
               </button>
             </div>
@@ -1124,7 +1124,7 @@ export default function HomePage() {
             <p className="text-[#374151] text-xs">© 2025 SkillFund Technologies Ltd. All rights reserved. Built in Africa 🌍</p>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse"/>
-              <span className="text-[#2d4a31] text-xs font-bold" style={{ fontFamily:"'Syne',sans-serif" }}>All systems operational</span>
+              <span className="text-[#2d4a31] text-xs font-bold" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>All systems operational</span>
             </div>
           </div>
         </div>

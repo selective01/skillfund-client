@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,9 +6,11 @@ import {
   faUser, faLock, faBell, faCreditCard, faShield,
   faChevronRight, faEye, faEyeSlash, faCircleNotch,
   faRightFromBracket, faTrash, faCircleCheck, faCircleExclamation,
+  faXmark, faBolt, faCopy,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const SECTIONS = [
   { key: "account",       label: "Account",       faIcon: faUser,        color: "#22c55e"  },
@@ -44,7 +46,7 @@ function SectionTitle({ label, accentColor = "#22c55e" }) {
 }
 
 function FieldLabel({ children }) {
-  return <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}>{children}</label>;
+  return <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "var(--text-dim)" }}>{children}</label>;
 }
 
 function Input({ ...props }) {
@@ -60,7 +62,7 @@ function Input({ ...props }) {
 
 function SaveButton({ onClick, loading, label = "Save Changes", loadingLabel = "Saving...", color = "#22c55e" }) {
   return (
-    <button onClick={onClick} disabled={loading} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-60 hover:scale-[1.02]" style={{ fontFamily: "'Syne',sans-serif", background: `linear-gradient(135deg,${color},${color}cc)`, color: "#000" }}>
+    <button onClick={onClick} disabled={loading} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-60 hover:scale-[1.02]" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: `linear-gradient(135deg,${color},${color}cc)`, color: "#000" }}>
       {loading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "13px" }} /> : null}
       {loading ? loadingLabel : label}
     </button>
@@ -68,13 +70,40 @@ function SaveButton({ onClick, loading, label = "Save Changes", loadingLabel = "
 }
 
 export default function Settings() {
-  const { user, logout, updateUser } = useAuthStore();
+  useNotificationReadOnView();
+  const { user: storeUser, logout, updateUser } = useAuthStore();
   const [activeSection, setActiveSection] = useState("account");
+  const [kycStatus, setKycStatus] = useState(null);
+  const [freshUser, setFreshUser] = useState(null);
+
+  // Merge store user with fresh data — freshUser wins when available
+  const user = freshUser ?? storeUser;
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      api.get("/auth/me"),
+      api.get("/kyc/status"),
+    ]).then(([meRes, kycRes]) => {
+      if (cancelled) return;
+      setFreshUser(meRes.data.user);
+      setKycStatus(kycRes.data.kycStatus);
+      // Update store in the background after render
+      setTimeout(() => updateUser(meRes.data.user), 0);
+    }).catch(() => {
+      if (cancelled) return;
+      api.get("/auth/me").then(res => {
+        if (cancelled) return;
+        setFreshUser(res.data.user);
+        setTimeout(() => updateUser(res.data.user), 0);
+      }).catch(() => {});
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div className="space-y-6">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
         @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
         .sg-in { animation: fadeUp 0.35s ease forwards; opacity:0; }
       `}</style>
@@ -86,7 +115,7 @@ export default function Settings() {
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
             <FontAwesomeIcon icon={faShield} style={{ fontSize: "11px", color: "#22c55e" }} />
-            <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#22c55e" }}>SETTINGS</span>
+            <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "#22c55e" }}>SETTINGS</span>
           </div>
           <h1 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "clamp(1.4rem,2.5vw,1.9rem)" }}>Account Settings</h1>
           <p style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif", fontSize: "14px", marginTop: "4px" }}>Manage your preferences and security</p>
@@ -104,7 +133,7 @@ export default function Settings() {
                 return (
                   <button key={s.key} onClick={() => setActiveSection(s.key)}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold flex-shrink-0 transition-all"
-                    style={{ fontFamily: "'Syne',sans-serif", background: isActive ? `${s.color}14` : "var(--bg-card)", border: isActive ? `1px solid ${s.color}30` : "1px solid var(--border)", color: isActive ? s.color : "var(--text-dim)", whiteSpace: "nowrap" }}
+                    style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: isActive ? `${s.color}14` : "var(--bg-card)", border: isActive ? `1px solid ${s.color}30` : "1px solid var(--border)", color: isActive ? s.color : "var(--text-dim)", whiteSpace: "nowrap" }}
                   >
                     <FontAwesomeIcon icon={s.faIcon} style={{ fontSize: "11px" }} />
                     {s.label}
@@ -123,7 +152,7 @@ export default function Settings() {
                     width: activeSection === s.key ? "16px" : "4px",
                     height: "3px",
                     borderRadius: "999px",
-                    background: activeSection === s.key ? "#22c55e" : "rgba(255,255,255,0.1)",
+                    background: activeSection === s.key ? "#22c55e" : "#1a2e1d",
                     transition: "all .2s ease",
                   }}
                 />
@@ -137,9 +166,9 @@ export default function Settings() {
               return (
                 <button key={s.key} onClick={() => setActiveSection(s.key)}
                   className="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all"
-                  style={{ fontFamily: "'Syne',sans-serif", background: isActive ? `${s.color}14` : "transparent", border: isActive ? `1px solid ${s.color}25` : "1px solid transparent", color: isActive ? s.color : "var(--text-dim)" }}
+                  style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: isActive ? `${s.color}14` : "transparent", border: isActive ? `1px solid ${s.color}25` : "1px solid transparent", color: isActive ? s.color : "var(--text-dim)" }}
                   onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "var(--bg-input)"; } }}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; } }}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = "#4a5568"; e.currentTarget.style.background = "transparent"; } }}
                 >
                   <div className="flex items-center gap-2.5">
                     <FontAwesomeIcon icon={s.faIcon} style={{ fontSize: "12px", color: isActive ? s.color : "var(--text-dim)" }} />
@@ -152,9 +181,9 @@ export default function Settings() {
             <div className="pt-2 mt-1" style={{ borderTop: "1px solid var(--border)" }}>
               <button onClick={logout}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}
+                style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "var(--text-dim)" }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "#4a5568"; e.currentTarget.style.background = "transparent"; }}
               >
                 <FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: "12px" }} /> Log Out
               </button>
@@ -164,7 +193,7 @@ export default function Settings() {
 
         {/* ── Panel ── */}
         <div className="flex-1 min-w-0">
-          {activeSection === "account"       && <AccountSection user={user} updateUser={updateUser} />}
+          {activeSection === "account"       && <AccountSection user={user} updateUser={updateUser} kycStatus={kycStatus} />}
           {activeSection === "security"      && <SecuritySection />}
           {activeSection === "notifications" && <NotificationsSection />}
           {activeSection === "subscription"  && <SubscriptionSection user={user} />}
@@ -176,9 +205,83 @@ export default function Settings() {
 }
 
 // ── Account ────────────────────────────────────────────────────────────────────
-function AccountSection({ user, updateUser }) {
+// ── Inline OTP verification widget ────────────────────────────────────────────
+function OtpWidget({ type, updateUser }) {
+  const { user } = useAuthStore();
+  const isVerified = type === "email" ? user?.emailVerified : user?.phoneVerified;
+  const [stage,   setStage]   = useState("idle"); // idle | sent | done
+  const [otp,     setOtp]     = useState("");
+  const [busy,    setBusy]    = useState(false);
+
+  const sendOtp = async () => {
+    setBusy(true);
+    try {
+      const res = await api.post(`/auth/${type}/send-otp`);
+      toast.success(res.data.message);
+      if (res.data.devOtp) toast(`[DEV] OTP: ${res.data.devOtp}`, { icon: "🔑", duration: 20000 });
+      setStage("sent");
+    } catch (e) {
+      toast.error(e.response?.data?.message || "Failed to send OTP");
+    } finally { setBusy(false); }
+  };
+
+  const verifyOtp = async () => {
+    if (!otp.trim()) return toast.error("Enter the OTP first");
+    setBusy(true);
+    try {
+      const res = await api.post(`/auth/${type}/verify-otp`, { otp });
+      updateUser(res.data.user);
+      toast.success(res.data.message);
+      setStage("done");
+    } catch (e) {
+      toast.error(e.response?.data?.message || "Invalid OTP");
+    } finally { setBusy(false); }
+  };
+
+  if (isVerified) return (
+    <div className="flex items-center gap-1 mt-1.5">
+      <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"10px", color:"#22c55e" }} />
+      <span style={{ color:"#22c55e", fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:"12px" }}>Verified</span>
+    </div>
+  );
+
+  return (
+    <div className="mt-2 space-y-2">
+      <div className="flex items-center gap-2">
+        <FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize:"10px", color:"#f59e0b" }} />
+        <span style={{ color:"#f59e0b", fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:"12px" }}>Not verified</span>
+        {stage === "idle" && (
+          <button onClick={sendOtp} disabled={busy} style={{ marginLeft:"auto", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", color:"#22c55e", borderRadius:"8px", padding:"3px 10px", fontSize:"11px", fontWeight:700, fontFamily:"'Plus Jakarta Sans',sans-serif", cursor:busy?"not-allowed":"pointer" }}>
+            {busy ? "Sending..." : "Send OTP"}
+          </button>
+        )}
+        {stage === "sent" && (
+          <button onClick={sendOtp} disabled={busy} style={{ marginLeft:"auto", background:"transparent", border:"none", color:"#9ca3af", fontSize:"11px", cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+            Resend
+          </button>
+        )}
+      </div>
+      {stage === "sent" && (
+        <div className="flex gap-2">
+          <input
+            type="text" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)}
+            placeholder="Enter 6-digit OTP"
+            style={{ flex:1, background:"var(--bg-input)", border:"1px solid var(--border)", borderRadius:"10px", padding:"8px 12px", color:"var(--text-primary)", fontSize:"13px", fontFamily:"'DM Sans',sans-serif", outline:"none", letterSpacing:"0.15em" }}
+          />
+          <button onClick={verifyOtp} disabled={busy} style={{ background:"rgba(34,197,94,0.15)", border:"1px solid rgba(34,197,94,0.3)", color:"#22c55e", borderRadius:"10px", padding:"8px 14px", fontSize:"12px", fontWeight:700, fontFamily:"'Plus Jakarta Sans',sans-serif", cursor:busy?"not-allowed":"pointer" }}>
+            {busy ? "..." : "Verify"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AccountSection({ user, updateUser, kycStatus: kycStatusProp }) {
   const [form, setForm] = useState({ name: user?.name || "", email: user?.email || "", phone: user?.phone || "" });
   const [saving, setSaving] = useState(false);
+
+  const kycStatus = kycStatusProp ?? user?.kycStatus ?? "not_submitted";
 
   const handleSave = async () => {
     setSaving(true);
@@ -194,11 +297,18 @@ function AccountSection({ user, updateUser }) {
   };
 
   const verifications = [
-    { label: "Email",    verified: user?.emailVerified },
-    { label: "Phone",    verified: user?.phoneVerified },
-    { label: "Identity", verified: user?.idVerified,   kycLink: true },
-    { label: "Profile",  verified: user?.isVerified    },
+    { label: "Email",    status: user?.emailVerified ? "verified" : "unverified" },
+    { label: "Phone",    status: user?.phoneVerified ? "verified" : "unverified" },
+    { label: "Identity", status: kycStatus === "approved" ? "verified" : kycStatus === "pending" ? "pending" : kycStatus === "rejected" ? "rejected" : "unverified", kycLink: true },
+    { label: "Profile",  status: user?.isVerified ? "verified" : "unverified" },
   ];
+
+  const STATUS_CONFIG = {
+    verified:   { label: "Verified",     color: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.2)",   icon: faCircleCheck       },
+    pending:    { label: "Under Review", color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.2)",  icon: faCircleExclamation },
+    rejected:   { label: "Rejected",     color: "#ef4444", bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.2)",   icon: faCircleExclamation },
+    unverified: { label: "Not Verified", color: "var(--text-dim)", bg: "var(--bg-input)", border: "var(--border)",        icon: faCircleExclamation },
+  };
 
   return (
     <div className="space-y-4">
@@ -206,27 +316,15 @@ function AccountSection({ user, updateUser }) {
         <SectionTitle label="Account Information" accentColor="#22c55e" />
         <div className="space-y-4">
           {[
-            { field: "name",  label: "FULL NAME",      type: "text",  placeholder: "Your name" },
-            { field: "email", label: "EMAIL ADDRESS",  type: "email", placeholder: "email@example.com" },
-            { field: "phone", label: "PHONE NUMBER",   type: "tel",   placeholder: "+234..." },
+            { field: "name",  label: "FULL NAME",    type: "text",  placeholder: "Your name" },
+            { field: "email", label: "EMAIL ADDRESS",type: "email", placeholder: "email@example.com" },
+            { field: "phone", label: "PHONE NUMBER", type: "tel",   placeholder: "+234..." },
           ].map(f => (
             <div key={f.field}>
               <FieldLabel>{f.label}</FieldLabel>
               <Input type={f.type} value={form[f.field]} onChange={e => setForm(p => ({ ...p, [f.field]: e.target.value }))} placeholder={f.placeholder} />
-              {f.field === "email" && (
-                <p className="text-xs flex items-center gap-1 mt-1.5">
-                  {user?.emailVerified
-                    ? <><FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"10px", color:"#22c55e" }} /><span style={{ color:"#22c55e", fontFamily:"'Syne',sans-serif", fontWeight:700 }}>Verified</span></>
-                    : <><FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize:"10px", color:"#f59e0b" }} /><span style={{ color:"#f59e0b", fontFamily:"'Syne',sans-serif", fontWeight:700 }}>Not verified</span></>}
-                </p>
-              )}
-              {f.field === "phone" && (
-                <p className="text-xs flex items-center gap-1 mt-1.5">
-                  {user?.phoneVerified
-                    ? <><FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"10px", color:"#22c55e" }} /><span style={{ color:"#22c55e", fontFamily:"'Syne',sans-serif", fontWeight:700 }}>Verified</span></>
-                    : <><FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize:"10px", color:"#f59e0b" }} /><span style={{ color:"#f59e0b", fontFamily:"'Syne',sans-serif", fontWeight:700 }}>Not verified</span></>}
-                </p>
-              )}
+              {f.field === "email" && <OtpWidget type="email" updateUser={updateUser} />}
+              {f.field === "phone" && <OtpWidget type="phone" updateUser={updateUser} />}
             </div>
           ))}
           <SaveButton onClick={handleSave} loading={saving} />
@@ -236,22 +334,25 @@ function AccountSection({ user, updateUser }) {
       <Panel accentColor="#22c55e">
         <SectionTitle label="Verification Status" accentColor="#22c55e" />
         <div className="space-y-2.5">
-          {verifications.map(v => (
+          {verifications.map(v => {
+            const cfg = STATUS_CONFIG[v.status];
+            return (
             <div key={v.label} className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
               <span className="text-sm" style={{ color: "var(--text-secondary)", fontFamily: "'DM Sans',sans-serif" }}>{v.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1.5" style={{ fontFamily: "'Syne',sans-serif", background: v.verified ? "rgba(34,197,94,0.1)" : "var(--bg-input)", border: v.verified ? "1px solid rgba(34,197,94,0.2)" : "1px solid var(--border)", color: v.verified ? "#22c55e" : "var(--text-dim)" }}>
-                  <FontAwesomeIcon icon={v.verified ? faCircleCheck : faCircleExclamation} style={{ fontSize: "10px" }} />
-                  {v.verified ? "Verified" : "Pending"}
+                <span className="text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1.5" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color }}>
+                  <FontAwesomeIcon icon={cfg.icon} style={{ fontSize: "10px" }} />
+                  {cfg.label}
                 </span>
-                {v.kycLink && !v.verified && (
-                  <Link to="/kyc" className="text-xs font-black px-2.5 py-1 rounded-full transition-all" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(20,184,166,0.25)", color: "#14b8a6" }}>
-                    Verify Now →
+                {v.kycLink && v.status !== "verified" && (
+                  <Link to="/kyc" className="text-xs font-black px-2.5 py-1 rounded-full transition-all" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(20,184,166,0.25)", color: "#14b8a6" }}>
+                    {v.status === "rejected" ? "Resubmit →" : v.status === "pending" ? "View Status →" : "Verify Now →"}
                   </Link>
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </Panel>
     </div>
@@ -319,7 +420,7 @@ function SecuritySection() {
                 <div key={i} className="h-1.5 flex-1 rounded-full transition-all" style={{ background: i <= pwdStrength ? STRENGTH_COLORS[pwdStrength] : "var(--border)" }} />
               ))}
             </div>
-            <p className="text-xs font-bold" style={{ fontFamily: "'Syne',sans-serif", color: STRENGTH_COLORS[pwdStrength] }}>{STRENGTH_LABELS[pwdStrength]}</p>
+            <p className="text-xs font-bold" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: STRENGTH_COLORS[pwdStrength] }}>{STRENGTH_LABELS[pwdStrength]}</p>
           </div>
         )}
         <PwdInput field="confirmPassword" label="CONFIRM PASSWORD" showKey="confirm" />
@@ -349,9 +450,9 @@ function NotificationsSection() {
   };
 
   const ToggleRow = ({ prefKey, label, desc }) => (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: "1px solid #0f1a10" }}>
       <div>
-        <p className="text-sm font-bold text-white" style={{ fontFamily: "'Syne',sans-serif" }}>{label}</p>
+        <p className="text-sm font-bold text-white" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{label}</p>
         {desc && <p className="text-xs mt-0.5" style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}>{desc}</p>}
       </div>
       <button onClick={() => toggle(prefKey)} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{ background: prefs[prefKey] ? "#22c55e" : "var(--border)" }}>
@@ -381,17 +482,252 @@ function NotificationsSection() {
   );
 }
 
+// ── Upgrade Modal ──────────────────────────────────────────────────────────────
+function UpgradeModal({ plan, planInfo, user, onClose }) {
+  const [step, setStep]         = useState("pick");   // pick | crypto-pending
+  const [loading, setLoading]   = useState(null);     // "paystack" | "stripe" | "crypto"
+  const [cryptoData, setCryptoData] = useState(null);
+  const [copied, setCopied]     = useState(false);
+
+  const METHODS = [
+    {
+      key: "paystack",
+      label: "Paystack",
+      desc: "Pay in NGN via card, bank transfer or USSD",
+      color: "#00C3F7",
+      flag: "🇳🇬",
+      roles: ["creator", "investor"],
+    },
+    {
+      key: "stripe",
+      label: "Stripe",
+      desc: "Pay in USD via credit or debit card",
+      color: "#6772e5",
+      flag: "💳",
+      roles: ["creator", "investor"],
+    },
+    {
+      key: "crypto",
+      label: "USDT (Crypto)",
+      desc: "Pay with USDT — ERC20 network",
+      color: "#26a17b",
+      flag: "₮",
+      roles: ["investor"],
+    },
+  ].filter(m => m.roles.includes(user?.role));
+
+  const handlePaystack = async () => {
+    setLoading("paystack");
+    try {
+      const res = await api.post("/payments/paystack/initialize", { plan });
+      const { authorization_url } = res.data.data;
+      window.location.href = authorization_url;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Paystack failed");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleStripe = async () => {
+    setLoading("stripe");
+    try {
+      const res = await api.post("/payments/stripe/create-session", { plan });
+      window.location.href = res.data.url;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Stripe failed");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleCrypto = async () => {
+    setLoading("crypto");
+    try {
+      const res = await api.post("/crypto/subscription", { plan });
+      setCryptoData(res.data.payment);
+      setStep("crypto-pending");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Crypto payment failed");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleMethod = (key) => {
+    if (key === "paystack") handlePaystack();
+    else if (key === "stripe") handleStripe();
+    else if (key === "crypto") handleCrypto();
+  };
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(cryptoData.payAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="relative w-full max-w-md rounded-3xl p-6"
+        style={{ background: "var(--bg-card)", border: `1px solid ${planInfo.color}30`, boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${planInfo.color}15` }}
+      >
+        {/* Close */}
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all" style={{ background: "var(--bg-input)", color: "var(--text-dim)" }}>
+          <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
+        </button>
+
+        {step === "pick" && (
+          <>
+            {/* Header */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-1">
+                <FontAwesomeIcon icon={faBolt} style={{ fontSize: "11px", color: planInfo.color }} />
+                <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: planInfo.color }}>UPGRADE PLAN</span>
+              </div>
+              <h2 className="font-black capitalize" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.6rem", color: "var(--text-primary)" }}>
+                Go {plan}
+              </h2>
+              <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
+                {planInfo.price}/month · Choose how you want to pay
+              </p>
+            </div>
+
+            {/* Plan features summary */}
+            <div className="rounded-2xl p-4 mb-5" style={{ background: `${planInfo.color}08`, border: `1px solid ${planInfo.color}20` }}>
+              <div className="space-y-1.5">
+                {planInfo.features.map(f => (
+                  <div key={f} className="flex items-center gap-2 text-xs" style={{ color: "var(--text-secondary)", fontFamily: "'DM Sans',sans-serif" }}>
+                    <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "10px", color: planInfo.color, flexShrink: 0 }} />
+                    {f}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Payment methods */}
+            <div className="space-y-2.5">
+              <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "var(--text-dim)" }}>SELECT PAYMENT METHOD</p>
+              {METHODS.map(m => (
+                <button
+                  key={m.key}
+                  onClick={() => handleMethod(m.key)}
+                  disabled={!!loading}
+                  className="w-full flex items-center gap-4 rounded-2xl px-4 py-3.5 transition-all disabled:opacity-50"
+                  style={{ background: "var(--bg-input)", border: `1px solid var(--border)`, textAlign: "left" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = m.color + "50"; e.currentTarget.style.background = m.color + "08"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg-input)"; }}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style={{ background: m.color + "15", border: `1px solid ${m.color}30` }}>
+                    {m.key === "crypto"
+                      ? <span style={{ color: m.color, fontSize: "18px", fontWeight: 900 }}>₮</span>
+                      : <span style={{ fontSize: "18px" }}>{m.flag}</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-sm" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "var(--text-primary)" }}>{m.label}</p>
+                    <p className="text-xs" style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--text-dim)" }}>{m.desc}</p>
+                  </div>
+                  {loading === m.key
+                    ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ color: m.color, fontSize: "14px" }} />
+                    : <FontAwesomeIcon icon={faChevronRight} style={{ color: "var(--text-ghost)", fontSize: "11px" }} />}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === "crypto-pending" && cryptoData && (
+          <>
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span style={{ fontSize: "11px", color: "#26a17b" }}>₮</span>
+                <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "#26a17b" }}>SEND USDT</span>
+              </div>
+              <h2 className="font-black" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.4rem", color: "var(--text-primary)" }}>Complete Payment</h2>
+              <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
+                Send exactly <strong style={{ color: "#26a17b" }}>{cryptoData.payAmount} {cryptoData.payCurrency?.toUpperCase()}</strong> to the address below
+              </p>
+            </div>
+
+            {/* Amount */}
+            <div className="rounded-2xl p-4 mb-3 text-center" style={{ background: "rgba(38,161,123,0.08)", border: "1px solid rgba(38,161,123,0.2)" }}>
+              <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "#26a17b" }}>AMOUNT TO SEND</p>
+              <p className="font-black" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.8rem", color: "#26a17b" }}>
+                {cryptoData.payAmount}
+              </p>
+              <p className="text-xs" style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}>{cryptoData.payCurrency?.toUpperCase()} (≈ ${cryptoData.priceAmount} USD)</p>
+            </div>
+
+            {/* Wallet address */}
+            <div className="rounded-2xl p-4 mb-4" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
+              <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: "var(--text-dim)" }}>WALLET ADDRESS</p>
+              <div className="flex items-center gap-2">
+                <p className="flex-1 text-xs break-all" style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--text-secondary)" }}>{cryptoData.payAddress}</p>
+                <button
+                  onClick={copyAddress}
+                  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                  style={{ background: copied ? "rgba(38,161,123,0.15)" : "var(--bg-card)", border: "1px solid var(--border)", color: copied ? "#26a17b" : "var(--text-dim)" }}
+                >
+                  <FontAwesomeIcon icon={faCopy} style={{ fontSize: "11px" }} />
+                </button>
+              </div>
+            </div>
+
+            <p className="text-xs text-center mb-4" style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--text-dim)", lineHeight: 1.6 }}>
+              Your plan will activate automatically once the transaction is confirmed on-chain. This usually takes 1–5 minutes.
+            </p>
+
+            <button onClick={onClose} className="w-full py-2.5 rounded-xl font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: "var(--bg-input)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}>
+              Done — I've sent the payment
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Subscription ───────────────────────────────────────────────────────────────
 function SubscriptionSection({ user }) {
-  const plan     = user?.plan || "basic";
-  const planInfo = PLAN_INFO[plan];
+  const { updateUser } = useAuthStore();
+  const [freshPlan, setFreshPlan] = useState(null);
+  const plan     = freshPlan ?? user?.plan ?? "basic";
+  const planInfo = PLAN_INFO[plan] || PLAN_INFO.basic;
+  const [upgradeTarget, setUpgradeTarget] = useState(null);
+
+  // Always fetch fresh plan on mount — store may be stale after payment redirect
+  useEffect(() => {
+    api.get("/auth/me")
+      .then(res => {
+        setFreshPlan(res.data.user.plan);
+        setTimeout(() => updateUser(res.data.user), 0);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-4">
+      {upgradeTarget && (
+        <UpgradeModal
+          plan={upgradeTarget.plan}
+          planInfo={upgradeTarget.planInfo}
+          user={user}
+          onClose={() => setUpgradeTarget(null)}
+          onSuccess={(newPlan) => {
+            updateUser({ ...user, plan: newPlan });
+            setUpgradeTarget(null);
+            toast.success(`Upgraded to ${newPlan}!`);
+          }}
+        />
+      )}
       {/* Current plan hero */}
       <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: `linear-gradient(135deg,${planInfo.color}12,var(--bg))`, border: `1px solid ${planInfo.color}25` }}>
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle,${planInfo.color}14 0%,transparent 70%)`, filter: "blur(16px)" }} />
-        <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne',sans-serif", color: planInfo.color }}>CURRENT PLAN</p>
+        <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: planInfo.color }}>CURRENT PLAN</p>
         <div className="flex items-end justify-between">
           <h2 className="font-black capitalize" style={{ fontFamily: "'Fraunces',serif", fontSize: "2.2rem", color: planInfo.color, lineHeight: 1 }}>{plan}</h2>
           <span className="font-black text-2xl" style={{ fontFamily: "'Fraunces',serif", color: planInfo.color }}>{planInfo.price}</span>
@@ -416,13 +752,13 @@ function SubscriptionSection({ user }) {
               <div key={p} className="rounded-2xl p-4 transition-all" style={{ background: isCurrent ? `${info.color}10` : "var(--bg-input)", border: isCurrent ? `1px solid ${info.color}30` : "1px solid var(--border)" }}>
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-black capitalize text-sm" style={{ fontFamily: "'Fraunces',serif", color: isCurrent ? info.color : "var(--text-primary)" }}>{p} {isCurrent && "✓"}</span>
-                  <span className="font-bold" style={{ fontFamily: "'Syne',sans-serif", color: isCurrent ? info.color : "var(--text-muted)" }}>{info.price}</span>
+                  <span className="font-bold" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", color: isCurrent ? info.color : "var(--text-muted)" }}>{info.price}</span>
                 </div>
                 <ul className="space-y-1 mb-3">
                   {info.features.map(f => <li key={f} className="text-xs flex items-center gap-1.5" style={{ color: "var(--text-dim)", fontFamily: "'DM Sans',sans-serif" }}><span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: info.color }} />{f}</li>)}
                 </ul>
-                {!isCurrent && p !== "basic" && <button className="w-full py-2 rounded-xl font-bold text-xs transition-all hover:scale-[1.01]" style={{ fontFamily: "'Syne',sans-serif", background: `${info.color}18`, border: `1px solid ${info.color}30`, color: info.color }}>Upgrade to {p}</button>}
-                {!isCurrent && p === "basic" && plan !== "basic" && <button className="w-full py-2 rounded-xl font-bold text-xs transition-all" style={{ fontFamily: "'Syne',sans-serif", background: "var(--bg-input)", border: "1px solid var(--border)", color: "var(--text-dim)" }}>Downgrade</button>}
+                {!isCurrent && p !== "basic" && <button onClick={() => setUpgradeTarget({ plan: p, planInfo: info })} className="w-full py-2 rounded-xl font-bold text-xs transition-all hover:scale-[1.01]" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: `${info.color}18`, border: `1px solid ${info.color}30`, color: info.color }}>Upgrade to {p}</button>}
+                {!isCurrent && p === "basic" && plan !== "basic" && <button className="w-full py-2 rounded-xl font-bold text-xs transition-all" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: "var(--bg-input)", border: "1px solid var(--border)", color: "var(--text-dim)" }}>Downgrade</button>}
               </div>
             );
           })}
@@ -465,7 +801,7 @@ function PrivacySection({ logout }) {
       <Panel accentColor="#14b8a6">
         <SectionTitle label="Export Your Data" accentColor="#14b8a6" />
         <p className="text-sm mb-4" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans',sans-serif" }}>Download a copy of all your data stored on SkillFund.</p>
-        <button onClick={() => toast.success("Data export requested. Check your email shortly.")} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(20,184,166,0.08)", border: "1px solid rgba(20,184,166,0.2)", color: "#14b8a6" }}>
+        <button onClick={() => toast.success("Data export requested. Check your email shortly.")} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: "rgba(20,184,166,0.08)", border: "1px solid rgba(20,184,166,0.2)", color: "#14b8a6" }}>
           <FontAwesomeIcon icon={faShield} style={{ fontSize: "12px" }} /> Request Data Export
         </button>
       </Panel>
@@ -482,7 +818,7 @@ function PrivacySection({ logout }) {
         <div className="space-y-3">
           <FieldLabel>TYPE "DELETE" TO CONFIRM</FieldLabel>
           <Input type="text" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder='DELETE' />
-          <button onClick={handleDelete} disabled={deleting || confirm !== "DELETE"} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed" style={{ fontFamily: "'Syne',sans-serif", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}>
+          <button onClick={handleDelete} disabled={deleting || confirm !== "DELETE"} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}>
             {deleting ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "12px" }} /> : <FontAwesomeIcon icon={faTrash} style={{ fontSize: "12px" }} />}
             {deleting ? "Deleting..." : "Delete My Account"}
           </button>

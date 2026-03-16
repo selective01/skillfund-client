@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import { ScoreBadge } from "../../components/layout/ScoreBadge";
+import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const CATEGORY_EMOJI = {
   fashion:"👗", carpentry:"🪚", farming:"🌾", photography:"📷",
@@ -35,9 +36,9 @@ function InvestorRow({ inv, index, fundingGoal }) {
   const COLORS = ["#22c55e","#3b82f6","#a855f7","#14b8a6","#f43f5e","#f59e0b"];
   const color  = COLORS[index % COLORS.length];
   return (
-    <div className="flex items-center justify-between rounded-xl px-4 py-3 transition-all" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.1)" }}
+    <div className="flex items-center justify-between rounded-xl px-4 py-3 transition-all" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = `${color}33`}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+      onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"}
     >
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black" style={{ background: `${color}18`, border: `1px solid ${color}33`, color }}>
@@ -54,6 +55,7 @@ function InvestorRow({ inv, index, fundingGoal }) {
 }
 
 export default function SyndicateCampaign() {
+  useNotificationReadOnView();
   const { id }   = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -159,7 +161,7 @@ export default function SyndicateCampaign() {
         </div>
 
         {/* ── Hero card ── */}
-        <div className="sc-in relative rounded-3xl overflow-hidden" style={{ animationDelay: ".06s", background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+        <div className="sc-in relative rounded-3xl overflow-hidden" style={{ animationDelay: ".06s", background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
           {/* Top glow strip */}
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: "linear-gradient(90deg,transparent,#3b82f6,transparent)" }} />
           {/* BG glow */}
@@ -170,7 +172,7 @@ export default function SyndicateCampaign() {
             {/* Title row */}
             <div className="flex items-start justify-between flex-wrap gap-3">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0" style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.2)" }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0" style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.35)" }}>
                   {CATEGORY_EMOJI[syndicate.skillCategory] || "⚡"}
                 </div>
                 <div>
@@ -178,7 +180,7 @@ export default function SyndicateCampaign() {
                     <FontAwesomeIcon icon={faLayerGroup} style={{ fontSize: "11px", color: "#3b82f6" }} />
                     <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "#3b82f6" }}>SYNDICATE</span>
                     {isHot && (
-                      <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b", fontFamily: "'Syne',sans-serif" }}>
+                      <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.30)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b", fontFamily: "'Syne',sans-serif" }}>
                         <FontAwesomeIcon icon={faFire} style={{ fontSize: "9px" }} /> HOT
                       </span>
                     )}
@@ -192,8 +194,8 @@ export default function SyndicateCampaign() {
               <div className="flex flex-col items-end gap-2">
                 <span className="text-xs font-bold px-3 py-1 rounded-full" style={{
                   fontFamily: "'Syne',sans-serif",
-                  background: isOpen ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.06)",
-                  border: isOpen ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.1)",
+                  background: isOpen ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.18)",
+                  border: isOpen ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.2)",
                   color: isOpen ? "#22c55e" : "#6b7280",
                 }}>
                   {isOpen ? "● Accepting Investors" : syndicate.status}
@@ -208,7 +210,7 @@ export default function SyndicateCampaign() {
                 <span className="font-black text-white text-2xl" style={{ fontFamily: "'Fraunces',serif" }}>${syndicate.amountRaised.toLocaleString()}</span>
                 <span className="text-sm" style={{ color: "#9ca3af" }}>of ${syndicate.fundingGoal.toLocaleString()} goal</span>
               </div>
-              <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.18)" }}>
                 <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fundingPct, 100)}%`, background: "linear-gradient(90deg,#2563eb,#3b82f6,#60a5fa)" }} />
               </div>
               <div className="flex justify-between text-xs" style={{ fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>
@@ -219,10 +221,10 @@ export default function SyndicateCampaign() {
 
             {/* Stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatBox icon={faUsers}        iconColor="#3b82f6" label="Investors"    value={`${syndicate.investors?.length || 0}/${syndicate.maxSlots}`}  bg="rgba(59,130,246,0.08)"  border="rgba(59,130,246,0.15)" />
-              <StatBox icon={faArrowTrendUp} iconColor="#22c55e" label="Profit Share" value={`${syndicate.profitSharePercentage}%`}                          bg="rgba(34,197,94,0.08)"   border="rgba(34,197,94,0.15)"  />
-              <StatBox icon={faClock}        iconColor="#a855f7" label="Duration"     value={`${syndicate.duration}mo`}                                       bg="rgba(168,85,247,0.08)"  border="rgba(168,85,247,0.15)" />
-              <StatBox icon={faDollarSign}   iconColor="#f59e0b" label="Monthly ROI"  value={projROI ? `$${projROI.toFixed(0)}/slot` : "—"}                  bg="rgba(245,158,11,0.08)"  border="rgba(245,158,11,0.15)" />
+              <StatBox icon={faUsers}        iconColor="#3b82f6" label="Investors"    value={`${syndicate.investors?.length || 0}/${syndicate.maxSlots}`}  bg="rgba(59,130,246,0.08)"  border="rgba(59,130,246,0.30)" />
+              <StatBox icon={faArrowTrendUp} iconColor="#22c55e" label="Profit Share" value={`${syndicate.profitSharePercentage}%`}                          bg="rgba(34,197,94,0.08)"   border="rgba(34,197,94,0.30)"  />
+              <StatBox icon={faClock}        iconColor="#a855f7" label="Duration"     value={`${syndicate.duration}mo`}                                       bg="rgba(168,85,247,0.08)"  border="rgba(168,85,247,0.30)" />
+              <StatBox icon={faDollarSign}   iconColor="#f59e0b" label="Monthly ROI"  value={projROI ? `$${projROI.toFixed(0)}/slot` : "—"}                  bg="rgba(245,158,11,0.08)"  border="rgba(245,158,11,0.30)" />
             </div>
 
             {/* ── Invest CTA ── */}
@@ -237,7 +239,7 @@ export default function SyndicateCampaign() {
                     Invest in This Campaign
                   </button>
                 ) : (
-                  <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(59,130,246,0.07)", border: "1px solid rgba(59,130,246,0.2)" }}>
+                  <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(59,130,246,0.07)", border: "1px solid rgba(59,130,246,0.35)" }}>
                     <div>
                       <p className="font-bold text-white text-sm mb-0.5" style={{ fontFamily: "'Syne',sans-serif" }}>Enter your investment amount</p>
                       <p className="text-xs" style={{ color: "#9ca3af" }}>
@@ -257,7 +259,7 @@ export default function SyndicateCampaign() {
                       />
                     </div>
                     {amtNum > 0 && (
-                      <div className="rounded-xl p-3.5 space-y-2" style={{ background: "#0a1209", border: "1px solid rgba(59,130,246,0.15)" }}>
+                      <div className="rounded-xl p-3.5 space-y-2" style={{ background: "#0a1209", border: "1px solid rgba(59,130,246,0.30)" }}>
                         <div className="flex justify-between text-xs">
                           <span style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>YOUR SHARE</span>
                           <span className="font-black text-white" style={{ fontFamily: "'Fraunces',serif" }}>{mySharePct}%</span>
@@ -282,9 +284,9 @@ export default function SyndicateCampaign() {
                       <button
                         onClick={() => { setShowJoin(false); setAmount(""); }}
                         className="flex-1 font-bold text-sm py-3 rounded-xl transition-all"
-                        style={{ fontFamily: "'Syne',sans-serif", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#6b7280" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#fff"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#6b7280"; }}
+                        style={{ fontFamily: "'Syne',sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; e.currentTarget.style.color = "#6b7280"; }}
                       >
                         Cancel
                       </button>
@@ -295,14 +297,14 @@ export default function SyndicateCampaign() {
             )}
 
             {alreadyIn && (
-              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}>
+              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.35)" }}>
                 <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "15px", color: "#22c55e", flexShrink: 0 }} />
                 <p className="text-sm font-bold" style={{ color: "#22c55e", fontFamily: "'Syne',sans-serif" }}>You are invested in this syndicate</p>
               </div>
             )}
 
             {isCreator && (
-              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.2)" }}>
                 <FontAwesomeIcon icon={faTriangleExclamation} style={{ fontSize: "14px", color: "#9ca3af", flexShrink: 0 }} />
                 <p className="text-sm" style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>This is your syndicate campaign</p>
               </div>
@@ -311,7 +313,7 @@ export default function SyndicateCampaign() {
         </div>
 
         {/* ── Story ── */}
-        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".12s", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".12s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#3b82f6,#2563eb)" }} />
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>The Story</h2>
@@ -320,7 +322,7 @@ export default function SyndicateCampaign() {
         </div>
 
         {/* ── Business Plan ── */}
-        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".16s", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".16s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#22c55e,#16a34a)" }} />
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>Business Plan</h2>
@@ -329,7 +331,7 @@ export default function SyndicateCampaign() {
         </div>
 
         {/* ── Investors list ── */}
-        <div className="sc-in rounded-2xl overflow-hidden" style={{ animationDelay: ".2s", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="sc-in rounded-2xl overflow-hidden" style={{ animationDelay: ".2s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <button
             className="flex items-center justify-between w-full p-6 transition-colors"
             onClick={() => setShowInvestors(v => !v)}
@@ -359,7 +361,7 @@ export default function SyndicateCampaign() {
         </div>
 
         {/* ── How it works ── */}
-        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".24s", background: "linear-gradient(135deg,#0f2e10,#091e09)", border: "1px solid rgba(34,197,94,0.15)" }}>
+        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".24s", background: "linear-gradient(135deg,#0f2e10,#091e09)", border: "1px solid rgba(34,197,94,0.30)" }}>
           <div className="flex items-center gap-2 mb-4">
             <FontAwesomeIcon icon={faShield} style={{ fontSize: "13px", color: "#22c55e" }} />
             <h3 className="font-bold text-white text-sm" style={{ fontFamily: "'Syne',sans-serif" }}>How syndicate investing works</h3>

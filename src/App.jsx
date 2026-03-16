@@ -6,6 +6,7 @@ import useAdminAuthStore from "./store/useAdminAuthStore";
 import useThemeStore from "./store/useThemeStore";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/layout/AdminLayout";
+import SocketListeners from "./components/realtime/SocketListeners";
 
 import HomePage from "./pages/HomePage";
 import Login from "./pages/auth/Login";
@@ -25,13 +26,14 @@ import UserProfile from "./pages/shared/UserProfile";
 import Withdraw from "./pages/shared/Withdraw";
 import Notifications from "./pages/shared/Notifications";
 import Settings from "./pages/shared/Settings";
-import KYC from "./pages/shared/Kyc";
+import KYC from "./pages/shared/KYC";
+import PaymentVerify from "./pages/shared/PaymentVerify";
 import Milestones from "./pages/shared/Milestones";
 import BrowseSyndicates from "./pages/shared/BrowseSyndicates";
 import SyndicateCampaign from "./pages/shared/SyndicateCampaign";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import Dispute from "./pages/shared/Dispute";
-import { AdminUsers, AdminVerifications, AdminWithdrawals, AdminDisputes, AdminTransactions } from "./pages/admin/AdminPages";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import { AdminUsers, AdminVerifications, AdminWithdrawals, AdminDisputes, AdminTransactions, AdminReports } from "./pages/admin/AdminPages";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuthStore();
@@ -49,28 +51,73 @@ const PublicRoute = ({ children }) => {
   return !user ? children : <Navigate to="/dashboard" />;
 };
 
-// Shared layout shell — Sidebar + Header mount ONCE, only <Outlet> swaps on navigation
-function AppLayout({ title }) {
+// Single shared Layout instance for all public-layout routes.
+// Title is derived from the current path so it never needs to remount.
+function PublicAppLayout() {
+  const location = useLocation();
+  const TITLES = {
+    "/browse":    "Browse Creators",
+    "/investors": "Browse Investors",
+    "/syndicates": "Browse Syndicates",
+  };
+  const title = TITLES[location.pathname] || "SkillFund";
   return (
-    <PrivateRoute>
-      <Layout title={title}>
-        <Outlet />
-      </Layout>
-    </PrivateRoute>
+    <Layout title={title}>
+      <Outlet />
+    </Layout>
   );
 }
 
-// Admin layout shell — uses separate AdminLayout with light SaaS design
+// Single shared Layout instance for ALL protected routes.
+// Header and Sidebar mount ONCE and never remount on navigation —
+// this is what allows the notification count to persist correctly
+// after the fetch resolves, without depending on mount timing.
+function ProtectedAppLayout() {
+  const { user } = useAuthStore();
+  const location = useLocation();
+
+  if (!user) return <Navigate to="/login" />;
+
+  const TITLES = {
+    "/dashboard":   "Dashboard",
+    "/profile":     "Profile",
+    "/connections": "Connections",
+    "/messages":    "Messages",
+    "/investments": "Investments",
+    "/portfolio":   "My Portfolio",
+    "/earnings":    "Creator Dashboard",
+    "/withdraw":    "Withdraw",
+    "/notifications": "Notifications",
+    "/settings":    "Settings",
+    "/kyc":         "Verify Identity",
+    "/disputes":    "Disputes",
+  };
+
+  // Handle dynamic segments like /investments/:id/milestones
+  let title = TITLES[location.pathname];
+  if (!title && location.pathname.includes("/milestones")) title = "Milestones";
+  if (!title) title = "SkillFund";
+
+  const isMessages = location.pathname === "/messages";
+
+  return (
+    <Layout title={title} noPadding={isMessages}>
+      <Outlet />
+    </Layout>
+  );
+}
+
 function AdminAppLayout() {
   const location = useLocation();
   const TITLES = {
-    "/admin":              "Dashboard",
-    "/admin/dashboard":    "Dashboard",
-    "/admin/users":        "User Management",
-    "/admin/verifications":"KYC Verifications",
-    "/admin/withdrawals":  "Withdrawal Approvals",
-    "/admin/disputes":     "Disputes",
-    "/admin/transactions": "Transactions",
+    "/admin":               "Dashboard",
+    "/admin/dashboard":     "Dashboard",
+    "/admin/users":         "User Management",
+    "/admin/verifications": "KYC Verifications",
+    "/admin/withdrawals":   "Withdrawal Approvals",
+    "/admin/disputes":      "Disputes",
+    "/admin/transactions":  "Transactions",
+    "/admin/reports":       "User Reports",
   };
   const title = TITLES[location.pathname] || "Admin Portal";
   return (
@@ -82,14 +129,12 @@ function AdminAppLayout() {
   );
 }
 
-// Scrolls window to top on every route change
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 }
 
-// Syncs theme store → <html data-theme="..."> so CSS vars cascade everywhere
 function ThemeProvider() {
   const { theme } = useThemeStore();
   useEffect(() => {
@@ -101,14 +146,15 @@ function ThemeProvider() {
 function App() {
   const { theme } = useThemeStore();
 
-  // Apply on first render too (before ThemeProvider mounts inside Router)
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
   return (
     <Router>
       <ScrollToTop />
       <ThemeProvider />
+      <SocketListeners />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -117,89 +163,56 @@ function App() {
         }}
       />
       <Routes>
-        {/* ── Public routes (no sidebar) ── */}
-        <Route path="/"         element={<HomePage />} />
-        {/* ── Admin login (completely separate auth) ── */}
+        {/* ── Fully public routes (no sidebar) ── */}
+        <Route path="/"            element={<HomePage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/login"       element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register"    element={<PublicRoute><Register /></PublicRoute>} />
 
-        <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-
-        {/* ── Protected routes — all share ONE Layout instance, Sidebar never remounts ── */}
-        <Route element={<AppLayout title="Dashboard" />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-
-        <Route element={<AppLayout title="Profile" />}>
-          <Route path="/profile"       element={<Profile />} />
+        {/* ── Public browse + profile pages — single shared Layout instance ── */}
+        <Route element={<PublicAppLayout />}>
+          <Route path="/browse"        element={<BrowseCreators />} />
+          <Route path="/investors"     element={<BrowseInvestors />} />
+          <Route path="/syndicates"    element={<BrowseSyndicates />} />
+          <Route path="/syndicates/:id" element={<SyndicateCampaign />} />
           <Route path="/users/:id"     element={<UserProfile />} />
           <Route path="/creators/:id"  element={<UserProfile />} />
           <Route path="/investors/:id" element={<UserProfile />} />
         </Route>
 
-        <Route element={<AppLayout title="Browse Creators" />}>
-          <Route path="/browse" element={<BrowseCreators />} />
-        </Route>
-
-        <Route element={<AppLayout title="Browse Investors" />}>
-          <Route path="/investors" element={<BrowseInvestors />} />
-        </Route>
-
-        <Route element={<AppLayout title="Connections" />}>
-          <Route path="/connections" element={<Connections />} />
-        </Route>
-
-        <Route element={<AppLayout title="Messages" />}>
-          <Route path="/messages" element={<Messages />} />
-        </Route>
-
-        <Route element={<AppLayout title="Investments" />}>
-          <Route path="/investments" element={<InvestmentsEarnings />} />
-        </Route>
-
-        <Route element={<AppLayout title="My Portfolio" />}>
-          <Route path="/portfolio" element={<InvestorDashboard />} />
-        </Route>
-
-        <Route element={<AppLayout title="Creator Dashboard" />}>
-          <Route path="/earnings" element={<CreatorDashboard />} />
-        </Route>
-
-        <Route element={<AppLayout title="Withdraw" />}>
-          <Route path="/withdraw" element={<Withdraw />} />
-        </Route>
-
-        <Route element={<AppLayout title="Notifications" />}>
+        {/* ── ALL protected routes share ONE Layout instance ── */}
+        {/* Header and Sidebar mount once — notification counts never reset */}
+        <Route element={<ProtectedAppLayout />}>
+          <Route path="/dashboard"    element={<Dashboard />} />
+          <Route path="/profile"      element={<Profile />} />
+          <Route path="/connections"  element={<Connections />} />
+          <Route path="/messages"     element={<Messages />} />
+          <Route path="/investments"  element={<InvestmentsEarnings />} />
+          <Route path="/portfolio"    element={<InvestorDashboard />} />
+          <Route path="/earnings"     element={<CreatorDashboard />} />
+          <Route path="/withdraw"     element={<Withdraw />} />
           <Route path="/notifications" element={<Notifications />} />
-        </Route>
-
-        <Route element={<AppLayout title="Settings" />}>
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/kyc"      element={<KYC />} />
-        </Route>
-
-        <Route element={<AppLayout title="Milestones" />}>
+          <Route path="/settings"     element={<Settings />} />
+          <Route path="/kyc"          element={<KYC />} />
+          <Route path="/disputes"     element={<Dispute />} />
           <Route path="/investments/:investmentId/milestones" element={<Milestones />} />
         </Route>
 
-        <Route element={<AppLayout title="Syndicates" />}>
-          <Route path="/syndicates"    element={<BrowseSyndicates />} />
-          <Route path="/syndicates/:id" element={<SyndicateCampaign />} />
-        </Route>
-
-        <Route element={<AppLayout title="Disputes" />}>
-          <Route path="/disputes" element={<Dispute />} />
-        </Route>
+        {/* ── Payment return pages — full screen, no sidebar ── */}
+        <Route path="/payment/verify"    element={<PrivateRoute><PaymentVerify /></PrivateRoute>} />
+        <Route path="/payment/success"   element={<PrivateRoute><PaymentVerify /></PrivateRoute>} />
+        <Route path="/payment/cancelled" element={<PrivateRoute><PaymentVerify /></PrivateRoute>} />
 
         {/* ── Admin routes ── */}
         <Route path="/admin" element={<AdminAppLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="users" element={<AdminUsers />} />
+          <Route index              element={<AdminDashboard />} />
+          <Route path="dashboard"   element={<AdminDashboard />} />
+          <Route path="users"       element={<AdminUsers />} />
           <Route path="verifications" element={<AdminVerifications />} />
           <Route path="withdrawals" element={<AdminWithdrawals />} />
-          <Route path="disputes" element={<AdminDisputes />} />
+          <Route path="disputes"    element={<AdminDisputes />} />
           <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="reports"      element={<AdminReports />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

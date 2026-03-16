@@ -10,10 +10,10 @@ import {
 
 function StatCard({ label, value, icon, colorClass, loading }) {
   const colorMap = {
-    green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.15)",  card: "var(--card-green)" },
-    blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.15)", card: "var(--card-blue)" },
-    purple: { text: "#a855f7", bg: "rgba(168,85,247,0.1)",  border: "rgba(168,85,247,0.15)", card: "var(--card-purple)" },
-    amber:  { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.15)", card: "var(--card-amber)" },
+    green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.30)",  card: "var(--card-green)" },
+    blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.30)", card: "var(--card-blue)" },
+    purple: { text: "#a855f7", bg: "rgba(168,85,247,0.1)",  border: "rgba(168,85,247,0.30)", card: "var(--card-purple)" },
+    amber:  { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.30)", card: "var(--card-amber)" },
   };
   const c = colorMap[colorClass] || colorMap.green;
   if (loading) {
@@ -46,7 +46,7 @@ function QuickAction({ emoji, label, description, path }) {
       onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(34,197,94,0.35)"; e.currentTarget.style.background = "var(--bg-input)"; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg-card)"; }}
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.12)" }}>{emoji}</div>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.28)" }}>{emoji}</div>
       <div className="flex-1 min-w-0">
         <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{label}</p>
         {description && <p className="text-xs truncate mt-0.5" style={{ color: "var(--text-dim)" }}>{description}</p>}
@@ -58,7 +58,7 @@ function QuickAction({ emoji, label, description, path }) {
 
 function StatusItem({ label, value, last }) {
   return (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.08)" }}>
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.2)" }}>
       <span className="text-sm" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
       <div className="flex items-center gap-1.5">
         {value
@@ -161,7 +161,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Welcome Banner */}
-      <div className="dash-in d1 rounded-3xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f2e10 0%, #071a0b 60%, #040d06 100%)", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+      <div className="dash-in d1 rounded-3xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f2e10 0%, #071a0b 60%, #040d06 100%)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
         <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)", filter: "blur(20px)" }} />
         <div className="absolute inset-0 pointer-events-none rounded-3xl" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.04) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -177,7 +177,7 @@ export default function Dashboard() {
             </p>
           </div>
           {user?.plan === "basic" && (
-            <Link to="/pricing" className="flex-shrink-0 flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>
+            <Link to="/settings" className="flex-shrink-0 flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.30)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>
               Upgrade Plan <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
             </Link>
           )}
@@ -215,7 +215,7 @@ export default function Dashboard() {
               <span className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "var(--text-dim)" }}>VERIFICATION PROGRESS</span>
               <span className="text-xs font-black" style={{ fontFamily: "'Fraunces', serif", color: "#22c55e" }}>{verifiedCount}/{verifications.length}</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
               <div className="h-full rounded-full transition-all duration-700" style={{ width: `${verifiedPct}%`, background: "linear-gradient(90deg, #16a34a, #22c55e, #4ade80)" }} />
             </div>
             <p className="text-xs mt-1.5" style={{ color: "var(--text-ghost)" }}>
@@ -227,7 +227,7 @@ export default function Dashboard() {
           </div>
           <div className="mt-4 flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "var(--bg)", border: "1px solid var(--border)" }}>
             <span className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>Current Plan</span>
-            <span className="text-xs font-black capitalize px-3 py-1.5 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#22c55e" }}>
+            <span className="text-xs font-black capitalize px-3 py-1.5 rounded-full" style={{ fontFamily: "'Syne', sans-serif", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e" }}>
               {user?.plan}
             </span>
           </div>

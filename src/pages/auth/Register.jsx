@@ -67,7 +67,7 @@ export default function Register() {
         {/* Card */}
         <div className="rounded-3xl p-8" style={{
           background: "linear-gradient(145deg, #0c1a0d 0%, #080f09 100%)",
-          border: "1px solid rgba(34,197,94,0.12)",
+          border: "1px solid rgba(34,197,94,0.28)",
           boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.05) inset",
           backdropFilter: "blur(20px)",
         }}>

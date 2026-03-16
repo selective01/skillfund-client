@@ -1,27 +1,30 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faGauge, faUsers, faShieldHalved, faWallet, faTriangleExclamation,
+  faGauge, faUsers, faShieldHalved, faWallet, faTriangleExclamation, faFlag,
   faReceipt, faBars, faXmark,
   faArrowRightFromBracket, faBell, faMagnifyingGlass,
   faArrowTrendUp, faChevronDown, faCheck, faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import useAdminAuthStore from "../../store/useAdminAuthStore";
 
+// Must match useAdminAuthStore — VITE_API_URL already ends with /api, no extra /api here
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const NAV_SECTIONS = [
   {
     label: "Overview",
     links: [
-      { path: "/admin/dashboard", icon: faGauge,   label: "Dashboard", color: "#6366f1" },
+      { path: "/admin/dashboard", icon: faGauge, label: "Dashboard", color: "#6366f1" },
     ],
   },
   {
     label: "Main",
     links: [
-      { path: "/admin/users",         icon: faUsers,               label: "Users",         color: "#6366f1" },
-      { path: "/admin/verifications", icon: faShieldHalved,        label: "KYC",           color: "#14b8a6" },
+      { path: "/admin/users",         icon: faUsers,        label: "Users", color: "#6366f1" },
+      { path: "/admin/verifications", icon: faShieldHalved, label: "KYC",   color: "#14b8a6" },
     ],
   },
   {
@@ -34,7 +37,8 @@ const NAV_SECTIONS = [
   {
     label: "Support",
     links: [
-      { path: "/admin/disputes",      icon: faTriangleExclamation, label: "Disputes",      color: "#f43f5e" },
+      { path: "/admin/disputes", icon: faTriangleExclamation, label: "Disputes", color: "#f43f5e" },
+      { path: "/admin/reports",  icon: faFlag,                label: "Reports",  color: "#f97316" },
     ],
   },
 ];
@@ -52,43 +56,25 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
   const [unreadCount,   setUnreadCount]   = useState(0);
   const bellRef = useRef(null);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!adminToken) return;
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL || ""}/api/admin/notifications?limit=20`,
+        `${BASE}/admin/notifications?limit=20`,
         { headers: { Authorization: `Bearer ${adminToken}` } }
       );
       setNotifications(res.data.notifications || []);
       setUnreadCount(res.data.unreadCount || 0);
     } catch { /* silent */ }
-  };
+  }, [adminToken]);
 
-  // Poll every 30s — adminToken is stable after login so this runs once
+  // Poll every 30 seconds — defer first call to avoid synchronous setState in effect body
   useEffect(() => {
     if (!adminToken) return;
-    let cancelled = false;
-
-    const run = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL || ""}/api/admin/notifications?limit=20`,
-          { headers: { Authorization: `Bearer ${adminToken}` } }
-        );
-        if (!cancelled) {
-          setNotifications(res.data.notifications || []);
-          setUnreadCount(res.data.unreadCount || 0);
-        }
-      } catch { /* silent */ }
-    };
-
-    run();
-    const interval = setInterval(run, 30000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [adminToken]);
+    const initial = setTimeout(fetchNotifications, 0);
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => { clearTimeout(initial); clearInterval(interval); };
+  }, [adminToken, fetchNotifications]);
 
   // Close bell dropdown when clicking outside
   useEffect(() => {
@@ -100,7 +86,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
   const markAllRead = async () => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL || ""}/api/admin/notifications/read`,
+        `${BASE}/admin/notifications/read`,
         {},
         { headers: { Authorization: `Bearer ${adminToken}` } }
       );
@@ -113,7 +99,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
     e.stopPropagation();
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URL || ""}/api/admin/notifications/${id}`,
+        `${BASE}/admin/notifications/${id}`,
         { headers: { Authorization: `Bearer ${adminToken}` } }
       );
       setNotifications(prev => prev.filter(n => n._id !== id));
@@ -122,17 +108,10 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
   };
 
   const handleNotificationClick = async (notif) => {
-    // Mark this one read
+    // Mark this one read locally (backend only supports mark-all)
     if (!notif.isRead) {
-      try {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL || ""}/api/admin/notifications/read`,
-          { ids: [notif._id] },
-          { headers: { Authorization: `Bearer ${adminToken}` } }
-        );
-        setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      } catch { /* silent */ }
+      setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
     }
     setBellOpen(false);
     if (notif.link) navigate(notif.link);
@@ -143,10 +122,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
     navigate("/admin/login");
   };
 
-  const activeLink = ALL_LINKS.find(l =>
-    l.path === location.pathname ||
-    (location.pathname === "/admin" && l.path === "/admin/dashboard")
-  );
+  const activeLink = ALL_LINKS.find(l => l.path === location.pathname);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -170,8 +146,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
             </p>
             <div className="space-y-0.5">
               {section.links.map(link => {
-                const isActive = location.pathname === link.path ||
-                  (location.pathname === "/admin" && link.path === "/admin/dashboard");
+                const isActive = location.pathname === link.path;
                 return (
                   <Link
                     key={link.path}
