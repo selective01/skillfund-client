@@ -1,5 +1,7 @@
 import axios from "axios";
 
+// ✅ Set VITE_API_URL in Vercel environment variables:
+// VITE_API_URL = https://skillfund-server.onrender.com/api
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
