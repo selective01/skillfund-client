@@ -10,7 +10,7 @@ import {
 import toast from "react-hot-toast";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
-import { ScoreBadge } from "../../components/layout/ScoreBadge";
+import { ScoreBadge } from "../../components/layout/Scorebadge";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 const CATEGORY_EMOJI = {
