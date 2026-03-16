@@ -26,7 +26,7 @@ import UserProfile from "./pages/shared/UserProfile";
 import Withdraw from "./pages/shared/Withdraw";
 import Notifications from "./pages/shared/Notifications";
 import Settings from "./pages/shared/Settings";
-import KYC from "./pages/shared/KYC";
+import KYC from "./pages/shared/Kyc";
 import PaymentVerify from "./pages/shared/PaymentVerify";
 import Milestones from "./pages/shared/Milestones";
 import BrowseSyndicates from "./pages/shared/BrowseSyndicates";
