@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
-import { ScoreCard } from "../../components/layout/Scorebadge";
+import { ScoreCard } from "../../components/layout/ScoreBadge";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
