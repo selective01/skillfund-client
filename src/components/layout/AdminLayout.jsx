@@ -6,7 +6,7 @@ import {
   faGauge, faUsers, faShieldHalved, faWallet, faTriangleExclamation, faFlag,
   faReceipt, faBars, faXmark,
   faArrowRightFromBracket, faBell, faMagnifyingGlass,
-  faArrowTrendUp, faChevronDown, faCheck, faTrash,
+  faArrowTrendUp, faChevronDown, faCheck, faTrash, faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import useAdminAuthStore from "../../store/useAdminAuthStore";
 
@@ -30,8 +30,9 @@ const NAV_SECTIONS = [
   {
     label: "Finance",
     links: [
-      { path: "/admin/withdrawals",   icon: faWallet,              label: "Withdrawals",   color: "#8b5cf6" },
-      { path: "/admin/transactions",  icon: faReceipt,             label: "Transactions",  color: "#f59e0b" },
+      { path: "/admin/withdrawals",  icon: faWallet,     label: "Withdrawals",  color: "#8b5cf6" },
+      { path: "/admin/transactions", icon: faReceipt,    label: "Transactions", color: "#f59e0b" },
+      { path: "/admin/revenue",      icon: faChartLine,  label: "Revenue",      color: "#16a34a" },
     ],
   },
   {

@@ -77,7 +77,8 @@ export default function UserProfile() {
     }
   };
 
-  const handleInvest = () => navigate(`/invest/${id}`, { state: { creator: profileData } });
+  // Per SkillFund spec: investment starts via chat proposal, not a direct /invest page
+  const handleInvest = () => navigate(`/messages?userId=${id}`, { state: { creator: profileData, openProposal: true } });
 
   if (loading) return
 <ProfileSkeleton />

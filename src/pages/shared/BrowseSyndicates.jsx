@@ -237,7 +237,7 @@ export default function BrowseSyndicates() {
                 </div>
               )}
               {isCreator && (
-                <button onClick={() => navigate("/syndicates/create")} className="flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff", boxShadow: "0 4px 16px rgba(59,130,246,0.3)" }}>
+                <button onClick={() => navigate("/profile", { state: { openCreateSyndicate: true } })} className="flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff", boxShadow: "0 4px 16px rgba(59,130,246,0.3)" }}>
                   <FontAwesomeIcon icon={faPlus} style={{ fontSize: "12px" }} /> Create Campaign
                 </button>
               )}
@@ -340,7 +340,7 @@ export default function BrowseSyndicates() {
           <p className="font-black text-white text-lg mb-1" style={{ fontFamily: "'Fraunces',serif" }}>No campaigns found</p>
           <p className="text-sm mb-5" style={{ color: "#9ca3af" }}>{hasFilters ? "Try adjusting your filters" : "Check back soon — new campaigns launch regularly"}</p>
           {isCreator && (
-            <button onClick={() => navigate("/syndicates/create")} className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff" }}>
+            <button onClick={() => navigate("/profile", { state: { openCreateSyndicate: true } })} className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff" }}>
               <FontAwesomeIcon icon={faPlus} style={{ fontSize: "12px" }} /> Create the First Campaign
             </button>
           )}

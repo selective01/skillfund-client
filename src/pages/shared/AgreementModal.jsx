@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -93,6 +94,7 @@ function CountdownTimer({ expiresAt }) {
 
 // ── Main Modal ────────────────────────────────────────────────────────────────
 export default function AgreementModal({ proposal, currentUser, onLocked, onClose }) {
+  const navigate    = useNavigate();
   // steps: "review" → "choose_payment" → "paystack_redirect" | "usdt_waiting" → "locked"
   const [step, setStep]                   = useState("review");
   const [agreed, setAgreed]               = useState(false);
@@ -669,7 +671,10 @@ export default function AgreementModal({ proposal, currentUser, onLocked, onClos
         {step === "locked" && (
           <div style={{ padding: "16px 22px 20px", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
             <button
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                navigate(isInvestor ? "/investments" : "/earnings");
+              }}
               style={{
                 width: "100%", padding: "12px", borderRadius: "12px", cursor: "pointer",
                 background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "none",

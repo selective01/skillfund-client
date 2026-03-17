@@ -34,6 +34,7 @@ import SyndicateCampaign from "./pages/shared/SyndicateCampaign";
 import Dispute from "./pages/shared/Dispute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { AdminUsers, AdminVerifications, AdminWithdrawals, AdminDisputes, AdminTransactions, AdminReports } from "./pages/admin/AdminPages";
+import { AdminRevenue } from "./pages/admin/AdminRevenue";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuthStore();
@@ -118,6 +119,7 @@ function AdminAppLayout() {
     "/admin/disputes":      "Disputes",
     "/admin/transactions":  "Transactions",
     "/admin/reports":       "User Reports",
+    "/admin/revenue":       "Platform Revenue",
   };
   const title = TITLES[location.pathname] || "Admin Portal";
   return (
@@ -213,6 +215,7 @@ function App() {
           <Route path="disputes"    element={<AdminDisputes />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="reports"      element={<AdminReports />} />
+          <Route path="revenue"      element={<AdminRevenue />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

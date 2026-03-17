@@ -208,6 +208,7 @@ export default function AdminDashboard() {
             { label: "Withdrawals",  icon: faWallet,              color: "#8b5cf6", bg: "#f5f3ff", border: "#ddd6fe", path: "/admin/withdrawals" },
             { label: "Transactions", icon: faReceipt,             color: "#f59e0b", bg: "#fffbeb", border: "#fde68a", path: "/admin/transactions" },
             { label: "Disputes",     icon: faTriangleExclamation, color: "#f43f5e", bg: "#fff1f2", border: "#fecdd3", path: "/admin/disputes" },
+            { label: "Revenue",      icon: faChartLine,           color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0", path: "/admin/revenue" },
           ].map(q => (
             <button key={q.label} onClick={() => navigate(q.path)}
               style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 14px", borderRadius: "12px", background: q.bg, border: `1px solid ${q.border}`, cursor: "pointer", transition: "opacity .15s", width: "100%" }}

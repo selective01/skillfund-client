@@ -43,12 +43,13 @@ export default function Header({ title, onMenuClick, sidebarOpen }) {
           <FontAwesomeIcon icon={sidebarOpen ? faXmark : faBars} style={{ fontSize: "15px" }} />
         </button>
 
-        <h2
-          className="font-semibold text-lg"
-          style={{ color: t.title, fontFamily: "'Syne', sans-serif", transition: "color 0.2s ease" }}
+        <Link
+          to="/"
+          className="font-semibold text-lg hover:opacity-80 transition-opacity"
+          style={{ color: t.title, fontFamily: "'Syne', sans-serif", transition: "color 0.2s ease", textDecoration: "none" }}
         >
           {title}
-        </h2>
+        </Link>
       </div>
 
       <div className="flex items-center gap-4">
