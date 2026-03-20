@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShield, faCircleCheck, faCircleXmark, faClockRotateLeft,
-  faIdCard, faPassport, faCarAlt, faCloudArrowUp, faTrash,
+  faIdCard, faPassport, faCar, faCloudArrowUp, faTrash,
   faArrowRight, faCircleNotch, faLock, faStar, faCheckDouble,
   faCamera, faRotateRight, faUserCheck, faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +13,7 @@ import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 const DOC_TYPES = [
   { key: "national_id",     label: "National ID",      icon: faIdCard,   color: "#22c55e", desc: "Government-issued national identity card" },
   { key: "passport",        label: "Passport",          icon: faPassport, color: "#3b82f6", desc: "International travel passport (any country)" },
-  { key: "drivers_license", label: "Driver's License",  icon: faCarAlt,   color: "#a855f7", desc: "Valid driver's license with photo" },
+  { key: "drivers_license", label: "Driver's License",  icon: faCar,   color: "#a855f7", desc: "Valid driver's license with photo" },
 ];
 
 const STEPS = [
@@ -160,7 +160,7 @@ function SelfieCapture({ onCapture }) {
           </div>
           <p className="font-black mb-1" style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", color: "#22c55e" }}>Selfie captured!</p>
           <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "12px", color: "#9ca3af", marginBottom: "16px" }}>Make sure your face is clearly visible</p>
-          <button onClick={retake} className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl font-bold" style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
+          <button onClick={retake} className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl font-bold" style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#9ca3af" }}>
             <FontAwesomeIcon icon={faRotateRight} style={{ fontSize: "12px" }} /> Retake
           </button>
         </div>
@@ -177,7 +177,7 @@ function SelfieCapture({ onCapture }) {
           )}
         </div>
         <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#9ca3af", marginBottom: "16px" }}>Position your face in the circle</p>
-        <button onClick={startCountdown} disabled={!!countdown} className="flex items-center gap-2 mx-auto px-6 py-3 rounded-xl font-black disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 4px 20px rgba(34,197,94,0.25)" }}>
+        <button onClick={startCountdown} disabled={!!countdown} className="flex items-center gap-2 mx-auto px-6 py-3 rounded-xl font-black disabled:opacity-60" style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 2px 8px rgba(34,197,94,0.2)" }}>
           <FontAwesomeIcon icon={faCamera} style={{ fontSize: "14px" }} />
           {countdown ? `Taking in ${countdown}…` : "Take Photo"}
         </button>
@@ -202,7 +202,7 @@ function SelfieCapture({ onCapture }) {
                   <FontAwesomeIcon icon={faCamera} style={{ fontSize: "12px" }} /> Try Again
                 </button>
                 <button onClick={() => selfieInputRef.current?.click()} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#9ca3af" }}>
                   <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "13px" }} /> Upload Photo Instead
                 </button>
               </div>
@@ -243,7 +243,7 @@ function DropZone({ file, onFile, onRemove, label }) {
     <div className="rounded-2xl p-4 flex items-center gap-4" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.25)" }}>
       {file.type?.startsWith("image/")
         ? <img src={URL.createObjectURL(file)} alt="preview" className="w-14 h-14 object-cover rounded-xl flex-shrink-0" style={{ border: "1px solid rgba(34,197,94,0.3)" }} />
-        : <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}><FontAwesomeIcon icon={faIdCard} style={{ fontSize: "20px", color: "#22c55e" }} /></div>
+        : <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}><FontAwesomeIcon icon={faIdCard} style={{ fontSize: "20px", color: "#22c55e" }} /></div>
       }
       <div className="flex-1 min-w-0">
         <p className="font-bold text-xs mb-0.5" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</p>
@@ -259,7 +259,7 @@ function DropZone({ file, onFile, onRemove, label }) {
   return (
     <div onClick={() => inputRef.current?.click()} onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={handleDrop}
       className="rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer"
-      style={{ minHeight: "140px", border: `2px dashed ${dragging ? "#22c55e" : "rgba(255,255,255,0.2)"}`, background: dragging ? "rgba(34,197,94,0.05)" : "#070d08", transition: "all .2s" }}
+      style={{ minHeight: "140px", border: `2px dashed ${dragging ? "#22c55e" : "rgba(255,255,255,0.2)"}`, background: dragging ? "rgba(34,197,94,0.05)" : "var(--bg-card)", transition: "all .2s" }}
     >
       <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)" }}>
         <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "18px", color: "#22c55e" }} />
@@ -327,7 +327,7 @@ export default function KYC() {
       `}</style>
 
       {/* Header */}
-      <div className="kyc-in rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+      <div className="kyc-in rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg,#040d06))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10" style={{ background: "radial-gradient(circle,#22c55e,transparent)", transform: "translate(30%,-30%)" }} />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -356,7 +356,7 @@ export default function KYC() {
       )}
 
       {showForm && (
-        <div className="kyc-in rounded-2xl p-6" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="kyc-in rounded-2xl p-6" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
           <StepIndicator current={step} />
 
           {/* Step 0 — Document type */}
@@ -390,7 +390,7 @@ export default function KYC() {
                 onClick={() => setStep(1)}
                 disabled={!docType}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: docType ? "0 4px 20px rgba(34,197,94,0.25)" : "none" }}
+                style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: docType ? "0 2px 8px rgba(34,197,94,0.2)" : "none" }}
               >
                 Continue <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
               </button>
@@ -407,14 +407,14 @@ export default function KYC() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep(0)} className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}>
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#6b7280" }}>
                   <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Back
                 </button>
                 <button
                   onClick={() => setStep(2)}
                   disabled={!selfieFile}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl font-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: selfieFile ? "0 4px 20px rgba(34,197,94,0.25)" : "none" }}
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: selfieFile ? "0 2px 8px rgba(34,197,94,0.2)" : "none" }}
                 >
                   Continue <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
                 </button>
@@ -438,14 +438,14 @@ export default function KYC() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)} className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}>
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#6b7280" }}>
                   <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Back
                 </button>
                 <button
                   onClick={() => setStep(3)}
                   disabled={!frontFile}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl font-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: frontFile ? "0 4px 20px rgba(34,197,94,0.25)" : "none" }}
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "14px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: frontFile ? "0 2px 8px rgba(34,197,94,0.2)" : "none" }}
                 >
                   Review <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} />
                 </button>
@@ -459,7 +459,7 @@ export default function KYC() {
               <p className="font-black mb-1" style={{ fontFamily: "'Fraunces',serif", fontSize: "18px", color: "#fff" }}>Review & submit</p>
               <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#6b7280", marginBottom: "20px" }}>Check everything looks good before submitting.</p>
 
-              <div className="rounded-2xl p-5 space-y-4 mb-5" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}>
+              <div className="rounded-2xl p-5 space-y-4 mb-5" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
                 <div className="flex items-center gap-4">
                   {selfieFile && (
                     <img src={URL.createObjectURL(selfieFile)} alt="selfie" className="w-14 h-14 rounded-full object-cover flex-shrink-0" style={{ border: "2px solid #22c55e" }} />
@@ -485,7 +485,7 @@ export default function KYC() {
 
                 <div className="space-y-2">
                   {frontFile && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+                    <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
                       {frontFile.type?.startsWith("image/") && (
                         <img src={URL.createObjectURL(frontFile)} alt="front" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                       )}
@@ -496,7 +496,7 @@ export default function KYC() {
                     </div>
                   )}
                   {backFile && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+                    <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
                       {backFile.type?.startsWith("image/") && (
                         <img src={URL.createObjectURL(backFile)} alt="back" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                       )}
@@ -518,14 +518,14 @@ export default function KYC() {
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(2)} className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}>
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#6b7280" }}>
                   <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Back
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || !selfieFile || !frontFile}
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-black transition-all disabled:opacity-60"
-                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "15px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 4px 20px rgba(34,197,94,0.25)" }}
+                  style={{ fontFamily: "'Syne',sans-serif", fontSize: "15px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 2px 8px rgba(34,197,94,0.2)" }}
                 >
                   {submitting ? (
                     <>
@@ -544,7 +544,7 @@ export default function KYC() {
       )}
 
       {/* What happens next */}
-      <div className="kyc-in rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+      <div className="kyc-in rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
         <p className="font-black mb-4" style={{ fontFamily: "'Syne',sans-serif", fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: ".1em" }}>What happens next</p>
         <div className="space-y-3">
           {[

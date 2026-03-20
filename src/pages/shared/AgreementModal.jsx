@@ -9,7 +9,7 @@ import {
   faTriangleExclamation, faStamp,
   faShieldHalved, faChevronDown,
   faCreditCard, faBitcoinSign, faCopy, faClock,
-  faCheckCircle, faArrowRight,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import api from "../../utils/api";
@@ -191,7 +191,7 @@ export default function AgreementModal({ proposal, currentUser, onLocked, onClos
           border: "1px solid rgba(34,197,94,0.2)",
           borderRadius: "24px", overflow: "hidden",
           display: "flex", flexDirection: "column",
-          boxShadow: "0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(34,197,94,0.05)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(34,197,94,0.05)",
         }}
       >
 
@@ -480,7 +480,7 @@ export default function AgreementModal({ proposal, currentUser, onLocked, onClos
                   onClick={copyAddress}
                   style={{ background: "none", border: "none", cursor: "pointer", color: copied ? "#22c55e" : "#5a8a63", flexShrink: 0, padding: "2px" }}
                 >
-                  <FontAwesomeIcon icon={copied ? faCheckCircle : faCopy} style={{ fontSize: "15px" }} />
+                  <FontAwesomeIcon icon={copied ? faCircleCheck : faCopy} style={{ fontSize: "15px" }} />
                 </button>
               </div>
 

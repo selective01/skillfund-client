@@ -21,6 +21,7 @@ import {
 import { faInstagram, faXTwitter, faLinkedin } from "@fortawesome/free-brands-svg-icons";
 
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
@@ -53,6 +54,18 @@ const TABS = [
 export default function Profile() {
   useNotificationReadOnView();
   const { user, updateUser } = useAuthStore();
+  const theme = useThemeStore((s) => s.theme);
+  const L = theme === "light";
+  const T = {
+    card:        L ? "#ffffff"              : "#070d08",
+    cardAlt:     L ? "#f0fdf4"              : "#0a1209",
+    border:      L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.1)",
+    borderSub:   L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.07)",
+    text:        L ? "#0a1a0c"              : "#f1f5f9",
+    muted:       L ? "#4b5563"              : "#9ca3af",
+    dim:         L ? "#6b7280"              : "#4b5563",
+    toggleOff:   L ? "rgba(0,0,0,0.15)"     : "rgba(255,255,255,0.2)",
+  };
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(true);
@@ -230,28 +243,34 @@ export default function Profile() {
   if (loading) return <ProfileSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{
+      "--bg-card":     T.card,
+      "--bg-input":    T.cardAlt,
+      "--border":      T.border,
+      "--text-primary":T.text,
+      "--text-muted":  T.muted,
+    }}>
       <style>{`
-        .sf-field { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .sf-field { background:var(--bg-input); border:1px solid var(--border); color:var(--text-primary); border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .sf-field::placeholder { color:#5a8a63; }
         .sf-field:focus { border-color:rgba(34,197,94,0.35); }
-        .sf-select { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; appearance:none; cursor:pointer; transition:border-color .2s; }
+        .sf-select { background:var(--bg-input); border:1px solid var(--border); color:var(--text-primary); border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; appearance:none; cursor:pointer; transition:border-color .2s; }
         .sf-select:focus { border-color:rgba(34,197,94,0.35); }
-        .sf-select option { background:#070d08; }
-        .sf-label { display:block; font-size:11px; font-weight:700; font-family:'Syne',sans-serif; text-transform:uppercase; letter-spacing:.05em; color:#9ca3af; margin-bottom:5px; }
-        .sf-ind-pill { padding:5px 12px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#0a1209; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .sf-select option { background:var(--bg-card); color:var(--text-primary); }
+        .sf-label { display:block; font-size:11px; font-weight:700; font-family:'Syne',sans-serif; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-bottom:5px; }
+        .sf-ind-pill { padding:5px 12px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid var(--border); background:var(--bg-input); color:var(--text-muted); font-family:'Syne',sans-serif; white-space:nowrap; }
         .sf-ind-pill.active { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.35); color:#22c55e; }
-        .sf-ind-pill:hover:not(.active) { border-color:rgba(34,197,94,0.2); color:#9ca3af; }
+        .sf-ind-pill:hover:not(.active) { border-color:rgba(34,197,94,0.2); color:var(--text-muted); }
         .sf-tab { padding:8px 18px; border-radius:10px; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; cursor:pointer; transition:all .15s; border:none; display:flex; align-items:center; gap:7px; }
         .sf-tab.active { background:rgba(34,197,94,0.12); color:#22c55e; border:1px solid rgba(34,197,94,0.25); }
-        .sf-tab:not(.active) { background:transparent; color:#9ca3af; border:1px solid transparent; }
-        .sf-tab:not(.active):hover { color:#9ca3af; background:rgba(255,255,255,0.03); }
+        .sf-tab:not(.active) { background:transparent; color:var(--text-muted); border:1px solid transparent; }
+        .sf-tab:not(.active):hover { color:var(--text-muted); background:${L ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.03)"}; }
         .sf-toggle { position:relative; width:44px; height:24px; border-radius:12px; border:none; cursor:pointer; transition:background .2s; flex-shrink:0; }
         .sf-toggle-thumb { position:absolute; top:3px; width:18px; height:18px; border-radius:9px; background:#fff; transition:left .2s; }
       `}</style>
 
       {/* ── Header card ── */}
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "20px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "20px", padding: "20px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
         {/* Avatar */}
         <div className="relative" style={{ flexShrink: 0 }}>
           <div
@@ -269,7 +288,7 @@ export default function Profile() {
           {/* Camera button overlay */}
           <button
             onClick={() => !avatarUploading && avatarInputRef.current?.click()}
-            style={{ position: "absolute", bottom: "-4px", right: "-4px", width: "26px", height: "26px", borderRadius: "8px", background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "2px solid #040806", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            style={{ position: "absolute", bottom: "-4px", right: "-4px", width: "26px", height: "26px", borderRadius: "8px", background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "2px solid var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
           >
             <FontAwesomeIcon icon={avatarUploading ? faCircleNotch : faCamera} spin={avatarUploading} style={{ color: "#000", fontSize: "10px" }} />
           </button>
@@ -284,14 +303,14 @@ export default function Profile() {
             </h2>
             {user?.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ color: "#22c55e", fontSize: "15px" }} />}
           </div>
-          <p style={{ color: "#9ca3af", fontSize: "13px", margin: "0 0 8px", fontFamily: "'DM Sans', sans-serif" }}>
+          <p style={{ color: T.muted, fontSize: "13px", margin: "0 0 8px", fontFamily: "'DM Sans', sans-serif" }}>
             {user?.email}
           </p>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
               {user?.role}
             </span>
-            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af", fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: T.cardAlt, border: `1px solid ${T.border}`, color: T.muted, fontFamily: "'Syne', sans-serif", textTransform: "capitalize" }}>
               {user?.plan} Plan
             </span>
           </div>
@@ -327,7 +346,7 @@ export default function Profile() {
       </div>
 
       {/* ── Tab content ── */}
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px" }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "20px", padding: "24px" }}>
 
         {/* Profile Tab */}
         {activeTab === "profile" && (
@@ -386,7 +405,7 @@ export default function Profile() {
                             <option key={c.value} value={c.value}>{c.label}</option>
                           ))}
                         </select>
-                        <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
+                        <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: "11px", pointerEvents: "none" }} />
                       </div>
                     </div>
                   </div>
@@ -417,15 +436,15 @@ export default function Profile() {
                   </div>
 
                   {/* Accepting investments toggle */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "16px", padding: "14px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "16px", padding: "14px", background: T.cardAlt, border: `1px solid ${T.border}`, borderRadius: "12px" }}>
                     <div>
-                      <p style={{ color: "#fff", fontWeight: 700, fontSize: "14px", margin: "0 0 2px", fontFamily: "'Syne', sans-serif" }}>Accepting Investments</p>
-                      <p style={{ color: "#9ca3af", fontSize: "12px", margin: 0 }}>Allow investors to send you proposals</p>
+                      <p style={{ color: T.text, fontWeight: 700, fontSize: "14px", margin: "0 0 2px", fontFamily: "'Syne', sans-serif" }}>Accepting Investments</p>
+                      <p style={{ color: T.muted, fontSize: "12px", margin: 0 }}>Allow investors to send you proposals</p>
                     </div>
                     <button
                       onClick={() => setForm((p) => ({ ...p, isAcceptingInvestments: !p.isAcceptingInvestments }))}
                       className="sf-toggle"
-                      style={{ background: form.isAcceptingInvestments ? "#22c55e" : "rgba(255,255,255,0.2)" }}
+                      style={{ background: form.isAcceptingInvestments ? "#22c55e" : T.toggleOff }}
                     >
                       <div className="sf-toggle-thumb" style={{ left: form.isAcceptingInvestments ? "23px" : "3px" }} />
                     </button>
@@ -454,7 +473,7 @@ export default function Profile() {
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
                       </select>
-                      <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
+                      <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: "11px", pointerEvents: "none" }} />
                     </div>
                   </div>
                   <div>
@@ -487,8 +506,8 @@ export default function Profile() {
           <div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
               <div>
-                <h3 style={{ color: "#fff", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 4px" }}>Portfolio</h3>
-                <p style={{ color: "#9ca3af", fontSize: "13px", margin: 0 }}>
+                <h3 style={{ color: T.text, fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 4px" }}>Portfolio</h3>
+                <p style={{ color: T.muted, fontSize: "13px", margin: 0 }}>
                   {profile?.portfolio?.length || 0} / {portfolioLimit} items · {user?.plan} plan
                 </p>
               </div>
@@ -504,9 +523,9 @@ export default function Profile() {
             </div>
 
             {!profile?.portfolio?.length ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: "16px" }}>
+              <div style={{ textAlign: "center", padding: "60px 20px", border: `2px dashed ${T.border}`, borderRadius: "16px" }}>
                 <FontAwesomeIcon icon={faImages} style={{ color: "#5a8a63", fontSize: "36px", marginBottom: "12px" }} />
-                <p style={{ color: "#9ca3af", fontSize: "14px", marginBottom: "16px" }}>No portfolio items yet</p>
+                <p style={{ color: T.muted, fontSize: "14px", marginBottom: "16px" }}>No portfolio items yet</p>
                 <button
                   onClick={() => portfolioInputRef.current?.click()}
                   style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", borderRadius: "10px", padding: "8px 20px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
@@ -517,13 +536,13 @@ export default function Profile() {
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px" }}>
                 {profile.portfolio.map((item) => (
-                  <div key={item._id} style={{ position: "relative", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.2)", background: "#0a1209", aspectRatio: "1" }} className="group">
+                  <div key={item._id} style={{ position: "relative", borderRadius: "14px", overflow: "hidden", border: `1px solid ${T.border}`, background: T.cardAlt, aspectRatio: "1" }} className="group">
                     <img src={item.imageUrl} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%)", opacity: 0, transition: "opacity .2s", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "12px" }}
                       onMouseEnter={e => e.currentTarget.style.opacity = 1}
                       onMouseLeave={e => e.currentTarget.style.opacity = 0}
                     >
-                      <p style={{ color: "#fff", fontSize: "12px", fontWeight: 700, margin: "0 0 6px", fontFamily: "'Syne', sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</p>
+                      <p style={{ color: T.text, fontSize: "12px", fontWeight: 700, margin: "0 0 6px", fontFamily: "'Syne', sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</p>
                       <button
                         onClick={() => handlePortfolioDelete(item._id)}
                         style={{ display: "flex", alignItems: "center", gap: "5px", background: "rgba(239,68,68,0.85)", border: "none", borderRadius: "7px", padding: "5px 10px", color: "#fff", fontSize: "11px", fontWeight: 700, cursor: "pointer", width: "fit-content", fontFamily: "'Syne', sans-serif" }}
@@ -537,7 +556,7 @@ export default function Profile() {
                 {/* Locked slots */}
                 {typeof portfolioLimit === "number" &&
                   Array.from({ length: Math.max(0, portfolioLimit - (profile.portfolio.length || 0)) }).map((_, i) => (
-                    <div key={`slot-${i}`} style={{ borderRadius: "14px", border: "2px dashed rgba(255,255,255,0.2)", aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                    <div key={`slot-${i}`} style={{ borderRadius: "14px", border: `2px dashed ${T.border}`, aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px" }}>
                       <FontAwesomeIcon icon={faPlus} style={{ color: "#5a8a63", fontSize: "18px" }} />
                       <span style={{ color: "#5a8a63", fontSize: "11px", fontFamily: "'Syne', sans-serif" }}>Empty slot</span>
                     </div>
@@ -551,7 +570,7 @@ export default function Profile() {
               <div style={{ marginTop: "20px", padding: "14px 16px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.30)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <FontAwesomeIcon icon={faLock} style={{ color: "#22c55e", fontSize: "13px" }} />
-                  <span style={{ color: "#9ca3af", fontSize: "13px", fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ color: T.muted, fontSize: "13px", fontFamily: "'DM Sans', sans-serif" }}>
                     Upgrade to <strong style={{ color: "#22c55e" }}>Pro</strong> or <strong style={{ color: "#22c55e" }}>Elite</strong> for more portfolio items
                   </span>
                 </div>
@@ -566,7 +585,7 @@ export default function Profile() {
         {/* Social Tab */}
         {activeTab === "social" && (
           <div>
-            <h3 style={{ color: "#fff", fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 20px" }}>Social Links</h3>
+            <h3 style={{ color: T.text, fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "16px", margin: "0 0 20px" }}>Social Links</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               {[
                 { key: "instagram", label: "Instagram",   icon: faInstagram, placeholder: "https://instagram.com/yourhandle", color: "#e1306c" },
@@ -598,9 +617,13 @@ export default function Profile() {
 
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 function Section({ title, children }) {
+  const theme = useThemeStore((s) => s.theme);
+  const L = theme === "light";
+  const border = L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)";
+  const muted  = L ? "#4b5563" : "#9ca3af";
   return (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.2)", paddingTop: "20px" }}>
-      <h4 style={{ color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px", display: "flex", alignItems: "center" }}>
+    <div style={{ borderTop: `1px solid ${border}`, paddingTop: "20px" }}>
+      <h4 style={{ color: muted, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px", display: "flex", alignItems: "center" }}>
         {title}
       </h4>
       {children}
@@ -610,17 +633,22 @@ function Section({ title, children }) {
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 function ProfileSkeleton() {
+  const theme = useThemeStore((s) => s.theme);
+  const L = theme === "light";
+  const card    = L ? "#ffffff"  : "#070d08";
+  const cardAlt = L ? "#f0fdf4"  : "#0a1209";
+  const border  = L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
   return (
     <div className="space-y-6 animate-pulse">
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
-        <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "#0a1209", flexShrink: 0 }} />
+      <div style={{ background: card, border: `1px solid ${border}`, borderRadius: "20px", padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
+        <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: cardAlt, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
-          <div style={{ height: "20px", background: "#0a1209", borderRadius: "6px", width: "160px", marginBottom: "8px" }} />
-          <div style={{ height: "13px", background: "#0a1209", borderRadius: "6px", width: "220px", marginBottom: "10px" }} />
-          <div style={{ height: "22px", background: "#0a1209", borderRadius: "999px", width: "80px" }} />
+          <div style={{ height: "20px", background: cardAlt, borderRadius: "6px", width: "160px", marginBottom: "8px" }} />
+          <div style={{ height: "13px", background: cardAlt, borderRadius: "6px", width: "220px", marginBottom: "10px" }} />
+          <div style={{ height: "22px", background: cardAlt, borderRadius: "999px", width: "80px" }} />
         </div>
       </div>
-      <div style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "24px", height: "320px" }} />
+      <div style={{ background: card, border: `1px solid ${border}`, borderRadius: "20px", padding: "24px", height: "320px" }} />
     </div>
   );
 }

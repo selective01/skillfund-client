@@ -50,7 +50,7 @@ function DisputeCard({ dispute, currentUserId }) {
   const s         = STATUS_CONFIG[dispute.status] || STATUS_CONFIG.open;
 
   return (
-    <div className="rounded-2xl overflow-hidden transition-all" style={{ background: "#070d08", border: `1px solid ${expanded ? s.border : "rgba(255,255,255,0.2)"}` }}>
+    <div className="rounded-2xl overflow-hidden transition-all" style={{ background: "var(--bg-card)", border: `1px solid ${expanded ? s.border : "rgba(255,255,255,0.2)"}` }}>
       {/* Card header */}
       <button className="w-full flex items-start gap-4 p-5 text-left" onClick={() => setExpanded(p => !p)}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
@@ -135,7 +135,7 @@ function EvidenceDropZone({ files, onAdd, onRemove }) {
       {files.length < 5 && (
         <button type="button" onClick={() => inputRef.current?.click()}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all"
-          style={{ fontFamily: "'Syne',sans-serif", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
+          style={{ fontFamily: "'Syne',sans-serif", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#9ca3af" }}>
           <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "13px" }} />
           Add evidence ({files.length}/5)
         </button>
@@ -209,7 +209,7 @@ export default function Dispute() {
     }
   };
 
-  const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: "12px", fontSize: "14px", color: "#fff", outline: "none", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif", transition: "border-color .2s" };
+  const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: "12px", fontSize: "14px", color: "#fff", outline: "none", background: "var(--bg-input)", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif", transition: "border-color .2s" };
   const labelStyle = { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: ".08em", display: "block", marginBottom: "8px" };
 
   return (
@@ -221,7 +221,7 @@ export default function Dispute() {
       `}</style>
 
       {/* Header */}
-      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#1a0f0f,#0f0a0a,#0a0606)", border: "1px solid rgba(239,68,68,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-rose-start,#1a0f0f),var(--card-rose-mid,#0f0a0a),var(--bg,#0a0606))", border: "1px solid rgba(239,68,68,0.35)", boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10" style={{ background: "radial-gradient(circle,#ef4444,transparent)", transform: "translate(30%,-30%)" }} />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -247,7 +247,7 @@ export default function Dispute() {
 
       {/* Form */}
       {showForm && (
-        <div className="rounded-2xl p-6 space-y-5" style={{ background: "#070d08", border: "1px solid rgba(239,68,68,0.35)" }}>
+        <div className="rounded-2xl p-6 space-y-5" style={{ background: "var(--bg-card)", border: "1px solid rgba(239,68,68,0.35)" }}>
           <div className="flex items-center justify-between mb-2">
             <p className="font-black" style={{ fontFamily: "'Fraunces',serif", fontSize: "18px", color: "#fff" }}>File a Dispute</p>
             <button onClick={() => setShowForm(false)} style={{ color: "#6b7280" }}>
@@ -267,7 +267,7 @@ export default function Dispute() {
           <div>
             <label style={labelStyle}>Investment <span style={{ color: "#ef4444" }}>*</span></label>
             {investments.length === 0 ? (
-              <div className="rounded-xl p-4 text-center" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}>
+              <div className="rounded-xl p-4 text-center" style={{ background: "var(--bg-input)", border: "1px solid var(--border)" }}>
                 <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "13px", color: "#6b7280" }}>No active investments to dispute.</p>
               </div>
             ) : (
@@ -326,7 +326,7 @@ export default function Dispute() {
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button onClick={() => setShowForm(false)} className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
-              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}>
+              style={{ fontFamily: "'Syne',sans-serif", fontSize: "13px", background: "var(--bg-input)", border: "1px solid var(--border)", color: "#6b7280" }}>
               <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Cancel
             </button>
             <button onClick={handleSubmit} disabled={submitting || !investmentId || !reason || description.length < 30}
@@ -347,7 +347,7 @@ export default function Dispute() {
           <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "20px", color: "#22c55e" }} />
         </div>
       ) : disputes.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="rounded-2xl p-10 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(107,114,128,0.1)", border: "1px solid rgba(107,114,128,0.2)" }}>
             <FontAwesomeIcon icon={faScaleBalanced} style={{ fontSize: "22px", color: "#6b7280" }} />
           </div>

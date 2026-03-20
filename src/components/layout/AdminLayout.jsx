@@ -7,6 +7,7 @@ import {
   faReceipt, faBars, faXmark,
   faArrowRightFromBracket, faBell, faMagnifyingGlass,
   faArrowTrendUp, faChevronDown, faCheck, faTrash, faChartLine,
+  faPhone, faBuilding, faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import useAdminAuthStore from "../../store/useAdminAuthStore";
 
@@ -33,6 +34,14 @@ const NAV_SECTIONS = [
       { path: "/admin/withdrawals",  icon: faWallet,     label: "Withdrawals",  color: "#8b5cf6" },
       { path: "/admin/transactions", icon: faReceipt,    label: "Transactions", color: "#f59e0b" },
       { path: "/admin/revenue",      icon: faChartLine,  label: "Revenue",      color: "#16a34a" },
+    ],
+  },
+  {
+    label: "Trust",
+    links: [
+      { path: "/admin/voice",      icon: faMicrophone, label: "Voice Calls",  color: "#6366f1" },
+      { path: "/admin/assets",     icon: faBuilding,   label: "Assets",       color: "#f59e0b" },
+      { path: "/admin/guarantors", icon: faPhone,      label: "Guarantors",   color: "#16a34a" },
     ],
   },
   {
@@ -133,7 +142,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
           <FontAwesomeIcon icon={faArrowTrendUp} style={{ fontSize: "13px", color: "#fff" }} />
         </div>
         <div>
-          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: "16px", color: "#0f172a" }}>SkillFund</span>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: "16px", color: "#0f172a" }}>SkillFund</span>
           <span className="ml-2 text-xs font-black px-1.5 py-0.5 rounded-md" style={{ fontFamily: "'Inter',sans-serif", fontWeight: 700, background: "#eef2ff", color: "#4338ca", border: "1px solid #c7d2fe", fontSize: "9px", letterSpacing: ".05em" }}>ADMIN</span>
         </div>
       </div>
@@ -205,7 +214,7 @@ export default function AdminLayout({ children, title = "Dashboard" }) {
   return (
     <div className="min-h-screen flex" style={{ background: "#f5f6fa", fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         .adm-sb-link:hover { background: #f1f5f9 !important; color: #0f172a !important; }
         .adm-overlay { animation: admFade .2s ease; }
         @keyframes admFade { from{opacity:0} to{opacity:1} }

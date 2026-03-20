@@ -147,3 +147,653 @@ body,
     color            0.2s ease,
     box-shadow       0.2s ease;
 }
+
+/* ──────────────────────────────────────────────────────────────
+   Alias CSS variables — map shorthand names used in pages
+   to the canonical sf- tokens. This makes all pages that use
+   var(--bg), var(--text-primary) etc. respond to theme.
+   ────────────────────────────────────────────────────────────── */
+
+[data-theme="dark"], :root {
+  --bg:            var(--sf-bg);
+  --bg-card:       var(--sf-bg-card);
+  --bg-input:      var(--sf-bg-input);
+  --border:        var(--sf-border);
+  --text-primary:  var(--sf-text-primary);
+  --text-secondary:var(--sf-text-secondary);
+  --text-muted:    var(--sf-text-muted);
+  --text-dim:      var(--sf-text-dim);
+  --text-ghost:    var(--sf-text-ghost);
+
+  /* Dashboard gradient cards */
+  --card-green:  linear-gradient(135deg, #0f2e10, #091e09);
+  --card-blue:   linear-gradient(135deg, #0f2244, #091830);
+  --card-purple: linear-gradient(135deg, #220f44, #180930);
+  --card-amber:  linear-gradient(135deg, #3d2200, #2a1600);
+  --card-green-start: #0f2e10;
+  --card-green-mid:   #071a0b;
+
+  /* Messages page */
+  --c-bg:           #040806;
+  --c-panel:        #070d08;
+  --c-item:         #0a1209;
+  --c-border:       rgba(255,255,255,0.07);
+  --c-green:        #22c55e;
+  --c-sub:          #6b7280;
+  --c-text:         #f1f5f9;
+  --c-bubble-me:    #0f3d1f;
+  --c-bubble-other: #0a1209;
+}
+
+[data-theme="light"] {
+  --bg:            var(--sf-bg);
+  --bg-card:       var(--sf-bg-card);
+  --bg-input:      var(--sf-bg-input);
+  --border:        var(--sf-border);
+  --text-primary:  var(--sf-text-primary);
+  --text-secondary:var(--sf-text-secondary);
+  --text-muted:    var(--sf-text-muted);
+  --text-dim:      var(--sf-text-dim);
+  --text-ghost:    var(--sf-text-ghost);
+
+  /* Dashboard gradient cards — soft light versions */
+  --card-green:  linear-gradient(135deg, #e8f5ea, #f0fdf4);
+  --card-blue:   linear-gradient(135deg, #eff6ff, #dbeafe);
+  --card-purple: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  --card-amber:  linear-gradient(135deg, #fffbeb, #fef3c7);
+  --card-green-start: #e8f5ea;
+  --card-green-mid:   #f0fdf4;
+
+  /* Messages page — light versions */
+  --c-bg:           #f4faf5;
+  --c-panel:        #ffffff;
+  --c-item:         #edf7ef;
+  --c-border:       rgba(0,0,0,0.07);
+  --c-green:        #16a34a;
+  --c-sub:          #6b7280;
+  --c-text:         #0a1a0c;
+  --c-bubble-me:    #dcfce7;
+  --c-bubble-other: #f1f5f9;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Broad light-mode overrides for pages using hardcoded dark hex
+   values in inline styles. We target structural containers and
+   override background/color at a high level.
+   ────────────────────────────────────────────────────────────── */
+
+/* Main page background */
+[data-theme="light"] body {
+  background-color: var(--sf-bg) !important;
+  color: var(--sf-text-primary) !important;
+}
+
+/* Any direct children of <main> that are full-bleed wrappers */
+[data-theme="light"] main > div {
+  color: var(--sf-text-primary);
+}
+
+/* ── Broad card override ─────────────────────────────────────── */
+/* Targets the most common dark card pattern in pages */
+[data-theme="light"] .rounded-2xl,
+[data-theme="light"] .rounded-3xl {
+  --local-bg: transparent;
+}
+
+/* ── Input / textarea / select ─────────────────────────────── */
+[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: var(--sf-bg-input) !important;
+  color: var(--sf-text-primary) !important;
+  border-color: var(--sf-border) !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--sf-text-dim) !important;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #e5f0e7;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #22c55e;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Page-specific light mode overrides
+   For pages that hardcode backgrounds in inline styles, we use
+   attribute selectors and structural patterns to flip them.
+   ────────────────────────────────────────────────────────────── */
+
+/* Auth pages (Login, Register) — full screen dark bg */
+[data-theme="light"] .auth-page-bg {
+  background-color: var(--sf-bg) !important;
+}
+
+/* KYC, Milestones, Profile — dark card containers */
+[data-theme="light"] [style*="#040806"],
+[data-theme="light"] [style*="#070d08"],
+[data-theme="light"] [style*="#0a1209"],
+[data-theme="light"] [style*="#0b0f0c"],
+[data-theme="light"] [style*="#111812"] {
+  background-color: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* Dark text colours used in pages */
+[data-theme="light"] [style*="color: \"#f1f5f9\""],
+[data-theme="light"] [style*="color: \"#e2e8f0\""],
+[data-theme="light"] [style*="color: \"white\""],
+[data-theme="light"] [style*="color: \"#fff\""] {
+  color: var(--sf-text-primary) !important;
+}
+
+[data-theme="light"] [style*="color: \"#9ca3af\""],
+[data-theme="light"] [style*="color: \"#6b7280\""] {
+  color: var(--sf-text-muted) !important;
+}
+
+[data-theme="light"] [style*="color: \"#4b5563\""],
+[data-theme="light"] [style*="color: \"#4a5568\""] {
+  color: var(--sf-text-dim) !important;
+}
+
+/* ── Tailwind text-white override ────────────────────────────── */
+[data-theme="light"] .text-white {
+  color: var(--sf-text-primary) !important;
+}
+
+/* ── Tailwind dark bg classes ────────────────────────────────── */
+[data-theme="light"] .bg-\[\#040806\],
+[data-theme="light"] .bg-\[\#070d08\],
+[data-theme="light"] .bg-\[\#0a1209\] {
+  background-color: var(--sf-bg-card) !important;
+}
+
+/* ── animate-pulse skeletons in light mode ───────────────────── */
+[data-theme="light"] .animate-pulse [style*="#0a1209"],
+[data-theme="light"] .animate-pulse [style*="#070d08"] {
+  background-color: #e5f0e7 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Component-specific overrides
+   ────────────────────────────────────────────────────────────── */
+
+/* Messages chat background tile */
+[data-theme="light"] .msg-bg {
+  background-color: var(--c-bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322c55e' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+}
+
+/* Conversation list item */
+[data-theme="light"] .conv-item {
+  border-bottom-color: var(--c-border) !important;
+}
+[data-theme="light"] .conv-item:hover {
+  background: rgba(34,197,94,0.05) !important;
+}
+[data-theme="light"] .conv-item.active {
+  background: rgba(34,197,94,0.1) !important;
+}
+
+/* Message bubbles */
+[data-theme="light"] .bubble.me {
+  background: #dcfce7 !important;
+  border-color: rgba(34,197,94,0.2) !important;
+  color: #0a1a0c !important;
+}
+[data-theme="light"] .bubble.other {
+  background: #ffffff !important;
+  border-color: var(--c-border) !important;
+  color: #0a1a0c !important;
+}
+
+/* Conv search input */
+[data-theme="light"] .conv-search {
+  background: #edf7ef !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+[data-theme="light"] .conv-search:focus {
+  border-color: rgba(34,197,94,0.5) !important;
+}
+
+/* Message input */
+[data-theme="light"] .msg-input {
+  color: var(--sf-text-primary) !important;
+}
+
+/* Date pill */
+[data-theme="light"] .date-pill span {
+  background: rgba(255,255,255,0.9) !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-muted) !important;
+}
+
+/* Category pills in BrowseCreators */
+[data-theme="light"] .cat-pill {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-muted) !important;
+}
+[data-theme="light"] .cat-pill.active {
+  background: linear-gradient(135deg,#22c55e,#16a34a) !important;
+  color: #000 !important;
+}
+
+/* Page buttons */
+[data-theme="light"] .page-btn {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-muted) !important;
+}
+[data-theme="light"] .page-btn.active {
+  background: linear-gradient(135deg,#22c55e,#16a34a) !important;
+  color: #000 !important;
+}
+
+/* Browse input */
+[data-theme="light"] .browse-input {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+[data-theme="light"] .browse-input::placeholder {
+  color: var(--sf-text-dim) !important;
+}
+
+/* ── Smooth transitions on all elements ─────────────────────── */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* But not transforms or other properties (would break animations) */
+.animate-pulse * {
+  transition: none !important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   HomePage — Tailwind arbitrary-value class overrides
+   These must live in a plain CSS file (not a JSX template
+   literal) to avoid JavaScript string escaping issues.
+   ────────────────────────────────────────────────────────────── */
+
+/* Dark background classes */
+[data-theme="light"] .bg-\[\#040806\],
+[data-theme="light"] .bg-\[\#030604\],
+[data-theme="light"] .bg-\[\#070d08\],
+[data-theme="light"] .bg-\[\#080e09\],
+[data-theme="light"] .bg-\[\#0f1a12\],
+[data-theme="light"] .bg-\[\#0a1a0b\] { background-color: var(--sf-bg-card) !important; }
+
+/* Section / footer dark bg */
+[data-theme="light"] section.bg-\[\#030604\],
+[data-theme="light"] footer.bg-\[\#030604\]  { background-color: var(--sf-bg) !important; }
+
+/* Dark border classes */
+[data-theme="light"] .border-\[\#2d5235\] { border-color: rgba(34,197,94,0.2) !important; }
+[data-theme="light"] .border-\[\#2d5a35\] { border-color: rgba(34,197,94,0.2) !important; }
+[data-theme="light"] .border-\[\#1a2e1d\] { border-color: rgba(34,197,94,0.15) !important; }
+
+/* Dark text classes */
+[data-theme="light"] .text-\[\#f1f5f9\],
+[data-theme="light"] .text-\[\#9ca3af\],
+[data-theme="light"] .text-\[\#6b7280\] { color: #4b5563 !important; }
+[data-theme="light"] .text-\[\#4a5568\] { color: #6b7280 !important; }
+[data-theme="light"] .text-\[\#2d4a31\] { color: #6b7280 !important; }
+[data-theme="light"] .text-\[\#1a2e1d\] { color: #9ca3af !important; }
+
+/* ──────────────────────────────────────────────────────────────
+   HomePage — additional dark color overrides for light mode
+   ────────────────────────────────────────────────────────────── */
+
+/* Dark bg with opacity modifiers */
+[data-theme="light"] .bg-\[\#070d08\]\/90,
+[data-theme="light"] .bg-\[\#7c2d12\]\/90,
+[data-theme="light"] .bg-\[\#7c2d12\]\/80 { background-color: rgba(255,255,255,0.95) !important; }
+
+/* Progress bar track */
+[data-theme="light"] .bg-\[\#0a1a0b\]  { background-color: #e5f0e7 !important; }
+[data-theme="light"] .bg-\[\#1a2e1d\]  { background-color: rgba(34,197,94,0.1) !important; }
+[data-theme="light"] .bg-\[\#0f1a12\]  { background-color: #edf7ef !important; }
+
+/* Divider lines */
+[data-theme="light"] .bg-\[\#1a2e1d\]  { background-color: rgba(34,197,94,0.15) !important; }
+
+/* Text colors that need to be readable */
+[data-theme="light"] .text-\[\#1a2e1d\] { color: #9ca3af !important; }
+[data-theme="light"] .text-\[\#2d4a31\] { color: #6b7280 !important; }
+[data-theme="light"] .text-\[\#4a5568\] { color: #6b7280 !important; }
+[data-theme="light"] .text-\[\#9ca3af\] { color: #374151 !important; }
+[data-theme="light"] .text-\[\#6b7280\] { color: #4b5563 !important; }
+[data-theme="light"] .text-\[\#f1f5f9\] { color: #0a1a0c !important; }
+
+/* Step number in How It Works */
+[data-theme="light"] .text-\[\#1a2e1d\].font-black { color: rgba(34,197,94,0.3) !important; }
+
+/* Activity feed cards */
+[data-theme="light"] .bg-\[\#070d08\]\/90 { background-color: rgba(255,255,255,0.95) !important; }
+
+/* Hover states */
+[data-theme="light"] .hover\:text-white:hover { color: #0a1a0c !important; }
+[data-theme="light"] .hover\:bg-white\/5:hover { background-color: rgba(34,197,94,0.06) !important; }
+
+/* Gradient bar stays green in light */
+[data-theme="light"] .gradient-bar { background: linear-gradient(90deg,#16a34a,#22c55e,#4ade80) !important; }
+
+/* Grid background pattern — lighter version */
+[data-theme="light"] .grid-bg {
+  background-image: linear-gradient(rgba(34,197,94,0.06) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(34,197,94,0.06) 1px,transparent 1px) !important;
+}
+
+/* Hero glow overlay — subtler in light */
+[data-theme="light"] .hero-glow { background: radial-gradient(ellipse 70% 60% at 65% 45%,rgba(34,197,94,0.06) 0%,transparent 70%) !important; }
+
+/* ──────────────────────────────────────────────────────────────
+   Other pages — additional light mode fixes
+   ────────────────────────────────────────────────────────────── */
+
+/* KYC, Milestones, Profile — common inline dark styles */
+[data-theme="light"] [style*="background: \"#040806\""],
+[data-theme="light"] [style*="background:\"#040806\""],
+[data-theme="light"] [style*="background: '#040806'"] { background: var(--sf-bg-card) !important; }
+
+/* Inline style bg overrides via attribute selector for remaining pages */
+[data-theme="light"] [style*="background: \"#070d08\""],
+[data-theme="light"] [style*="#070d08"] { background-color: var(--sf-bg-card) !important; }
+
+[data-theme="light"] [style*="background: \"#0a1209\""],
+[data-theme="light"] [style*="#0a1209"] { background-color: var(--sf-bg-input) !important; }
+
+[data-theme="light"] [style*="background: \"#0a1a0b\""],
+[data-theme="light"] [style*="#0a1a0b"] { background-color: var(--sf-bg-input) !important; }
+
+[data-theme="light"] [style*="background: \"#0f2e10\""],
+[data-theme="light"] [style*="background: \"#0f2244\""],
+[data-theme="light"] [style*="background: \"#220f44\""],
+[data-theme="light"] [style*="background: \"#3d0f22\""],
+[data-theme="light"] [style*="background: \"#3d2200\""],
+[data-theme="light"] [style*="background: \"#0f3d38\""] { background-color: var(--sf-bg-card) !important; }
+
+/* Inline dark text color overrides */
+[data-theme="light"] [style*="color: \"#f1f5f9\""] { color: var(--sf-text-primary) !important; }
+[data-theme="light"] [style*="color: \"#9ca3af\""] { color: var(--sf-text-secondary) !important; }
+[data-theme="light"] [style*="color: \"#6b7280\""] { color: var(--sf-text-muted) !important; }
+[data-theme="light"] [style*="color: \"#4a5568\""] { color: var(--sf-text-muted) !important; }
+[data-theme="light"] [style*="color: \"#4b5563\""] { color: var(--sf-text-muted) !important; }
+
+/* Inline border overrides */
+[data-theme="light"] [style*="border: \"1px solid #1a2e1d\""],
+[data-theme="light"] [style*="borderColor: \"#1a2e1d\""],
+[data-theme="light"] [style*="borderColor: \"#2d5235\""] { border-color: var(--sf-border) !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   COMPREHENSIVE LIGHT MODE FIXES — All inner pages
+   Covers: Dashboard, InvestmentsEarnings, CreatorDashboard,
+   InvestorDashboard, Profile, Dispute, KYC, BrowseInvestors,
+   VoiceVerification, TrustVerification, ReferralProgramme,
+   Help, CampaignSetup, Milestones, Withdraw, Connections etc.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Hero banner gradients (green) ─────────────────────────────
+   Used as page headers in: Dashboard, KYC, Investments,
+   Referrals, Help, TrustVerification, VoiceVerification       */
+[data-theme="light"] [style*="#0f2e10"][style*="#071a0b"],
+[data-theme="light"] [style*="#0f2e10"][style*="#040d06"],
+[data-theme="light"] [style*="0f2e10"] {
+  background: linear-gradient(135deg, #e8f5ea, #f0fdf4, #f8faf8) !important;
+  border-color: rgba(34,197,94,0.3) !important;
+  box-shadow: 0 8px 32px rgba(34,197,94,0.08) !important;
+}
+
+/* ── Hero banner gradient (red/dispute) ────────────────────── */
+[data-theme="light"] [style*="#1a0f0f"][style*="#0f0a0a"] {
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6, #fff8f8) !important;
+  border-color: rgba(239,68,68,0.3) !important;
+  box-shadow: 0 8px 32px rgba(239,68,68,0.08) !important;
+}
+
+/* ── Card/panel backgrounds (#070d08) ───────────────────────── */
+[data-theme="light"] [style*="background: \"#070d08\""],
+[data-theme="light"] [style*="background:\"#070d08\""],
+[data-theme="light"] [style*="background: '#070d08'"] {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* ── Input/form backgrounds (#0a1209) ───────────────────────── */
+[data-theme="light"] [style*="background: \"#0a1209\""],
+[data-theme="light"] [style*="background:\"#0a1209\""],
+[data-theme="light"] [style*="background: '#0a1209'"] {
+  background: #edf7ef !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+
+/* ── Other dark card shades ─────────────────────────────────── */
+[data-theme="light"] [style*="background: \"#040806\""],
+[data-theme="light"] [style*="background:\"#040806\""],
+[data-theme="light"] [style*="background: \"#040d06\""],
+[data-theme="light"] [style*="background: \"#020502\""] {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* ── CSS class-based dark backgrounds (inline <style> tags) ── */
+/* Profile page */
+[data-theme="light"] .sf-field,
+[data-theme="light"] .sf-select,
+[data-theme="light"] .sf-ind-pill,
+/* Investments/Earnings page */
+[data-theme="light"] .ie-inp,
+[data-theme="light"] .ie-ta,
+/* VoiceVerification */
+[data-theme="light"] .vv-field,
+[data-theme="light"] .vv-select,
+/* CampaignSetup */
+[data-theme="light"] .cs-field,
+[data-theme="light"] .cs-select,
+/* KYC */
+[data-theme="light"] .kyc-upload {
+  background: var(--sf-bg-input) !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+
+[data-theme="light"] .cs-field:focus { background: #e8f5ea !important; }
+
+/* Share buttons in referral */
+[data-theme="light"] .rp-share-btn {
+  background: var(--sf-bg-input) !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-muted) !important;
+}
+
+/* ── White text on dark cards ────────────────────────────────── */
+[data-theme="light"] [style*="color: \"#fff\""],
+[data-theme="light"] [style*="color: \"white\""],
+[data-theme="light"] [style*="color:\"#fff\""] {
+  color: var(--sf-text-primary) !important;
+}
+
+/* ── Muted/dim text ─────────────────────────────────────────── */
+[data-theme="light"] [style*="color: \"#9ca3af\""] { color: var(--sf-text-muted) !important; }
+[data-theme="light"] [style*="color: \"#6b7280\""] { color: var(--sf-text-muted) !important; }
+[data-theme="light"] [style*="color: \"#4b5563\""] { color: var(--sf-text-dim) !important; }
+
+/* ── Dark borders ───────────────────────────────────────────── */
+[data-theme="light"] [style*="border: \"1px solid rgba(255,255,255,0.2)\""],
+[data-theme="light"] [style*="border: \"1px solid rgba(255,255,255,0.1)\""],
+[data-theme="light"] [style*="border: \"1px solid rgba(255,255,255,0.07)\""],
+[data-theme="light"] [style*="border: \"1px solid rgba(255,255,255,0.08)\""] {
+  border-color: var(--sf-border) !important;
+}
+
+/* ── Avatar camera button border ─────────────────────────────── */
+[data-theme="light"] [style*="border: \"2px solid #040806\""] {
+  border-color: #ffffff !important;
+}
+
+/* ── Recharts tooltip ───────────────────────────────────────── */
+[data-theme="light"] .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+
+/* ── Select option dropdowns ────────────────────────────────── */
+[data-theme="light"] .sf-select option,
+[data-theme="light"] .vv-select option,
+[data-theme="light"] .cs-select option,
+[data-theme="light"] select option {
+  background: #ffffff !important;
+  color: #0a1a0c !important;
+}
+
+/* ── Tab switcher bars (Investments, Connections, etc.) ──────── */
+[data-theme="light"] [style*="background: \"#070d08\""][style*="border: \"1px solid"],
+[data-theme="light"] [style*="background:\"#070d08\""][style*="border:\"1px solid"] {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* ── Dashboard stat cards with gradient colors ──────────────── */
+[data-theme="light"] .dash-stat-green  { background: linear-gradient(135deg,#f0fdf4,#dcfce7) !important; border-color: rgba(34,197,94,0.2) !important; }
+[data-theme="light"] .dash-stat-blue   { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; border-color: rgba(59,130,246,0.2) !important; }
+[data-theme="light"] .dash-stat-purple { background: linear-gradient(135deg,#f5f3ff,#ede9fe) !important; border-color: rgba(168,85,247,0.2) !important; }
+[data-theme="light"] .dash-stat-amber  { background: linear-gradient(135deg,#fffbeb,#fef3c7) !important; border-color: rgba(245,158,11,0.2) !important; }
+
+/* ── Creator/Investor Dashboard hero area ────────────────────── */
+[data-theme="light"] .cd-hero,
+[data-theme="light"] .id-hero {
+  background: linear-gradient(135deg, #e8f5ea, #f0fdf4) !important;
+  border-color: rgba(34,197,94,0.2) !important;
+}
+
+/* ── Quick action cards ──────────────────────────────────────── */
+[data-theme="light"] .qa-card {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+[data-theme="light"] .qa-card:hover {
+  background: #f0fdf4 !important;
+  border-color: rgba(34,197,94,0.3) !important;
+}
+
+/* ── Dashed upload area (KYC, CampaignSetup) ─────────────────── */
+[data-theme="light"] [style*="border: \"2px dashed rgba(255,255,255,0.2)\""],
+[data-theme="light"] [style*="border: `2px dashed"] {
+  background: #f8faf8 !important;
+  border-color: rgba(34,197,94,0.3) !important;
+}
+
+/* ── Progress bar tracks ─────────────────────────────────────── */
+[data-theme="light"] [style*="background: \"#0a1a0b\""],
+[data-theme="light"] [style*="background: \"#1a2e1d\""],
+[data-theme="light"] [style*="background: \"#0f1a12\""] {
+  background: #e5f0e7 !important;
+}
+
+/* ── BrowseInvestors category pills ─────────────────────────── */
+[data-theme="light"] .inv-pill {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-muted) !important;
+}
+[data-theme="light"] .inv-pill.active {
+  background: linear-gradient(135deg,#22c55e,#16a34a) !important;
+  color: #000 !important;
+}
+
+/* ── Investor card (BrowseInvestors) ─────────────────────────── */
+[data-theme="light"] .inv-card {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* ── Filters button ──────────────────────────────────────────── */
+[data-theme="light"] .filter-btn-dark {
+  background: #ffffff !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-primary) !important;
+}
+
+/* ── Empty state panels ──────────────────────────────────────── */
+[data-theme="light"] .empty-panel {
+  background: var(--sf-bg-card) !important;
+  border-color: var(--sf-border) !important;
+}
+
+/* ── Explore Campaigns button (hero) ─────────────────────────── */
+[data-theme="light"] [style*="background: rgba(34,197,94,0.08)"][style*="borderColor: rgba(34,197,94,0.35)"] {
+  background: rgba(34,197,94,0.1) !important;
+  border-color: rgba(34,197,94,0.4) !important;
+  color: #16a34a !important;
+}
+
+/* ── Additional card gradient vars ───────────────────────────── */
+[data-theme="dark"], :root {
+  --card-rose-start: #1a0f0f;
+  --card-rose-mid:   #0f0a0a;
+}
+[data-theme="light"] {
+  --card-rose-start: #fff1f2;
+  --card-rose-mid:   #ffe4e6;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Mobile shadow reduction — all cards get lighter shadows
+   on screens below 768px for better performance & visual clarity
+   ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Override all large box-shadow values on cards/panels */
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-xl,
+  [style*="box-shadow"],
+  [style*="boxShadow"] {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Hover state shadows — keep minimal on mobile (no hover anyway) */
+  .card-hover:hover,
+  .group:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Tailwind shadow utilities */
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .shadow-lg {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Light mode — even softer */
+  [data-theme="light"] .rounded-2xl,
+  [data-theme="light"] .rounded-3xl,
+  [data-theme="light"] .rounded-xl,
+  [data-theme="light"] [style*="box-shadow"],
+  [data-theme="light"] [style*="boxShadow"] {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  [data-theme="light"] .shadow-xl,
+  [data-theme="light"] .shadow-2xl {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  [data-theme="light"] .shadow-lg {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  }
+}

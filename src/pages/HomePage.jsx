@@ -8,6 +8,7 @@ import {
   faXmark, faFire,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../store/authStore";
+import useThemeStore from "../store/useThemeStore";
 
 // ─── Animated Counter ─────────────────────────────────────────────────────────
 function Counter({ end, prefix = "", suffix = "", duration = 2000, decimals = 0 }) {
@@ -53,6 +54,8 @@ const CREATORS = ["Ada Fashion","Bella Cakes","Kofi Woodcraft","Ngozi Studio","T
 const AMOUNTS  = [100, 200, 300, 500, 750, 1000];
 
 function ActivityFeed() {
+  const theme = useThemeStore((s) => s.theme);
+  const pageText = theme === "light" ? "#0a1a0c" : "#ffffff";
   const [items, setItems] = useState(ACTIVITY_SEED);
 
   useEffect(() => {
@@ -82,11 +85,11 @@ function ActivityFeed() {
           style={{ opacity: 1 - i * 0.15, transform: `scale(${1 - i * 0.02})`, transformOrigin: "left center" }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#16a34a] to-[#065f30] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#16a34a] to-[#065f30] flex items-center justify-center text-xs font-black flex-shrink-0" style={{ color: "#ffffff" }}>
               {item.investor[0]}
             </div>
             <div className="min-w-0">
-              <p className="text-white text-xs font-semibold leading-tight truncate">
+              <p className="text-xs font-semibold leading-tight truncate" style={{ color: pageText }}>
                 <span className="text-[#22c55e]">{item.investor}</span> invested{" "}
                 <span className="text-[#4ade80]">${item.amount}</span>
               </p>
@@ -104,6 +107,8 @@ function ActivityFeed() {
 
 // ─── Creator Card ─────────────────────────────────────────────────────────────
 function CreatorCard({ name, skill, goal, raised, roi, investors, score, trending, daysLeft, videoId, emoji }) {
+  const theme = useThemeStore((s) => s.theme);
+  const pageText = theme === "light" ? "#0a1a0c" : "#ffffff";
   const [showVideo, setShowVideo] = useState(false);
   const pct = Math.round((raised / goal) * 100);
   const remaining = goal - raised;
@@ -157,7 +162,7 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-white font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{name}</h3>
+            <h3 className="font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: pageText }}>{name}</h3>
             <p className="text-[#4a5568] text-xs mt-0.5">{skill}</p>
           </div>
           <div className="text-right">
@@ -169,7 +174,7 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
         {/* Progress bar */}
         <div className="mb-3">
           <div className="flex justify-between text-xs mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
-            <span className="text-[#6b7280]">Raised <span className="text-white">${raised.toLocaleString()}</span></span>
+            <span className="text-[#6b7280]">Raised <span style={{ color: pageText }}>${raised.toLocaleString()}</span></span>
             <span className="text-[#22c55e]">{pct}%</span>
           </div>
           <div className="h-2 bg-[#0a1a0b] border border-[#2d5235] rounded-full overflow-hidden">
@@ -216,7 +221,7 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
               />
             </div>
             <div className="bg-[#070d08] border-t border-[#2d5235] px-4 py-3">
-              <p className="text-white font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{name} — Pitch Video</p>
+              <p className="font-bold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: pageText }}>{name} — Pitch Video</p>
               <p className="text-[#4a5568] text-xs mt-0.5">{skill}</p>
             </div>
           </div>
@@ -228,6 +233,8 @@ function CreatorCard({ name, skill, goal, raised, roi, investors, score, trendin
 
 // ─── Accordion Item ───────────────────────────────────────────────────────────
 function AccordionItem({ faIcon, iconColor = "#22c55e", title, description, isOpen, onToggle, stat }) {
+  const theme = useThemeStore((s) => s.theme);
+  const pageText = theme === "light" ? "#0a1a0c" : "#ffffff";
   return (
     <div onClick={onToggle} className={`rounded-2xl border cursor-pointer transition-all duration-300 ${isOpen ? "card-green shadow-lg shadow-[#22c55e]/5" : "bg-[#080e09] border-[#2d5235] hover:border-[#22c55e]/50"}`}>
       <div className="flex items-center justify-between p-6">
@@ -235,7 +242,7 @@ function AccordionItem({ faIcon, iconColor = "#22c55e", title, description, isOp
           <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${isOpen ? "shadow-lg" : "bg-[#0f1a12] border border-[#2d5a35]"}`} style={isOpen ? { background: iconColor, boxShadow: `0 8px 24px ${iconColor}55` } : {}}>
             <FontAwesomeIcon icon={faIcon} style={{ fontSize: "17px", color: isOpen ? "#000" : iconColor }} />
           </div>
-          <span className={`font-bold text-sm transition-colors ${isOpen ? "text-white" : "text-[#9ca3af]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</span>
+          <span className="font-bold text-sm transition-colors" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: isOpen ? pageText : "#9ca3af" }}>{title}</span>
         </div>
         <div className="flex items-center gap-3">
           {isOpen && stat && <span className="text-xs text-[#22c55e] bg-[#22c55e]/10 rounded-full px-2.5 py-1 hidden sm:block font-bold" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{stat}</span>}
@@ -252,19 +259,40 @@ function AccordionItem({ faIcon, iconColor = "#22c55e", title, description, isOp
 }
 
 // ─── Testimonial Card ─────────────────────────────────────────────────────────
-function TestimonialCard({ quote, name, role, emoji, color = "card-green" }) {
+const TCARD_COLORS = {
+  "card-green":  { text:"#0a2e0c", muted:"#1a4a1d", dim:"#2d6b32" },
+  "card-blue":   { text:"#1e3a5f", muted:"#2a4f7a", dim:"#3b6090" },
+  "card-purple": { text:"#3b1f6e", muted:"#52308a", dim:"#6b45a8" },
+  "card-amber":  { text:"#5a3a00", muted:"#7a5000", dim:"#9a6800" },
+  "card-teal":   { text:"#0f3d38", muted:"#1a5550", dim:"#2a6e68" },
+  "card-rose":   { text:"#5e1a2a", muted:"#7a2838", dim:"#9a3848" },
+};
+
+function TestimonialCard({ t, isLight, quote, name, role, emoji, color = "card-green" }) {
+  // Support both old (flat props) and new (t object) call shapes
+  const _quote = t?.quote ?? quote;
+  const _name  = t?.name  ?? name;
+  const _role  = t?.role  ?? role;
+  const _emoji = t?.emoji ?? emoji;
+  const _color = t?.color ?? color;
+  const lc = TCARD_COLORS[_color] || TCARD_COLORS["card-green"];
+  const quoteColor  = isLight ? lc.dim    : "rgba(255,255,255,0.1)";
+  const bodyColor   = isLight ? lc.text   : "rgba(255,255,255,0.7)";
+  const nameColor   = isLight ? lc.text   : "#ffffff";
+  const roleColor   = isLight ? lc.muted  : "rgba(255,255,255,0.4)";
+  const avatarBg    = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.1)";
   return (
-    <div className={`rounded-2xl p-6 break-inside-avoid mb-4 border card-hover ${color}`}>
-      <div className="text-3xl text-[#1a2e1d] font-serif mb-3 leading-none">"</div>
-      <p className="text-[#9ca3af] text-sm leading-relaxed mb-5">{quote}</p>
+    <div className={`border rounded-2xl p-6 flex-shrink-0 card-hover ${_color}`} style={{ width:"320px" }}>
+      <div className="text-3xl font-serif mb-3 leading-none" style={{ color: quoteColor }}>"</div>
+      <p className="text-sm leading-relaxed mb-5" style={{ color: bodyColor }}>{_quote}</p>
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-[#0f1a12] border border-[#2d5a35] flex items-center justify-center text-base">{emoji}</div>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: avatarBg }}>{_emoji}</div>
         <div>
-          <p className="text-white text-sm font-semibold">{name}</p>
-          <p className="text-[#4a5568] text-xs">{role}</p>
+          <p className="font-semibold text-sm" style={{ color: nameColor }}>{_name}</p>
+          <p className="text-xs" style={{ color: roleColor }}>{_role}</p>
         </div>
-        <div className="ml-auto flex gap-0.5">
-          {Array.from({ length: 5 }).map((_, i) => <FontAwesomeIcon key={i} icon={faStar} style={{ fontSize: "10px", color: "#f59e0b" }} />)}
+        <div className="ml-auto flex gap-0.5 flex-shrink-0">
+          {Array.from({length:5}).map((_,i) => <FontAwesomeIcon key={i} icon={faStar} style={{ fontSize: "9px", color: "#f59e0b" }} />)}
         </div>
       </div>
     </div>
@@ -307,8 +335,13 @@ export default function HomePage() {
     { animation: "orbit3 7s linear infinite" },
   ];
 
+  const theme = useThemeStore((s) => s.theme);
+  const isLight = theme === "light";
+  const pageBg = isLight ? "#f8faf8" : "#040806";
+  const pageText = isLight ? "#0a1a0c" : "#ffffff";
+
   return (
-    <div className="min-h-screen bg-[#040806] text-white overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif", background: pageBg, color: pageText }}>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
@@ -358,10 +391,166 @@ export default function HomePage() {
         .masonry{columns:2;column-gap:1rem}
         @media(min-width:768px){.masonry{columns:3}}
         .slide-in{animation:slideInLeft .4s ease forwards}
+
+        /* ── Light mode overrides ── */
+        [data-theme="light"] .card-blue   { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #93c5fd; color: #1e3a5f; }
+        [data-theme="light"] .card-purple { background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-color: #c4b5fd; color: #3b1f6e; }
+        [data-theme="light"] .card-amber  { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fcd34d; color: #5a3a00; }
+        [data-theme="light"] .card-teal   { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); border-color: #5eead4; color: #0f3d38; }
+        [data-theme="light"] .card-rose   { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border-color: #fda4af; color: #5e1a2a; }
+        [data-theme="light"] .card-green  { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: rgba(34,197,94,0.45); color: #0a2e0c; }
+        [data-theme="light"] .card-blue:hover   { border-color: #3b82f6; box-shadow: 0 24px 48px rgba(59,130,246,0.15); }
+        [data-theme="light"] .card-purple:hover { border-color: #a855f7; box-shadow: 0 24px 48px rgba(168,85,247,0.15); }
+        [data-theme="light"] .card-amber:hover  { border-color: #f59e0b; box-shadow: 0 24px 48px rgba(245,158,11,0.15); }
+        [data-theme="light"] .card-teal:hover   { border-color: #14b8a6; box-shadow: 0 24px 48px rgba(20,184,166,0.15); }
+        [data-theme="light"] .card-rose:hover   { border-color: #f43f5e; box-shadow: 0 24px 48px rgba(244,63,94,0.15); }
+        [data-theme="light"] .card-green:hover  { border-color: #22c55e; box-shadow: 0 24px 48px rgba(34,197,94,0.15); }
+
+        /* Light mode text overrides — cards have colored text set above */
+        [data-theme="light"] .card-blue   .text-white,
+        [data-theme="light"] .card-purple .text-white,
+        [data-theme="light"] .card-amber  .text-white,
+        [data-theme="light"] .card-teal   .text-white,
+        [data-theme="light"] .card-rose   .text-white,
+        [data-theme="light"] .card-green  .text-white { color: inherit !important; }
+
+        /* Fix text-white/70 (quote body) and text-white/40 (role) — Tailwind opacity variants invisible on light pastel cards */
+        [data-theme="light"] .card-blue   [class*="text-white/"],
+        [data-theme="light"] .card-purple [class*="text-white/"],
+        [data-theme="light"] .card-amber  [class*="text-white/"],
+        [data-theme="light"] .card-teal   [class*="text-white/"],
+        [data-theme="light"] .card-rose   [class*="text-white/"],
+        [data-theme="light"] .card-green  [class*="text-white/"] { --tw-text-opacity: 1 !important; }
+
+        [data-theme="light"] .card-blue   p.text-white/70, [data-theme="light"] .card-blue   p.text-white/40 { color: #1e3a5f !important; }
+        [data-theme="light"] .card-purple p.text-white/70, [data-theme="light"] .card-purple p.text-white/40 { color: #3b1f6e !important; }
+        [data-theme="light"] .card-amber  p.text-white/70, [data-theme="light"] .card-amber  p.text-white/40 { color: #5a3a00 !important; }
+        [data-theme="light"] .card-teal   p.text-white/70, [data-theme="light"] .card-teal   p.text-white/40 { color: #0f3d38 !important; }
+        [data-theme="light"] .card-rose   p.text-white/70, [data-theme="light"] .card-rose   p.text-white/40 { color: #5e1a2a !important; }
+        [data-theme="light"] .card-green  p.text-white/70, [data-theme="light"] .card-green  p.text-white/40 { color: #0a2e0c !important; }
+
+        /* Slightly dim the role line vs the quote */
+        [data-theme="light"] .card-blue   p.text-white/40,
+        [data-theme="light"] .card-purple p.text-white/40,
+        [data-theme="light"] .card-amber  p.text-white/40,
+        [data-theme="light"] .card-teal   p.text-white/40,
+        [data-theme="light"] .card-rose   p.text-white/40,
+        [data-theme="light"] .card-green  p.text-white/40 { opacity: 0.6 !important; }
+
+        /* Avatar bubble bg-white/10 — too faint on light cards */
+        [data-theme="light"] .card-blue   .bg-white/10,
+        [data-theme="light"] .card-purple .bg-white/10,
+        [data-theme="light"] .card-amber  .bg-white/10,
+        [data-theme="light"] .card-teal   .bg-white/10,
+        [data-theme="light"] .card-rose   .bg-white/10,
+        [data-theme="light"] .card-green  .bg-white/10 { background-color: rgba(0,0,0,0.08) !important; }
+
+        /* ── Story cards: all white opacity text variants → card text color ── */
+        [data-theme="light"] .card-rose  span.text-white/50,
+        [data-theme="light"] .card-rose  span.text-white/80,
+        [data-theme="light"] .card-rose  span.text-white/40,
+        [data-theme="light"] .card-rose  span.text-white/70,
+        [data-theme="light"] .card-rose  span.text-white/20,
+        [data-theme="light"] .card-rose  p.text-white/50,
+        [data-theme="light"] .card-rose  p.text-white/80 { color: #5e1a2a !important; opacity: 1 !important; }
+
+        [data-theme="light"] .card-blue  span.text-white/50,
+        [data-theme="light"] .card-blue  span.text-white/80,
+        [data-theme="light"] .card-blue  span.text-white/40,
+        [data-theme="light"] .card-blue  span.text-white/70,
+        [data-theme="light"] .card-blue  span.text-white/20,
+        [data-theme="light"] .card-blue  p.text-white/50,
+        [data-theme="light"] .card-blue  p.text-white/80 { color: #1e3a5f !important; opacity: 1 !important; }
+
+        [data-theme="light"] .card-amber span.text-white/50,
+        [data-theme="light"] .card-amber span.text-white/80,
+        [data-theme="light"] .card-amber span.text-white/40,
+        [data-theme="light"] .card-amber span.text-white/70,
+        [data-theme="light"] .card-amber span.text-white/20,
+        [data-theme="light"] .card-amber p.text-white/50,
+        [data-theme="light"] .card-amber p.text-white/80 { color: #5a3a00 !important; opacity: 1 !important; }
+
+        [data-theme="light"] .card-teal  span.text-white/50,
+        [data-theme="light"] .card-teal  span.text-white/80,
+        [data-theme="light"] .card-teal  span.text-white/40,
+        [data-theme="light"] .card-teal  span.text-white/70,
+        [data-theme="light"] .card-teal  span.text-white/20,
+        [data-theme="light"] .card-teal  p.text-white/50,
+        [data-theme="light"] .card-teal  p.text-white/80 { color: #0f3d38 !important; opacity: 1 !important; }
+
+        [data-theme="light"] .card-green span.text-white/50,
+        [data-theme="light"] .card-green span.text-white/80,
+        [data-theme="light"] .card-green span.text-white/40,
+        [data-theme="light"] .card-green span.text-white/70,
+        [data-theme="light"] .card-green span.text-white/20,
+        [data-theme="light"] .card-green p.text-white/50,
+        [data-theme="light"] .card-green p.text-white/80 { color: #0a2e0c !important; opacity: 1 !important; }
+
+        /* Story card: ✕ icon (text-white/20) */
+        [data-theme="light"] .card-rose  span.text-white/20 { color: #5e1a2a !important; opacity: 0.3 !important; }
+        [data-theme="light"] .card-blue  span.text-white/20 { color: #1e3a5f !important; opacity: 0.3 !important; }
+        [data-theme="light"] .card-amber span.text-white/20 { color: #5a3a00 !important; opacity: 0.3 !important; }
+
+        /* Story card: non-highlight CTA button (bg-white/10 text-white hover:bg-white/15) */
+        [data-theme="light"] .card-rose  .bg-white/10,
+        [data-theme="light"] .card-blue  .bg-white/10,
+        [data-theme="light"] .card-amber .bg-white/10 { background-color: rgba(0,0,0,0.07) !important; color: inherit !important; }
+        [data-theme="light"] .card-rose  button.bg-white/10,
+        [data-theme="light"] .card-blue  button.bg-white/10,
+        [data-theme="light"] .card-amber button.bg-white/10 { color: inherit !important; font-weight: 700 !important; }
+
+        /* Story card: border separator rgba(255,255,255,0.18) → visible on light */
+        [data-theme="light"] .card-rose  [style*="rgba(255,255,255,0.18)"],
+        [data-theme="light"] .card-blue  [style*="rgba(255,255,255,0.18)"],
+        [data-theme="light"] .card-amber [style*="rgba(255,255,255,0.18)"] { border-bottom-color: rgba(0,0,0,0.1) !important; }
+
+        /* ── For-cards (FOR CREATORS / FOR INVESTORS): button light mode fixes ── */
+        /* "Start Investing" — dark bg button invisible on light card-blue */
+        [data-theme="light"] .card-blue button[class*="border"][class*="text-white"],
+        [data-theme="light"] .card-blue button[class*="text-white"] { color: #1e3a5f !important; background-color: rgba(0,0,0,0.06) !important; border-color: rgba(30,58,95,0.4) !important; }
+
+        /* ── Hero: "Explore Campaigns" button — white text on near-white bg ── */
+        [data-theme="light"] .hp-hero button[style*="color: rgb(255, 255, 255)"],
+        [data-theme="light"] .hp-hero button[style*="color:#fff"],
+        [data-theme="light"] .hp-hero button[style*="color: #fff"] { color: #0a2e0c !important; border-color: rgba(34,197,94,0.5) !important; background: rgba(34,197,94,0.12) !important; }
+
+        /* Global text-white override in light mode (non-card contexts) */
+        [data-theme="light"] .text-white { color: #0a1a0c !important; }
+        /* Tailwind arbitrary-value class overrides handled in theme.css */
+
+        /* Navbar light */
+        [data-theme="light"] .hp-nav { background: rgba(255,255,255,0.95) !important; border-bottom-color: rgba(34,197,94,0.2) !important; }
+        [data-theme="light"] .hp-nav a { color: #374151 !important; }
+        [data-theme="light"] .hp-nav a:hover { color: #0a1a0c !important; background: rgba(34,197,94,0.06) !important; }
+
+        /* Hero section — keep dark (it has a video/canvas background) */
+        [data-theme="light"] .hp-hero { background: linear-gradient(135deg, #f0fdf4, #dcfce7, #f0fdf4) !important; }
+        [data-theme="light"] .hp-hero .glow-text { text-shadow: none; color: #0a1a0c; }
+
+        /* Sections with dark gradient backgrounds */
+        [data-theme="light"] .hp-dark-section { background: linear-gradient(135deg, #f0fdf4, #f8faf8) !important; }
+
+        /* Live activity cards */
+        [data-theme="light"] .hp-activity-card { background: #ffffff !important; border-color: rgba(34,197,94,0.2) !important; color: #0a1a0c !important; }
+
+        /* Stats section */
+        [data-theme="light"] .hp-stat-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important; border-color: rgba(34,197,94,0.2) !important; }
+
+        /* Ticker fade — use page bg color */
+        [data-theme="light"] .ticker-wrap { mask-image: linear-gradient(90deg, #f8faf8, black 10%, black 90%, #f8faf8) !important; }
+
+        /* FAQ accordion */
+        [data-theme="light"] .hp-faq-item { background: #ffffff !important; border-color: rgba(0,0,0,0.08) !important; }
+        [data-theme="light"] .hp-faq-item.open { background: #f0fdf4 !important; border-color: rgba(34,197,94,0.3) !important; }
+
+        /* number-gradient stays */
+        [data-theme="light"] .number-gradient { background: linear-gradient(135deg,#16a34a,#22c55e,#4ade80); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+        /* Tailwind arbitrary-value bg/border/text overrides handled in theme.css */
       `}</style>
 
       {/* ── Navbar ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#040806]/95 backdrop-blur-xl overflow-hidden" style={{ borderBottom: "1px solid rgba(34,197,94,0.22)" }}>
+      <nav className="hp-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl overflow-hidden" style={{ background: isLight ? "rgba(255,255,255,0.95)" : "rgba(4,8,6,0.95)", borderBottom: "1px solid rgba(34,197,94,0.22)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-6">
 
           {/* Logo */}
@@ -414,7 +603,7 @@ export default function HomePage() {
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden text-center">
 
         {/* Deep radial bg */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 100% 80% at 50% 50%, #071a0b 0%, #040806 60%, #020402 100%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: isLight ? "radial-gradient(ellipse 100% 80% at 50% 50%, #e8f5ea 0%, #f0fdf4 60%, #f8faf8 100%)" : "radial-gradient(ellipse 100% 80% at 50% 50%, #071a0b 0%, #040806 60%, #020402 100%)" }} />
 
         {/* 3D mesh sphere */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ zIndex: 0 }}>
@@ -453,7 +642,7 @@ export default function HomePage() {
         </div>
 
         {/* Vignette */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 110% 90% at 50% 50%, transparent 40%, #040806 85%)", zIndex: 1 }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: isLight ? "radial-gradient(ellipse 110% 90% at 50% 50%, transparent 40%, #f8faf8 85%)" : "radial-gradient(ellipse 110% 90% at 50% 50%, transparent 40%, #040806 85%)", zIndex: 1 }} />
 
         {/* Live Activity Feed — left side */}
         <ActivityFeed />
@@ -478,7 +667,7 @@ export default function HomePage() {
             <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#22c55e", color: "#000" }}>
               Start Investing
             </button>
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.35)", color: "#fff", backdropFilter: "blur(8px)" }}>
+            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: isLight ? "rgba(34,197,94,0.12)" : "rgba(34,197,94,0.08)", borderColor: isLight ? "rgba(34,197,94,0.5)" : "rgba(34,197,94,0.35)", color: isLight ? "#0a2e0c" : "#fff", backdropFilter: "blur(8px)" }}>
               Explore Campaigns
             </button>
           </div>
@@ -515,7 +704,7 @@ export default function HomePage() {
               { label:"Investors",       end:340,  suffix:"+" },
               { label:"Avg Monthly ROI", end:17.8, suffix:"%", decimals:1 },
             ].map((s,i)=>(
-              <div key={i} className="text-center py-6 px-3 rounded-2xl" style={{ background:"linear-gradient(135deg,#0a1a0b,#061009)", border:"1px solid rgba(34,197,94,0.12)" }}>
+              <div key={i} className="text-center py-6 px-3 rounded-2xl" style={{ background: isLight ? "linear-gradient(135deg,#f0fdf4,#dcfce7)" : "linear-gradient(135deg,#0a1a0b,#061009)", border:"1px solid rgba(34,197,94,0.12)" }}>
                 <p className="number-gradient font-black mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.6rem,4vw,3rem)", lineHeight:1 }}>
                   {s.display || <Counter end={s.end} suffix={s.suffix} decimals={s.decimals||0}/>}
                 </p>
@@ -688,7 +877,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-6">
           {[
             { emoji:"🎨", tag:"FOR CREATORS", title:"Stop borrowing.", accent:"Start partnering.", body:"Traditional loans saddle you with debt. SkillFund connects you with investors who believe in your skill — sharing your upside with no interest, no deadline pressure.", items:["Set your own terms — share %, duration","Capital released in milestone-based stages","Build your SkillFund credit score over time","Dashboard tracks all earnings and investors"], btnLabel:"Apply as Creator", btnStyle:"bg-[#22c55e] text-black hover:bg-[#16a34a]", color:"card-teal" },
-            { emoji:"💼", tag:"FOR INVESTORS", title:"Back real people.", accent:"Earn real returns.", body:"While stocks fluctuate and savings stagnate, SkillFund gives you direct exposure to Africa's growing skilled economy — one verified creator at a time.", items:["Browse by skill, category, and credit score","Vote on milestones before funds are released","Join Syndicates to pool capital with others","Withdraw via Paystack, Stripe, or USDT"], btnLabel:"Start Investing", btnStyle:"border border-[#22c55e]/50 hover:border-[#22c55e]/60 text-white hover:bg-[#0a1a0b]", color:"card-blue" },
+            { emoji:"💼", tag:"FOR INVESTORS", title:"Back real people.", accent:"Earn real returns.", body:"While stocks fluctuate and savings stagnate, SkillFund gives you direct exposure to Africa's growing skilled economy — one verified creator at a time.", items:["Browse by skill, category, and credit score","Vote on milestones before funds are released","Join Syndicates to pool capital with others","Withdraw via Paystack, Stripe, or USDT"], btnLabel:"Start Investing", btnStyle: isLight ? "border border-[#1e3a5f]/40 text-[#1e3a5f] hover:bg-[#1e3a5f]/10" : "border border-[#22c55e]/50 hover:border-[#22c55e]/60 text-white hover:bg-[#0a1a0b]", color:"card-blue" },
           ].map(card=>(
             <div key={card.tag} className={`border rounded-3xl p-8 transition-all card-hover ${card.color}`}>
               <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 border border-[#22c55e]/40 flex items-center justify-center mb-5 text-2xl">{card.emoji}</div>
@@ -737,39 +926,47 @@ export default function HomePage() {
                 before:["Baking from home kitchen","Capped at 10 orders/week","No delivery capability","Word-of-mouth only"],
                 after:["Commercial kitchen space","Delivery motorbike + app","40+ weekly orders","Featured in local food blog"],
               },
-            ].map((story, i) => (
+            ].map((story, i) => {
+              const sc = { rose:"#5e1a2a", blue:"#1e3a5f", amber:"#5a3a00" }[story.color.replace("card-","")];
+              const storyText    = isLight ? sc         : "rgba(255,255,255,0.8)";
+              const storyMuted   = isLight ? sc         : "rgba(255,255,255,0.5)";
+              const storyDim     = isLight ? sc         : "rgba(255,255,255,0.4)";
+              const storyFaint   = isLight ? sc         : "rgba(255,255,255,0.2)";
+              const storyDivider = isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.18)";
+              const storyAvatarBg= isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.1)";
+              return (
               <div key={i} className={`border rounded-3xl overflow-hidden transition-all card-hover flex flex-col ${story.color} ${story.highlight ? "scale-105 shadow-2xl" : ""}`}>
                 {/* Top colored header */}
-                <div className="p-7 pb-5" style={{ borderBottom:"1px solid rgba(255,255,255,0.18)" }}>
+                <div className="p-7 pb-5" style={{ borderBottom:`1px solid ${storyDivider}` }}>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">{story.emoji}</div>
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl" style={{ background: storyAvatarBg }}>{story.emoji}</div>
                     <div>
-                      <p className="text-white font-black text-lg leading-tight" style={{ fontFamily:"'Fraunces',serif" }}>{story.name}</p>
-                      <p className="text-white/50 text-xs mt-0.5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>{story.skill}</p>
+                      <p className="font-black text-lg leading-tight" style={{ fontFamily:"'Fraunces',serif", color: storyText }}>{story.name}</p>
+                      <p className="text-xs mt-0.5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600, color: storyMuted }}>{story.skill}</p>
                     </div>
                   </div>
-                  <p className="text-white/80 text-sm leading-relaxed mb-5">{story.tagline}</p>
+                  <p className="text-sm leading-relaxed mb-5" style={{ color: storyMuted }}>{story.tagline}</p>
                   <div className="flex items-end gap-1 mb-1">
                     <span className="text-[#22c55e] font-black" style={{ fontFamily:"'Fraunces',serif", fontSize:"2.5rem", lineHeight:1 }}>{story.roi}</span>
-                    <span className="text-white/40 text-sm mb-1.5 ml-1">/ avg ROI</span>
+                    <span className="text-sm mb-1.5 ml-1" style={{ color: storyDim }}>/ avg ROI</span>
                   </div>
                   <div className="flex gap-4 text-xs mt-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>
-                    <span className="text-white/40">Funded <span className="text-white/70">{story.funded}</span></span>
-                    <span className="text-white/40">·</span>
-                    <span className="text-white/40">{story.months} months ago</span>
+                    <span style={{ color: storyDim }}>Funded <span style={{ color: storyMuted }}>{story.funded}</span></span>
+                    <span style={{ color: storyDim }}>·</span>
+                    <span style={{ color: storyDim }}>{story.months} months ago</span>
                   </div>
                 </div>
 
                 {/* Before list */}
                 <div className="px-7 pt-6 pb-3">
-                  <p className="text-white/40 text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
-                    <span className="w-2 h-2 rounded-full bg-white/20 inline-block"/>BEFORE SKILLFUND
+                  <p className="text-xs font-bold mb-3 flex items-center gap-2" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", color: storyDim }}>
+                    <span className="w-2 h-2 rounded-full inline-block" style={{ background: storyFaint }}/>BEFORE SKILLFUND
                   </p>
                   <div className="space-y-2.5">
                     {story.before.map((b,j) => (
                       <div key={j} className="flex items-start gap-3">
-                        <span className="text-white/20 mt-0.5 flex-shrink-0">✕</span>
-                        <span className="text-white/50 text-sm">{b}</span>
+                        <span className="mt-0.5 flex-shrink-0" style={{ color: storyFaint }}>✕</span>
+                        <span className="text-sm" style={{ color: storyMuted }}>{b}</span>
                       </div>
                     ))}
                   </div>
@@ -784,7 +981,7 @@ export default function HomePage() {
                     {story.after.map((a,j) => (
                       <div key={j} className="flex items-start gap-3">
                         <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "13px", color: "#22c55e", marginTop: "2px", flexShrink: 0 }} />
-                        <span className="text-white/80 text-sm">{a}</span>
+                        <span className="text-sm" style={{ color: storyText }}>{a}</span>
                       </div>
                     ))}
                   </div>
@@ -793,15 +990,16 @@ export default function HomePage() {
                 {/* Revenue + CTA */}
                 <div className="px-7 pb-7">
                   <div className="rounded-2xl p-4 mb-4 text-center" style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)" }}>
-                    <p className="text-white/50 text-xs mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>NOW EARNING</p>
+                    <p className="text-xs mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600, color: storyMuted }}>NOW EARNING</p>
                     <p className="text-[#22c55e] font-black text-2xl" style={{ fontFamily:"'Fraunces',serif" }}>{story.revenue}</p>
                   </div>
-                  <button onClick={()=>navigate("/register")} className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${story.highlight ? "bg-[#22c55e] text-black hover:bg-[#16a34a]" : "bg-white/10 text-white hover:bg-white/15"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+                  <button onClick={()=>navigate("/register")} className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${story.highlight ? "bg-[#22c55e] text-black hover:bg-[#16a34a]" : ""}`}
+                    style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", ...(story.highlight ? {} : { background: isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.1)", color: isLight ? sc : "#ffffff", border: isLight ? `1px solid rgba(0,0,0,0.12)` : "none" }) }}>
                     Invest in creators like {story.name.split(" ")[0]}
                   </button>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -903,7 +1101,7 @@ export default function HomePage() {
         </div>
 
         {/* Row 1 — scrolls LEFT */}
-        <div className="mb-5 overflow-hidden" style={{ maskImage:"linear-gradient(90deg,transparent,black 8%,black 92%,transparent)" }}>
+        <div className="mb-5 overflow-hidden" style={{ maskImage: isLight ? `linear-gradient(90deg,${pageBg},black 8%,black 92%,${pageBg})` : "linear-gradient(90deg,transparent,black 8%,black 92%,transparent)" }}>
           <div style={{ display:"flex", gap:"20px", animation:"scrollLeft 30s linear infinite", width:"max-content" }}>
             {[
               { quote:"I got funded in 3 days. My investor understood what I was building and trusted the process. My fashion business grew 3x in 8 months.", name:"Amara Toure", role:"Fashion Designer, Lagos", emoji:"👗", color:"card-green" },
@@ -917,26 +1115,13 @@ export default function HomePage() {
               { quote:"The milestone system meant I wasn't handing over money blindly. I could see exactly what the creator achieved before approving each release.", name:"David Osei", role:"Investor, Accra", emoji:"💼", color:"card-blue" },
               { quote:"My SkillFund score went from 50 to 89 in six months just by reporting on time. Investors started approaching me instead.", name:"Kwame N.", role:"Carpenter, Kumasi", emoji:"🪚", color:"card-purple" },
             ].map((t,i) => (
-              <div key={i} className={`border rounded-2xl p-6 flex-shrink-0 card-hover ${t.color}`} style={{ width:"320px" }}>
-                <div className="text-3xl text-white/10 font-serif mb-3 leading-none">"</div>
-                <p className="text-white/70 text-sm leading-relaxed mb-5">{t.quote}</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-base flex-shrink-0">{t.emoji}</div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <p className="text-white/40 text-xs">{t.role}</p>
-                  </div>
-                  <div className="ml-auto flex gap-0.5 flex-shrink-0">
-                    {Array.from({length:5}).map((_,j)=><FontAwesomeIcon key={j} icon={faStar} style={{ fontSize: "9px", color: "#f59e0b" }} />)}
-                  </div>
-                </div>
-              </div>
+              <TestimonialCard key={i} t={t} isLight={isLight} />
             ))}
           </div>
         </div>
 
         {/* Row 2 — scrolls RIGHT */}
-        <div className="overflow-hidden" style={{ maskImage:"linear-gradient(90deg,transparent,black 8%,black 92%,transparent)" }}>
+        <div className="overflow-hidden" style={{ maskImage: isLight ? `linear-gradient(90deg,${pageBg},black 8%,black 92%,${pageBg})` : "linear-gradient(90deg,transparent,black 8%,black 92%,transparent)" }}>
           <div style={{ display:"flex", gap:"20px", animation:"scrollRight 35s linear infinite", width:"max-content" }}>
             {[
               { quote:"Clean, transparent, and the USDT withdrawal was seamless. Will definitely fund more creators next quarter.", name:"Emeka C.", role:"Investor, Enugu", emoji:"🌍", color:"card-rose" },
@@ -950,20 +1135,7 @@ export default function HomePage() {
               { quote:"Zero debt, zero interest. I used SkillFund to expand my bakery and paid my investor back from actual sales. This is how it should work.", name:"Grace O.", role:"Baker, Port Harcourt", emoji:"🍞", color:"card-teal" },
               { quote:"I joined a Syndicate with 4 other investors and we backed a photography studio together. The weighted voting system is genius.", name:"Fatima A.", role:"Investor, Kano", emoji:"📸", color:"card-amber" },
             ].map((t,i) => (
-              <div key={i} className={`border rounded-2xl p-6 flex-shrink-0 card-hover ${t.color}`} style={{ width:"320px" }}>
-                <div className="text-3xl text-white/10 font-serif mb-3 leading-none">"</div>
-                <p className="text-white/70 text-sm leading-relaxed mb-5">{t.quote}</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-base flex-shrink-0">{t.emoji}</div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <p className="text-white/40 text-xs">{t.role}</p>
-                  </div>
-                  <div className="ml-auto flex gap-0.5 flex-shrink-0">
-                    {Array.from({length:5}).map((_,j)=><FontAwesomeIcon key={j} icon={faStar} style={{ fontSize: "9px", color: "#f59e0b" }} />)}
-                  </div>
-                </div>
-              </div>
+              <TestimonialCard key={i} t={t} isLight={isLight} />
             ))}
           </div>
         </div>
@@ -983,12 +1155,16 @@ export default function HomePage() {
               { name:"Starter", price:"$9",   fee:"4%", highlight:false, color:"card-teal",   features:["More creator visibility","5 active investments","Priority support","Analytics"] },
               { name:"Pro",     price:"$25",  fee:"3%", highlight:true,  color:"card-green",  features:["Full creator access","Unlimited investments","Syndicate access","Advanced analytics"] },
               { name:"Elite",   price:"$60",  fee:"2%", highlight:false, color:"card-purple", features:["All Pro features","Lowest 2% fees","Dedicated manager","Early features"] },
-            ].map(plan=>(
+            ].map(plan => {
+              const pc = TCARD_COLORS[plan.color] || TCARD_COLORS["card-green"];
+              const planText = isLight ? pc.text : "#ffffff";
+              const planMuted = isLight ? pc.muted : "#9ca3af";
+              return (
               <div key={plan.name} className={`border rounded-2xl p-6 card-hover ${plan.color} ${plan.highlight ? "shadow-2xl shadow-[#22c55e]/10 scale-105" : ""}`}>
                 {plan.highlight&&<div className="text-xs text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/40 rounded-full px-2.5 py-0.5 inline-block mb-3" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700 }}>POPULAR</div>}
-                <p className="text-white font-bold mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{plan.name}</p>
+                <p className="font-bold mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", color: planText }}>{plan.name}</p>
                 <div className="flex items-end gap-1 mb-1">
-                  <span className={`font-black text-4xl ${plan.highlight?"number-gradient":"text-white"}`} style={{ fontFamily:"'Fraunces',serif" }}>{plan.price}</span>
+                  <span className={`font-black text-4xl ${plan.highlight?"number-gradient":""}`} style={{ fontFamily:"'Fraunces',serif", color: plan.highlight ? undefined : planText }}>{plan.price}</span>
                   {plan.price!=="Free"&&<span className="text-[#4a5568] text-sm mb-1.5">/mo</span>}
                 </div>
                 <p className="text-[#22c55e] text-xs mb-5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>{plan.fee} withdrawal fee</p>
@@ -996,15 +1172,22 @@ export default function HomePage() {
                   {plan.features.map(f=>(
                     <div key={f} className="flex items-center gap-2">
                       <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "11px", color: "#22c55e", flexShrink: 0 }} />
-                      <span className="text-[#9ca3af] text-xs">{f}</span>
+                      <span className="text-xs" style={{ color: planMuted }}>{f}</span>
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"border border-[#2d5235] text-white hover:border-[#22c55e]/60 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+                <button onClick={()=>navigate("/register")}
+                  className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":""}`}
+                  style={plan.highlight ? { fontFamily:"'Plus Jakarta Sans',sans-serif" } : {
+                    fontFamily:"'Plus Jakarta Sans',sans-serif",
+                    border: isLight ? `1px solid ${pc.dim}60` : "1px solid #2d5235",
+                    color: isLight ? pc.text : "#ffffff",
+                    background: isLight ? "rgba(0,0,0,0.04)" : "transparent",
+                  }}>
                   Get started
                 </button>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -1048,7 +1231,7 @@ export default function HomePage() {
       <footer className="bg-[#030604]">
 
         {/* Section 1: Brand + tagline */}
-        <div className="py-14" style={{ background:"linear-gradient(135deg,#071a0b,#040806)" }}>
+        <div className="py-14" style={{ background: isLight ? "linear-gradient(135deg,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#071a0b,#040806)" }}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-md">
               <div className="flex items-center gap-3 mb-4">
@@ -1066,7 +1249,14 @@ export default function HomePage() {
                 { label:"Instagram", icon:"ig", bg:"#2e0d1a", accent:"#f43f5e" },
                 { label:"YouTube",   icon:"▶",  bg:"#2e0d0d", accent:"#ef4444" },
               ].map(s => (
-                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", background:s.bg }}>
+                <a key={s.label} href="#"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-xs font-black hover:scale-110"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans',sans-serif",
+                    background: isLight ? `${s.accent}18` : s.bg,
+                    color: s.accent,
+                    border: isLight ? `1px solid ${s.accent}40` : "none",
+                  }}>
                   {s.icon}
                 </a>
               ))}
@@ -1098,7 +1288,7 @@ export default function HomePage() {
         </div>
 
         {/* Section 3: Newsletter */}
-        <div className="py-14" style={{ background:"linear-gradient(135deg,#071a0b,#040806)" }}>
+        <div className="py-14" style={{ background: isLight ? "linear-gradient(135deg,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#071a0b,#040806)" }}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
               <p className="text-white font-black text-xl mb-2" style={{ fontFamily:"'Fraunces',serif" }}>Stay in the loop</p>
@@ -1119,7 +1309,7 @@ export default function HomePage() {
         </div>
 
         {/* Section 4: Bottom bar */}
-        <div className="py-6" style={{ background:"#020502" }}>
+        <div className="py-6" style={{ background: isLight ? "#f0fdf4" : "#020502" }}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3">
             <p className="text-[#374151] text-xs">© 2025 SkillFund Technologies Ltd. All rights reserved. Built in Africa 🌍</p>
             <div className="flex items-center gap-2">

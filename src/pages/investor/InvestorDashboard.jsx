@@ -7,7 +7,7 @@ import {
   faCoins, faHandshake, faArrowTrendUp, faCircleNotch,
   faArrowRight, faCalendarCheck,
   faCircleCheck, faTriangleExclamation, faClockRotateLeft,
-  faWallet,
+  faWallet, faMagnifyingGlass, faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 
 const C = {
@@ -141,9 +141,29 @@ export default function InvestorDashboard() {
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
       {/* Header */}
-      <div>
-        <h1 style={{ fontFamily: C.display, fontSize: "24px", color: C.text, margin: "0 0 4px", fontWeight: 700 }}>Investor Portfolio</h1>
-        <p style={{ fontFamily: C.font, fontSize: "13px", color: C.sub, margin: 0 }}>Track your capital, returns and active creator deals</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontFamily: C.display, fontSize: "24px", color: C.text, margin: "0 0 4px", fontWeight: 700 }}>Investor Portfolio</h1>
+          <p style={{ fontFamily: C.font, fontSize: "13px", color: C.sub, margin: 0 }}>Track your capital, returns and active creator deals</p>
+        </div>
+        <div style={{ display: "flex", gap: "8px", flexShrink: 0, flexWrap: "wrap" }}>
+          <button
+            onClick={() => navigate("/browse")}
+            style={{ display: "flex", alignItems: "center", gap: "7px", padding: "9px 16px", borderRadius: "12px", cursor: "pointer", fontFamily: C.syne, fontWeight: 700, fontSize: "12px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#22c55e", transition: ".15s" }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(34,197,94,0.18)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(34,197,94,0.1)"}
+          >
+            <FontAwesomeIcon icon={faMagnifyingGlass} style={{ fontSize: "12px" }} /> Browse Campaigns
+          </button>
+          <button
+            onClick={() => navigate("/settings?tab=payment")}
+            style={{ display: "flex", alignItems: "center", gap: "7px", padding: "9px 16px", borderRadius: "12px", cursor: "pointer", fontFamily: C.syne, fontWeight: 700, fontSize: "12px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: C.sub, transition: ".15s" }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(59,130,246,0.3)"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
+          >
+            <FontAwesomeIcon icon={faShieldHalved} style={{ fontSize: "12px" }} /> Payment Verify
+          </button>
+        </div>
       </div>
 
       {/* Stat cards */}

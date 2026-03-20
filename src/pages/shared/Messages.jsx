@@ -8,7 +8,7 @@ import {
   faHandshake, faEllipsisVertical, faFileContract, faFaceSmile,
   faPlus, faMicrophone, faFile, faImage, faCamera, faMusic,
   faStop, faTrash, faPlay, faPause, faUserSlash,
-  faDeleteLeft, faTriangleExclamation,
+  faDeleteLeft, faTriangleExclamation, faVideo, faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import useBlockStore from "../../store/useBlockStore";
@@ -663,8 +663,8 @@ export default function Messages() {
       className=""
     >
       <style>{`
-        /* ── Colors ── */
-        :root {
+        /* ── Colors — dark mode defaults (light overrides in theme.css) ── */
+        [data-theme="dark"], :root {
           --c-bg:       #040806;
           --c-panel:    #070d08;
           --c-item:     #0a1209;
@@ -675,6 +675,19 @@ export default function Messages() {
           --c-text:     #f1f5f9;
           --c-bubble-me:    #0f3d1f;
           --c-bubble-other: #0a1209;
+        }
+        /* ── Light mode overrides ── */
+        [data-theme="light"] {
+          --c-bg:           #f4faf5;
+          --c-panel:        #ffffff;
+          --c-item:         #edf7ef;
+          --c-border:       rgba(0,0,0,0.07);
+          --c-green:        #16a34a;
+          --c-green2:       #15803d;
+          --c-sub:          #6b7280;
+          --c-text:         #0a1a0c;
+          --c-bubble-me:    #dcfce7;
+          --c-bubble-other: #f1f5f9;
         }
         /* ── Chat background tile pattern ── */
         .msg-bg {
@@ -690,8 +703,8 @@ export default function Messages() {
         .conv-item.active { background: rgba(34,197,94,0.08); border-left: 3px solid var(--c-green); }
         /* ── Bubble ── */
         .bubble { position:relative; padding:7px 12px 6px; border-radius:8px; word-break:break-word; white-space:pre-wrap; font-size:14.5px; line-height:1.55; font-family:'DM Sans',sans-serif; }
-        .bubble.me { background:var(--c-bubble-me); border-radius:8px 0 8px 8px; border:1px solid rgba(34,197,94,0.15); }
-        .bubble.other { background:var(--c-bubble-other); border-radius:0 8px 8px 8px; border:1px solid var(--c-border); }
+        .bubble.me { background:var(--c-bubble-me); border-radius:8px 0 8px 8px; border:1px solid rgba(34,197,94,0.2); color:var(--c-text); }
+        .bubble.other { background:var(--c-bubble-other); border-radius:0 8px 8px 8px; border:1px solid var(--c-border); color:var(--c-text); }
         .bubble:hover .react-btn { opacity:1; }
         /* ── Reaction button ── */
         .react-btn { opacity:0; transition:opacity .15s; position:absolute; top:-12px; background:var(--c-panel); border:1px solid var(--c-border); border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; }
@@ -712,14 +725,14 @@ export default function Messages() {
         @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
         /* ── Date header ── */
         .date-pill { display:flex; align-items:center; justify-content:center; margin:12px 0 6px; }
-        .date-pill span { background:rgba(7,13,8,0.85); border:1px solid var(--c-border); color:var(--c-sub); font-size:11.5px; padding:3px 14px; border-radius:6px; font-family:'DM Sans',sans-serif; }
+        .date-pill span { background:var(--c-panel); border:1px solid var(--c-border); color:var(--c-sub); font-size:11.5px; padding:3px 14px; border-radius:6px; font-family:'DM Sans',sans-serif; }
         /* ── Online dot ── */
         .online-dot { width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid var(--c-panel); position:absolute; bottom:0; right:0; }
         /* ── Input ── */
         .msg-input { flex:1; background:transparent; border:none; color:var(--c-text); font-size:15px; outline:none; font-family:'DM Sans',sans-serif; resize:none; line-height:1.5; padding:0; }
         .msg-input::placeholder { color:var(--c-sub); }
         /* ── Search ── */
-        .conv-search { background:#111e13; border:1px solid rgba(255,255,255,0.12); color:var(--c-text); border-radius:20px; padding:9px 12px 9px 36px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .conv-search { background:var(--c-item); border:1px solid var(--c-border); color:var(--c-text); border-radius:20px; padding:9px 12px 9px 36px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .conv-search::placeholder { color:#8a9e8d; }
         .conv-search:focus { border-color:rgba(34,197,94,0.45); background:#152518; }
         /* ── Send button ── */
@@ -833,10 +846,32 @@ export default function Messages() {
                   {isOtherTyping ? "typing..." : isOtherOnline ? "online" : otherParticipant?.role || ""}
                 </span>
               </div>
-              <div style={{ display:"flex", alignItems:"center", gap:"10px", position:"relative" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:"6px", position:"relative" }}>
+                {/* Voice call */}
+                <button
+                  onClick={() => toast("Voice calls coming soon!", { icon: "📞" })}
+                  style={{ background:"none", border:"none", color:"var(--c-sub)", cursor:"pointer", padding:"7px", borderRadius:"10px", transition:"all .15s", display:"flex", alignItems:"center", justifyContent:"center" }}
+                  onMouseEnter={e => { e.currentTarget.style.background="rgba(34,197,94,0.08)"; e.currentTarget.style.color="var(--c-green)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background="none"; e.currentTarget.style.color="var(--c-sub)"; }}
+                  title="Voice call">
+                  <FontAwesomeIcon icon={faPhone} style={{ fontSize:"16px" }} />
+                </button>
+
+                {/* Video call */}
+                <button
+                  onClick={() => toast("Video calls coming soon!", { icon: "🎥" })}
+                  style={{ background:"none", border:"none", color:"var(--c-sub)", cursor:"pointer", padding:"7px", borderRadius:"10px", transition:"all .15s", display:"flex", alignItems:"center", justifyContent:"center" }}
+                  onMouseEnter={e => { e.currentTarget.style.background="rgba(34,197,94,0.08)"; e.currentTarget.style.color="var(--c-green)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background="none"; e.currentTarget.style.color="var(--c-sub)"; }}
+                  title="Video call">
+                  <FontAwesomeIcon icon={faVideo} style={{ fontSize:"16px" }} />
+                </button>
+
+                {/* Propose — desktop only, hidden on mobile */}
                 {user?.role === "investor" && (
                   <button onClick={() => setShowProposalForm((v) => !v)}
-                    style={{ display:"flex", alignItems:"center", gap:"6px", padding:"7px 14px", borderRadius:"20px", fontSize:"12px", fontWeight:700, cursor:"pointer", transition:"all .15s", border:"none", fontFamily:"'Plus Jakarta Sans',sans-serif", background: showProposalForm ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(34,197,94,0.08)", color: showProposalForm ? "#000" : "var(--c-green)" }}>
+                    className="hidden sm:flex"
+                    style={{ alignItems:"center", gap:"6px", padding:"7px 14px", borderRadius:"20px", fontSize:"12px", fontWeight:700, cursor:"pointer", transition:"all .15s", border:"none", fontFamily:"'Plus Jakarta Sans',sans-serif", background: showProposalForm ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(34,197,94,0.08)", color: showProposalForm ? "#000" : "var(--c-green)" }}>
                     <FontAwesomeIcon icon={showProposalForm ? faXmark : faArrowTrendUp} style={{ fontSize:"11px" }} />
                     {showProposalForm ? "Cancel" : "Propose"}
                   </button>
@@ -855,6 +890,7 @@ export default function Messages() {
                     style={{ position:"absolute", top:"calc(100% + 6px)", right:0, background:"var(--c-panel)", border:"1px solid var(--c-border)", borderRadius:"12px", overflow:"hidden", boxShadow:"0 6px 28px rgba(0,0,0,0.6)", zIndex:70, minWidth:"200px" }}>
                     {[
                       { label:"View profile",  icon:faCircleCheck,       color:"var(--c-text)", action: () => { setShowHeaderMenu(false); navigate(`/users/${otherParticipant?._id}`); } },
+                      ...(user?.role === "investor" ? [{ label:"Send Proposal", icon:faArrowTrendUp, color:"var(--c-green)", action: () => { setShowHeaderMenu(false); setShowProposalForm((v) => !v); } }] : []),
                       { label:"Clear chat",    icon:faDeleteLeft,        color:"#f59e0b",       action: () => { setShowHeaderMenu(false); setShowClearConfirm(true); } },
                       { label:"Block user",    icon:faUserSlash,         color:"#ef4444",       action: () => { setShowHeaderMenu(false); setShowBlockConfirm(true); } },
                       { label:"Report",        icon:faTriangleExclamation, color:"#ef4444",     action: () => { setShowHeaderMenu(false); setShowReportConfirm(true); } },
@@ -1094,22 +1130,23 @@ export default function Messages() {
               )}
 
               <div style={{ display:"flex", alignItems:"flex-end", gap:"8px" }}>
-                {/* Emoji */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); setShowAttachMenu(false); setShowInputEmoji((v) => !v); }}
-                  style={{ background:"none", border:"none", color: showInputEmoji ? "var(--c-green)" : "var(--c-sub)", cursor:"pointer", padding:"8px", fontSize:"20px", lineHeight:1, transition:"color .15s", marginBottom:"1px" }}>
-                  <FontAwesomeIcon icon={faFaceSmile} />
-                </button>
 
-                {/* Attach */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); setShowInputEmoji(false); setShowAttachMenu((v) => !v); }}
-                  style={{ background:"none", border:"none", color: showAttachMenu ? "var(--c-green)" : "var(--c-sub)", cursor:"pointer", padding:"8px", fontSize:"20px", lineHeight:1, transition:"color .15s", marginBottom:"1px" }}>
-                  <FontAwesomeIcon icon={faPlus} />
-                </button>
+                {/* Text input pill with emoji + attach inside */}
+                <div style={{ flex:1, background:"var(--c-item)", border:"1px solid var(--c-border)", borderRadius:"24px", padding:"6px 8px 6px 12px", display:"flex", alignItems:"flex-end", gap:"4px" }}>
+                  {/* Emoji inside pill */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowAttachMenu(false); setShowInputEmoji((v) => !v); }}
+                    style={{ background:"none", border:"none", color: showInputEmoji ? "var(--c-green)" : "var(--c-sub)", cursor:"pointer", padding:"4px", fontSize:"19px", lineHeight:1, transition:"color .15s", flexShrink:0, marginBottom:"2px" }}>
+                    <FontAwesomeIcon icon={faFaceSmile} />
+                  </button>
 
-                {/* Text input pill */}
-                <div style={{ flex:1, background:"var(--c-item)", border:"1px solid var(--c-border)", borderRadius:"24px", padding:"10px 16px", display:"flex", alignItems:"flex-end" }}>
+                  {/* Attach inside pill */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowInputEmoji(false); setShowAttachMenu((v) => !v); }}
+                    style={{ background:"none", border:"none", color: showAttachMenu ? "var(--c-green)" : "var(--c-sub)", cursor:"pointer", padding:"4px", fontSize:"19px", lineHeight:1, transition:"color .15s", flexShrink:0, marginBottom:"2px" }}>
+                    <FontAwesomeIcon icon={faPlus} />
+                  </button>
+
                   <textarea
                     ref={inputRef}
                     value={newMessage}
@@ -1118,7 +1155,7 @@ export default function Messages() {
                     placeholder="Type a message"
                     rows={1}
                     className="msg-input"
-                    style={{ maxHeight:"120px" }}
+                    style={{ maxHeight:"120px", flex:1, padding:"4px 4px 4px 6px" }}
                     onInput={(e) => {
                       e.target.style.height = "auto";
                       e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;

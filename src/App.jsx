@@ -34,7 +34,14 @@ import SyndicateCampaign from "./pages/shared/SyndicateCampaign";
 import Dispute from "./pages/shared/Dispute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { AdminUsers, AdminVerifications, AdminWithdrawals, AdminDisputes, AdminTransactions, AdminReports } from "./pages/admin/AdminPages";
+import { AdminVoiceVerifications, AdminAssetCollateral, AdminGuarantors } from "./pages/admin/AdminTrustPages";
 import { AdminRevenue } from "./pages/admin/AdminRevenue";
+import CampaignPage from "./pages/shared/CampaignPage";
+import CampaignSetup from "./pages/creator/CampaignSetup";
+import TrustVerification from "./pages/creator/TrustVerification";
+import VoiceVerification from "./pages/creator/VoiceVerification";
+import ReferralProgramme from "./pages/shared/ReferralProgramme";
+import Help from "./pages/shared/Help";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuthStore();
@@ -92,11 +99,17 @@ function ProtectedAppLayout() {
     "/settings":    "Settings",
     "/kyc":         "Verify Identity",
     "/disputes":    "Disputes",
+    "/campaign/setup": "Campaign Setup",
+    "/trust":       "Trust Verification",
+    "/voice-verify": "Voice Verification",
+    "/referrals":   "Referral Programme",
+    "/help":        "Help Centre",
   };
 
   // Handle dynamic segments like /investments/:id/milestones
   let title = TITLES[location.pathname];
   if (!title && location.pathname.includes("/milestones")) title = "Milestones";
+  if (!title && location.pathname.startsWith("/campaign/")) title = "Campaign";
   if (!title) title = "SkillFund";
 
   const isMessages = location.pathname === "/messages";
@@ -120,6 +133,9 @@ function AdminAppLayout() {
     "/admin/transactions":  "Transactions",
     "/admin/reports":       "User Reports",
     "/admin/revenue":       "Platform Revenue",
+    "/admin/voice":         "Voice Verifications",
+    "/admin/assets":        "Asset Collateral",
+    "/admin/guarantors":    "Guarantors",
   };
   const title = TITLES[location.pathname] || "Admin Portal";
   return (
@@ -180,6 +196,7 @@ function App() {
           <Route path="/users/:id"     element={<UserProfile />} />
           <Route path="/creators/:id"  element={<UserProfile />} />
           <Route path="/investors/:id" element={<UserProfile />} />
+          <Route path="/campaign/:id"  element={<CampaignPage />} />
         </Route>
 
         {/* ── ALL protected routes share ONE Layout instance ── */}
@@ -198,6 +215,12 @@ function App() {
           <Route path="/kyc"          element={<KYC />} />
           <Route path="/disputes"     element={<Dispute />} />
           <Route path="/investments/:investmentId/milestones" element={<Milestones />} />
+          <Route path="/campaign/setup"  element={<CampaignSetup />} />
+          <Route path="/campaign/:id"    element={<CampaignPage />} />
+          <Route path="/trust"           element={<TrustVerification />} />
+          <Route path="/voice-verify"    element={<VoiceVerification />} />
+          <Route path="/referrals"       element={<ReferralProgramme />} />
+          <Route path="/help"            element={<Help />} />
         </Route>
 
         {/* ── Payment return pages — full screen, no sidebar ── */}
@@ -216,6 +239,9 @@ function App() {
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="reports"      element={<AdminReports />} />
           <Route path="revenue"      element={<AdminRevenue />} />
+          <Route path="voice"        element={<AdminVoiceVerifications />} />
+          <Route path="assets"       element={<AdminAssetCollateral />} />
+          <Route path="guarantors"   element={<AdminGuarantors />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

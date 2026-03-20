@@ -8,6 +8,7 @@ import {
   faUsers, faChartBar, faShield, faArrowTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@ const RISK_COLORS = {
   high:   { bg: "rgba(239,68,68,0.1)",  border: "rgba(239,68,68,0.25)",  text: "#ef4444"  },
 };
 
-const CARD_COLORS = [
+const CARD_COLORS_DARK = [
   "linear-gradient(135deg,#0f2244,#091830)",
   "linear-gradient(135deg,#0f2e10,#091e09)",
   "linear-gradient(135deg,#220f44,#180930)",
@@ -46,8 +47,26 @@ const CARD_COLORS = [
   "linear-gradient(135deg,#3d0f22,#280918)",
 ];
 
+const CARD_COLORS_LIGHT = [
+  "linear-gradient(135deg,#eff6ff,#dbeafe)",   // blue
+  "linear-gradient(135deg,#f0fdf4,#dcfce7)",   // green
+  "linear-gradient(135deg,#f5f3ff,#ede9fe)",   // purple
+  "linear-gradient(135deg,#f0fdfa,#ccfbf1)",   // teal
+  "linear-gradient(135deg,#fffbeb,#fef3c7)",   // amber
+  "linear-gradient(135deg,#fff1f2,#ffe4e6)",   // rose
+];
+
+const CARD_LIGHT_TEXT = [
+  "#1e3a5f", "#0a2e0c", "#3b1f6e", "#0f3d38", "#5a3a00", "#5e1a2a",
+];
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function BrowseInvestors() {
+  const theme = useThemeStore((s) => s.theme);
+  const isLight = theme === "light";
+  const card = isLight ? "#ffffff" : "#070d08";
+  const cardBorder = isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.08)";
+  const textMuted = isLight ? "#4b5563" : "#9ca3af";
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -124,7 +143,7 @@ export default function BrowseInvestors() {
   const hasActiveFilters = search || industry || minBudget;
 
   const selectStyle = {
-    background: "#070d08", border: "1px solid rgba(255,255,255,0.2)", color: "#ffffff",
+    background: card, border: `1px solid ${cardBorder}`, color: isLight ? "#0a1a0c" : "#ffffff",
     borderRadius: "12px", padding: "10px 36px 10px 14px", fontSize: "14px",
     outline: "none", width: "100%", appearance: "none", WebkitAppearance: "none",
     fontFamily: "'DM Sans', sans-serif",
@@ -134,17 +153,17 @@ export default function BrowseInvestors() {
     <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        .bi-input { background:#070d08; border:1px solid rgba(255,255,255,0.1); color:#ffffff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .bi-input { background:${isLight ? "#f0fdf4" : "#070d08"}; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; color:${isLight ? "#0a1a0c" : "#ffffff"}; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .bi-input:focus { border-color:rgba(34,197,94,0.4); }
         .bi-input::placeholder { color:#5a8a63; }
-        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; white-space:nowrap; }
-        .ind-pill:hover { border-color:rgba(59,130,246,0.3); color:#9ca3af; }
+        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#4b5563" : "#9ca3af"}; font-family:'Syne',sans-serif; white-space:nowrap; }
+        .ind-pill:hover { border-color:rgba(59,130,246,0.3); color:${isLight ? "#1e3a5f" : "#9ca3af"}; }
         .ind-pill.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid rgba(255,255,255,0.1); background:#070d08; color:#9ca3af; font-family:'Syne',sans-serif; }
-        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:#ffffff; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#4b5563" : "#9ca3af"}; font-family:'Syne',sans-serif; }
+        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:${isLight ? "#1e3a5f" : "#ffffff"}; }
         .page-btn.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-        select option { background:#070d08; color:#ffffff; }
+        select option { background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#0a1a0c" : "#ffffff"}; }
       `}</style>
 
       {/* Header */}
@@ -153,7 +172,7 @@ export default function BrowseInvestors() {
           <div>
             <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne', sans-serif", color: "#3b82f6" }}>DISCOVER</p>
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Investors</h2>
-            <p className="text-sm mt-0.5" style={{ color: "#9ca3af" }}>
+            <p className="text-sm mt-0.5" style={{ color: textMuted }}>
               {loading ? "Loading..." : <><span className="text-white font-semibold">{total}</span> investors looking to fund creators</>}
             </p>
           </div>
@@ -176,7 +195,7 @@ export default function BrowseInvestors() {
             style={{ paddingLeft: "38px", paddingRight: search ? "38px" : "14px" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#9ca3af" }}>
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: textMuted }}>
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
             </button>
           )}
@@ -185,16 +204,16 @@ export default function BrowseInvestors() {
           <select value={industry} onChange={e => setIndustry(e.target.value)} style={selectStyle}>
             {INDUSTRIES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: textMuted, fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex-shrink-0"
           style={{
             fontFamily: "'Syne', sans-serif",
-            background: showFilters || hasActiveFilters ? "rgba(59,130,246,0.1)" : "#070d08",
-            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : "rgba(255,255,255,0.2)"}`,
-            color: showFilters || hasActiveFilters ? "#3b82f6" : "#9ca3af",
+            background: showFilters || hasActiveFilters ? "rgba(59,130,246,0.1)" : isLight ? "#ffffff" : "#070d08",
+            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.2)"}`,
+            color: showFilters || hasActiveFilters ? "#3b82f6" : textMuted,
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "13px" }} /> Filters
@@ -204,9 +223,9 @@ export default function BrowseInvestors() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="rounded-2xl p-5 mb-4" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="rounded-2xl p-5 mb-4" style={{ background: card, border: `1px solid ${cardBorder}` }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-white font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
+            <p className="font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif", color: isLight ? "#0a1a0c" : "#ffffff" }}>Advanced Filters</p>
             {hasActiveFilters && (
               <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Syne', sans-serif" }}>
                 <FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Clear all
@@ -215,16 +234,16 @@ export default function BrowseInvestors() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>MIN BUDGET ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: textMuted }}>MIN BUDGET ($)</label>
               <input type="number" value={minBudget} onChange={e => setMinBudget(e.target.value)} placeholder="0" className="bi-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>INDUSTRY</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: textMuted }}>INDUSTRY</label>
               <div className="relative">
                 <select value={industry} onChange={e => setIndustry(e.target.value)} style={selectStyle}>
                   {INDUSTRIES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
                 </select>
-                <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
+                <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: textMuted, fontSize: "11px", pointerEvents: "none" }} />
               </div>
             </div>
           </div>
@@ -257,7 +276,8 @@ export default function BrowseInvestors() {
                 onConnect={handleConnect}
                 onMessage={handleMessage}
                 actionLoading={actionLoading}
-                cardColor={CARD_COLORS[idx % CARD_COLORS.length]}
+                cardColor={isLight ? CARD_COLORS_LIGHT[idx % CARD_COLORS_LIGHT.length] : CARD_COLORS_DARK[idx % CARD_COLORS_DARK.length]}
+                colorIdx={idx % CARD_COLORS_LIGHT.length}
               />
             ))}
           </div>
@@ -277,23 +297,37 @@ export default function BrowseInvestors() {
 }
 
 // ─── Investor Card ────────────────────────────────────────────────────────────
-function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoading, cardColor }) {
+function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoading, cardColor, colorIdx = 0 }) {
+  const theme = useThemeStore((s) => s.theme);
+  const isLight = theme === "light";
+
+  const cardText          = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#ffffff";
+  const cardMuted         = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#9ca3af";
+  const cardDim           = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#9ca3af";
+  const cardBorder        = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}25` : "rgba(255,255,255,0.07)";
+  const cardOverlay       = isLight ? "rgba(0,0,0,0.04)"  : "rgba(0,0,0,0.2)";
+  const cardStatBg        = isLight ? "rgba(0,0,0,0.05)"  : "rgba(0,0,0,0.25)";
+  const cardStatBorder    = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.18)";
+  const cardDefaultBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.18)";
+  const cardHoverBorder   = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}50` : "rgba(59,130,246,0.25)";
+  const cardGhostBg       = isLight ? "rgba(0,0,0,0.05)"  : "rgba(0,0,0,0.3)";
+
   const navigate = useNavigate();
   const id = investor.userId?._id || investor.userId || investor._id;
 
-  const name         = investor.userId?.name     || "Investor";
-  const avatar       = investor.avatar           || null;
-  const isVerified   = investor.userId?.isVerified || false;
-  const plan         = investor.userId?.plan     || "basic";
-  const location     = investor.location         || "";
-  const bio          = investor.bio              || "";
-  const budget       = investor.investmentBudget || 0;
-  const roi          = investor.preferredROI     || 0;
-  const risk         = investor.riskTolerance    || "";
-  const duration     = investor.preferredDuration|| 0;
-  const totalInvested= investor.totalInvested    || 0;
-  const industries   = investor.industriesOfInterest || [];
-  const connectionStatus = investor.connectionStatus || null;
+  const name            = investor.userId?.name        || "Investor";
+  const avatar          = investor.avatar              || null;
+  const isVerified      = investor.userId?.isVerified  || false;
+  const plan            = investor.userId?.plan        || "basic";
+  const location        = investor.location            || "";
+  const bio             = investor.bio                 || "";
+  const budget          = investor.investmentBudget    || 0;
+  const roi             = investor.preferredROI        || 0;
+  const risk            = investor.riskTolerance       || "";
+  const duration        = investor.preferredDuration   || 0;
+  const totalInvested   = investor.totalInvested       || 0;
+  const industries      = investor.industriesOfInterest || [];
+  const connectionStatus = investor.connectionStatus   || null;
 
   const connectLoading = actionLoading[`connect_${id}`];
   const isCreator = currentUser?.role === "creator";
@@ -302,14 +336,14 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
 
   return (
     <div
-      className="group rounded-2xl cursor-pointer transition-all duration-200 hover:-translate-y-1"
-      style={{ background: cardColor, border: "1px solid rgba(255,255,255,0.18)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", position: "relative", overflow: "visible" }}
+      className="group rounded-2xl cursor-pointer transition-all duration-200 "
+      style={{ background: cardColor, border: `1px solid ${cardDefaultBorder}`, boxShadow: isLight ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.12)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/investors/${id}`)}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 16px 48px rgba(0,0,0,0.5)"; e.currentTarget.style.borderColor = "rgba(59,130,246,0.25)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"; e.currentTarget.style.borderColor = cardHoverBorder; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.12)"; e.currentTarget.style.borderColor = cardDefaultBorder; }}
     >
       {/* Cover strip */}
-      <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: "rgba(0,0,0,0.2)" }}>
+      <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: cardOverlay }}>
         <div className="text-7xl select-none" style={{ opacity: 0.1 }}>💼</div>
         {/* Plan badge */}
         <div className="absolute top-3 left-3 flex gap-1.5">
@@ -330,37 +364,37 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
       <div className="p-5 pt-10">
         {/* Avatar + name stacked */}
         <div className="mb-3">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "white", border: "3px solid rgba(59,130,246,0.5)", position: "absolute", top: "calc(96px - 28px)", left: "20px" }}>
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", color: "#f1f5f9", border: "3px solid rgba(59,130,246,0.5)", position: "absolute", top: "calc(96px - 28px)", left: "20px" }}>
             {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-white font-black text-base truncate" style={{ fontFamily: "'Syne', sans-serif" }}>{name}</h3>
+            <h3 className="font-black text-base truncate" style={{ fontFamily: "'Syne', sans-serif", color: cardText }}>{name}</h3>
             {isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "13px", color: "#22c55e", flexShrink: 0 }} />}
           </div>
           <p className="text-sm font-semibold" style={{ color: "#3b82f6" }}>💼 Investor</p>
         </div>
 
         {location && (
-          <div className="flex items-center gap-1 mb-2" style={{ color: "#9ca3af" }}>
+          <div className="flex items-center gap-1 mb-2" style={{ color: cardMuted }}>
             <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px" }} /><span className="text-xs">{location}</span>
           </div>
         )}
 
-        {bio && <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: "#6b7280" }}>{bio}</p>}
+        {bio && <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: cardMuted }}>{bio}</p>}
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-2 mb-4">
           {[
-            { faIcon: faWallet,       color: "#22c55e", label: "Budget",        value: budget        > 0 ? `$${Number(budget).toLocaleString()}`        : "—" },
-            { faIcon: faArrowTrendUp, color: "#3b82f6", label: "Target ROI",    value: roi           > 0 ? `${roi}%`                                   : "—" },
-            { faIcon: faChartBar,     color: "#a855f7", label: "Total Invested", value: totalInvested > 0 ? `$${Number(totalInvested).toLocaleString()}` : "—" },
-            { faIcon: faShield,       color: "#f59e0b", label: "Duration",       value: duration      > 0 ? `${duration}mo`                            : "—" },
+            { faIcon: faWallet,       color: "#22c55e", label: "Budget",         value: budget        > 0 ? `$${Number(budget).toLocaleString()}`        : "—" },
+            { faIcon: faArrowTrendUp, color: "#3b82f6", label: "Target ROI",     value: roi           > 0 ? `${roi}%`                                   : "—" },
+            { faIcon: faChartBar,     color: "#a855f7", label: "Total Invested",  value: totalInvested > 0 ? `$${Number(totalInvested).toLocaleString()}` : "—" },
+            { faIcon: faShield,       color: "#f59e0b", label: "Duration",        value: duration      > 0 ? `${duration}mo`                            : "—" },
           ].map(({ faIcon, color, label, value }) => (
-            <div key={label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.18)" }}>
+            <div key={label} className="rounded-xl p-3" style={{ background: cardStatBg, border: `1px solid ${cardStatBorder}` }}>
               <div className="flex items-center gap-1 mb-1">
-                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
+                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: cardDim }}>{label}</span>
               </div>
-              <p className="font-black text-sm text-white" style={{ fontFamily: "'Fraunces', serif" }}>{value}</p>
+              <p className="font-black text-sm" style={{ fontFamily: "'Fraunces', serif", color: cardText }}>{value}</p>
             </div>
           ))}
         </div>
@@ -374,7 +408,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
               </span>
             ))}
             {industries.length > 3 && (
-              <span className="text-xs px-2 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.3)", color: "#9ca3af" }}>+{industries.length - 3}</span>
+              <span className="text-xs px-2 py-1 rounded-full" style={{ background: cardStatBg, color: cardDim }}>+{industries.length - 3}</span>
             )}
           </div>
         )}
@@ -394,7 +428,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
                     border: connectionStatus === "accepted" ? "1px solid rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "1px solid rgba(245,158,11,0.3)" : "none",
                     color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "#ffffff",
                     cursor: connectionStatus ? "default" : "pointer",
-                    boxShadow: !connectionStatus ? "0 4px 16px rgba(59,130,246,0.3)" : "none",
+                    boxShadow: !connectionStatus ? "0 2px 8px rgba(59,130,246,0.2)" : "none",
                   }}
                 >
                   {connectLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "13px" }} />
@@ -405,7 +439,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
                 <button
                   onClick={e => onMessage(id, e)}
                   className="flex items-center justify-center px-3 py-2.5 rounded-xl transition-all"
-                  style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
+                  style={{ background: cardGhostBg, border: `1px solid ${cardBorder}`, color: cardMuted }}
                 >
                   <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} />
                 </button>
@@ -415,7 +449,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
               <button
                 onClick={e => onMessage(id, e)}
                 className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold py-2.5 rounded-xl transition-all whitespace-nowrap"
-                style={{ fontFamily: "'Syne', sans-serif", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
+                style={{ fontFamily: "'Syne', sans-serif", background: cardGhostBg, border: `1px solid ${cardBorder}`, color: cardMuted }}
               >
                 <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} /> Message
               </button>
@@ -430,21 +464,27 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function InvestorsGridSkeleton() {
+  const theme = useThemeStore((s) => s.theme);
+  const isLight = theme === "light";
+  const card = isLight ? "#ffffff" : "#070d08";
+  const cardBorder = isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
+  const inputBg = isLight ? "#edf7ef" : "#0a1209";
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
-          <div className="h-24" style={{ background: "#0a1209" }} />
+        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: card, border: `1px solid ${cardBorder}` }}>
+          <div className="h-24" style={{ background: inputBg }} />
           <div className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.2)" }} />
-            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.2)" }} />
-            <div className="h-3 rounded-full w-1/3" style={{ background: "rgba(255,255,255,0.2)" }} />
-            <div className="h-3 rounded-full w-full" style={{ background: "rgba(255,255,255,0.2)" }} />
-            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: cardBorder }} />
+            <div className="h-3.5 rounded-full w-3/4" style={{ background: cardBorder }} />
+            <div className="h-3 rounded-full w-1/3" style={{ background: cardBorder }} />
+            <div className="h-3 rounded-full w-full" style={{ background: cardBorder }} />
+            <div className="h-3 rounded-full w-2/3" style={{ background: cardBorder }} />
             <div className="grid grid-cols-2 gap-2">
-              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />)}
+              {Array.from({ length: 4 }).map((_, j) => <div key={j} className="h-14 rounded-xl" style={{ background: cardBorder }} />)}
             </div>
-            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-10 rounded-xl" style={{ background: cardBorder }} />
           </div>
         </div>
       ))}
@@ -454,11 +494,17 @@ function InvestorsGridSkeleton() {
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onClear, hasFilters }) {
+  const theme = useThemeStore((s) => s.theme);
+  const isLight = theme === "light";
+  const card = isLight ? "#ffffff" : "#070d08";
+  const cardBorder = isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
+  const textMuted = isLight ? "#4b5563" : "#9ca3af";
+
   return (
-    <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+    <div className="rounded-3xl p-16 text-center" style={{ background: card, border: `1px solid ${cardBorder}` }}>
       <div className="text-5xl mb-4">💼</div>
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>No investors found</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#9ca3af" }}>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: textMuted }}>
         {hasFilters ? "No investors match your current filters. Try adjusting your search." : "No investors are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (

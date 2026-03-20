@@ -12,6 +12,7 @@ import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import { ScoreBadge } from "../../components/layout/ScoreBadge";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
+import useThemeStore from "../../store/useThemeStore";
 
 const CATEGORY_EMOJI = {
   fashion:"👗", carpentry:"🪚", farming:"🌾", photography:"📷",
@@ -19,24 +20,43 @@ const CATEGORY_EMOJI = {
 };
 
 // Stat box used in hero
+function useT() {
+  const _t = useThemeStore((s) => s.theme);
+  const L = _t === "light";
+  return {
+    card:      L ? "#ffffff"              : "#070d08",
+    cardAlt:   L ? "#f0fdf4"              : "#0a1209",
+    border:    L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    text:      L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     L ? "#4b5563"              : "#9ca3af",
+    dim:       L ? "#6b7280"              : "#4b5563",
+    hover:     L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+    heroGrad:  L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)",
+    heroBorder:L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)",
+  };
+}
+
 function StatBox({ icon, iconColor, label, value, bg, border }) {
+  const T = useT();
   return (
     <div className="rounded-2xl p-4 text-center" style={{ background: bg, border: `1px solid ${border}` }}>
       <FontAwesomeIcon icon={icon} style={{ fontSize: "15px", color: iconColor, display: "block", margin: "0 auto 6px" }} />
       <p className="font-black text-white text-base" style={{ fontFamily: "'Fraunces',serif", lineHeight: 1 }}>{value}</p>
-      <p className="text-xs mt-1" style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{label}</p>
+      <p className="text-xs mt-1" style={{ color: T.muted, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{label}</p>
     </div>
   );
 }
 
 // Investor row
 function InvestorRow({ inv, index, fundingGoal }) {
+  const T = useT();
   const name = inv.investorId?.name || "Investor";
   const pct  = ((inv.amount / fundingGoal) * 100).toFixed(1);
   const COLORS = ["#22c55e","#3b82f6","#a855f7","#14b8a6","#f43f5e","#f59e0b"];
   const color  = COLORS[index % COLORS.length];
   return (
-    <div className="flex items-center justify-between rounded-xl px-4 py-3 transition-all" style={{ background: "#0a1209", border: "1px solid rgba(255,255,255,0.2)" }}
+    <div className="flex items-center justify-between rounded-xl px-4 py-3 transition-all" style={{ background: T.cardAlt, border: `1px solid ${T.border}` }}
       onMouseEnter={e => e.currentTarget.style.borderColor = `${color}33`}
       onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"}
     >
@@ -48,13 +68,27 @@ function InvestorRow({ inv, index, fundingGoal }) {
       </div>
       <div className="text-right">
         <p className="text-sm font-black text-white" style={{ fontFamily: "'Fraunces',serif" }}>${inv.amount.toLocaleString()}</p>
-        <p className="text-xs" style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{inv.sharePercentage || pct}% share</p>
+        <p className="text-xs" style={{ color: T.muted, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{inv.sharePercentage || pct}% share</p>
       </div>
     </div>
   );
 }
 
 export default function SyndicateCampaign() {
+  const _theme = useThemeStore((s) => s.theme);
+  const _L = _theme === "light";
+  const T = {
+    bg:        _L ? "#f4faf5"              : "#040806",
+    card:      _L ? "#ffffff"              : "#070d08",
+    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
+    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
+    text:      _L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     _L ? "#4b5563"              : "#9ca3af",
+    dim:       _L ? "#6b7280"              : "#4b5563",
+    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
   useNotificationReadOnView();
   const { id }   = useParams();
   const navigate = useNavigate();
@@ -150,18 +184,18 @@ export default function SyndicateCampaign() {
 
         {/* ── Nav row ── */}
         <div className="sc-in flex items-center justify-between" style={{ animationDelay: "0s" }}>
-          <button onClick={() => navigate("/syndicates")} className="flex items-center gap-2 text-sm font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}
+          <button onClick={() => navigate("/syndicates")} className="flex items-center gap-2 text-sm font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: T.muted }}
             onMouseEnter={e => e.currentTarget.style.color = "#fff"} onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}>
             <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "12px" }} /> Back to Syndicates
           </button>
-          <button onClick={handleShare} className="flex items-center gap-2 text-sm font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: "#9ca3af" }}
+          <button onClick={handleShare} className="flex items-center gap-2 text-sm font-bold transition-colors" style={{ fontFamily: "'Syne',sans-serif", color: T.muted }}
             onMouseEnter={e => e.currentTarget.style.color = "#3b82f6"} onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}>
             <FontAwesomeIcon icon={faShareNodes} style={{ fontSize: "13px" }} /> Share
           </button>
         </div>
 
         {/* ── Hero card ── */}
-        <div className="sc-in relative rounded-3xl overflow-hidden" style={{ animationDelay: ".06s", background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+        <div className="sc-in relative rounded-3xl overflow-hidden" style={{ animationDelay: ".06s", background: "linear-gradient(135deg,#0f2244 0%,#091830 60%,#040806 100%)", border: "1px solid rgba(59,130,246,0.35)", boxShadow: T.shadow }}>
           {/* Top glow strip */}
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: "linear-gradient(90deg,transparent,#3b82f6,transparent)" }} />
           {/* BG glow */}
@@ -186,7 +220,7 @@ export default function SyndicateCampaign() {
                     )}
                   </div>
                   <h1 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "clamp(1.3rem,2.5vw,1.8rem)" }}>{syndicate.title}</h1>
-                  <p className="text-sm mt-0.5" style={{ color: "#6b7280" }}>
+                  <p className="text-sm mt-0.5" style={{ color: T.dim }}>
                     by <span className="text-white font-semibold">{creator?.name}</span> · <span className="capitalize">{syndicate.skillCategory}</span>
                   </p>
                 </div>
@@ -195,7 +229,7 @@ export default function SyndicateCampaign() {
                 <span className="text-xs font-bold px-3 py-1 rounded-full" style={{
                   fontFamily: "'Syne',sans-serif",
                   background: isOpen ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.18)",
-                  border: isOpen ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(255,255,255,0.2)",
+                  border: isOpen ? "1px solid rgba(34,197,94,0.3)" : `1px solid ${T.border}`,
                   color: isOpen ? "#22c55e" : "#6b7280",
                 }}>
                   {isOpen ? "● Accepting Investors" : syndicate.status}
@@ -208,14 +242,14 @@ export default function SyndicateCampaign() {
             <div className="space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="font-black text-white text-2xl" style={{ fontFamily: "'Fraunces',serif" }}>${syndicate.amountRaised.toLocaleString()}</span>
-                <span className="text-sm" style={{ color: "#9ca3af" }}>of ${syndicate.fundingGoal.toLocaleString()} goal</span>
+                <span className="text-sm" style={{ color: T.muted }}>of ${syndicate.fundingGoal.toLocaleString()} goal</span>
               </div>
               <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.18)" }}>
                 <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fundingPct, 100)}%`, background: "linear-gradient(90deg,#2563eb,#3b82f6,#60a5fa)" }} />
               </div>
               <div className="flex justify-between text-xs" style={{ fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>
                 <span style={{ color: "#3b82f6" }}>{fundingPct}% funded</span>
-                <span style={{ color: "#9ca3af" }}>${remaining.toLocaleString()} remaining · {slotsLeft} slot{slotsLeft !== 1 ? "s" : ""} left</span>
+                <span style={{ color: T.muted }}>${remaining.toLocaleString()} remaining · {slotsLeft} slot{slotsLeft !== 1 ? "s" : ""} left</span>
               </div>
             </div>
 
@@ -234,7 +268,7 @@ export default function SyndicateCampaign() {
                   <button
                     onClick={() => setShowJoin(true)}
                     className="w-full font-bold text-sm py-3.5 rounded-xl transition-all hover:scale-[1.01]"
-                    style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff", boxShadow: "0 4px 20px rgba(59,130,246,0.35)" }}
+                    style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: T.text, boxShadow: "0 4px 20px rgba(59,130,246,0.35)" }}
                   >
                     Invest in This Campaign
                   </button>
@@ -242,12 +276,12 @@ export default function SyndicateCampaign() {
                   <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(59,130,246,0.07)", border: "1px solid rgba(59,130,246,0.35)" }}>
                     <div>
                       <p className="font-bold text-white text-sm mb-0.5" style={{ fontFamily: "'Syne',sans-serif" }}>Enter your investment amount</p>
-                      <p className="text-xs" style={{ color: "#9ca3af" }}>
-                        Minimum: <span style={{ color: "#9ca3af" }}>${syndicate.minInvestment.toLocaleString()}</span> · Available: <span style={{ color: "#9ca3af" }}>${remaining.toLocaleString()}</span>
+                      <p className="text-xs" style={{ color: T.muted }}>
+                        Minimum: <span style={{ color: T.muted }}>${syndicate.minInvestment.toLocaleString()}</span> · Available: <span style={{ color: T.muted }}>${remaining.toLocaleString()}</span>
                       </p>
                     </div>
                     <div className="relative">
-                      <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "12px", pointerEvents: "none" }} />
+                      <FontAwesomeIcon icon={faDollarSign} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: "12px", pointerEvents: "none" }} />
                       <input
                         type="number"
                         className="amt-input"
@@ -259,14 +293,14 @@ export default function SyndicateCampaign() {
                       />
                     </div>
                     {amtNum > 0 && (
-                      <div className="rounded-xl p-3.5 space-y-2" style={{ background: "#0a1209", border: "1px solid rgba(59,130,246,0.30)" }}>
+                      <div className="rounded-xl p-3.5 space-y-2" style={{ background: T.cardAlt, border: "1px solid rgba(59,130,246,0.30)" }}>
                         <div className="flex justify-between text-xs">
-                          <span style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>YOUR SHARE</span>
+                          <span style={{ color: T.muted, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>YOUR SHARE</span>
                           <span className="font-black text-white" style={{ fontFamily: "'Fraunces',serif" }}>{mySharePct}%</span>
                         </div>
                         {myMonthly && (
                           <div className="flex justify-between text-xs">
-                            <span style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>EST. MONTHLY RETURN</span>
+                            <span style={{ color: T.muted, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>EST. MONTHLY RETURN</span>
                             <span className="font-black" style={{ fontFamily: "'Fraunces',serif", color: "#22c55e" }}>${myMonthly}</span>
                           </div>
                         )}
@@ -277,14 +311,14 @@ export default function SyndicateCampaign() {
                         onClick={handleJoin}
                         disabled={joining}
                         className="flex-1 font-bold text-sm py-3 rounded-xl transition-all hover:scale-[1.01] disabled:opacity-60 flex items-center justify-center gap-2"
-                        style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "#fff" }}
+                        style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: T.text }}
                       >
                         {joining ? <><FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "13px" }} /> Processing...</> : "Confirm Investment"}
                       </button>
                       <button
                         onClick={() => { setShowJoin(false); setAmount(""); }}
                         className="flex-1 font-bold text-sm py-3 rounded-xl transition-all"
-                        style={{ fontFamily: "'Syne',sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.2)", color: "#6b7280" }}
+                        style={{ fontFamily: "'Syne',sans-serif", background: "rgba(255,255,255,0.18)", border: `1px solid ${T.border}`, color: T.dim }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "#fff"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; e.currentTarget.style.color = "#6b7280"; }}
                       >
@@ -304,53 +338,53 @@ export default function SyndicateCampaign() {
             )}
 
             {isCreator && (
-              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                <FontAwesomeIcon icon={faTriangleExclamation} style={{ fontSize: "14px", color: "#9ca3af", flexShrink: 0 }} />
-                <p className="text-sm" style={{ color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>This is your syndicate campaign</p>
+              <div className="flex items-center gap-3 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.18)", border: `1px solid ${T.border}` }}>
+                <FontAwesomeIcon icon={faTriangleExclamation} style={{ fontSize: "14px", color: T.muted, flexShrink: 0 }} />
+                <p className="text-sm" style={{ color: T.muted, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>This is your syndicate campaign</p>
               </div>
             )}
           </div>
         </div>
 
         {/* ── Story ── */}
-        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".12s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".12s", background: T.card, border: `1px solid ${T.border}` }}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#3b82f6,#2563eb)" }} />
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>The Story</h2>
           </div>
-          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#9ca3af", fontFamily: "'DM Sans',sans-serif" }}>{syndicate.story}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: T.muted, fontFamily: "'DM Sans',sans-serif" }}>{syndicate.story}</p>
         </div>
 
         {/* ── Business Plan ── */}
-        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".16s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="sc-in rounded-2xl p-6" style={{ animationDelay: ".16s", background: T.card, border: `1px solid ${T.border}` }}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#22c55e,#16a34a)" }} />
             <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>Business Plan</h2>
           </div>
-          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#9ca3af", fontFamily: "'DM Sans',sans-serif" }}>{syndicate.businessPlan}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: T.muted, fontFamily: "'DM Sans',sans-serif" }}>{syndicate.businessPlan}</p>
         </div>
 
         {/* ── Investors list ── */}
-        <div className="sc-in rounded-2xl overflow-hidden" style={{ animationDelay: ".2s", background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+        <div className="sc-in rounded-2xl overflow-hidden" style={{ animationDelay: ".2s", background: T.card, border: `1px solid ${T.border}` }}>
           <button
             className="flex items-center justify-between w-full p-6 transition-colors"
             onClick={() => setShowInvestors(v => !v)}
-            onMouseEnter={e => e.currentTarget.style.background = "#0a1209"}
+            onMouseEnter={e => e.currentTarget.style.background = T.cardAlt}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
           >
             <div className="flex items-center gap-2">
               <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom,#a855f7,#7c3aed)" }} />
               <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem" }}>
-                Investors <span style={{ color: "#9ca3af" }}>({syndicate.investors?.length || 0})</span>
+                Investors <span style={{ color: T.muted }}>({syndicate.investors?.length || 0})</span>
               </h2>
             </div>
-            <FontAwesomeIcon icon={showInvestors ? faChevronUp : faChevronDown} style={{ fontSize: "13px", color: "#9ca3af" }} />
+            <FontAwesomeIcon icon={showInvestors ? faChevronUp : faChevronDown} style={{ fontSize: "13px", color: T.muted }} />
           </button>
 
           {showInvestors && (
             <div className="px-6 pb-6 space-y-2">
               {!syndicate.investors?.length ? (
-                <p className="text-sm py-4 text-center" style={{ color: "#9ca3af" }}>No investors yet — be the first!</p>
+                <p className="text-sm py-4 text-center" style={{ color: T.muted }}>No investors yet — be the first!</p>
               ) : (
                 syndicate.investors.map((inv, i) => (
                   <InvestorRow key={inv.investorId?._id || i} inv={inv} index={i} fundingGoal={syndicate.fundingGoal} />
@@ -375,7 +409,7 @@ export default function SyndicateCampaign() {
             ].map(item => (
               <div key={item.n} className="flex items-start gap-3">
                 <span className="text-xs font-black flex-shrink-0 mt-0.5" style={{ fontFamily: "'Fraunces',serif", color: "#22c55e" }}>{item.n}</span>
-                <p className="text-sm" style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif" }}>{item.text}</p>
+                <p className="text-sm" style={{ color: T.dim, fontFamily: "'DM Sans',sans-serif" }}>{item.text}</p>
               </div>
             ))}
           </div>

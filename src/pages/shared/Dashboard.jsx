@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,7 +9,26 @@ import {
   faArrowRight, faCircleCheck, faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
+function useT() {
+  const _t = useThemeStore((s) => s.theme);
+  const L = _t === "light";
+  return {
+    card:       L ? "#ffffff"              : "#070d08",
+    cardAlt:    L ? "#f0fdf4"              : "#0a1209",
+    cardBorder: L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)",
+    input:      L ? "#edf7ef"              : "#0a1209",
+    border:     L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    text:       L ? "#0a1a0c"              : "#f1f5f9",
+    muted:      L ? "#4b5563"              : "#9ca3af",
+    dim:        L ? "#6b7280"              : "#4b5563",
+    heroGrad:   L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)",
+    heroBorder: L ? "rgba(34,197,94,0.2)"  : "rgba(34,197,94,0.25)",
+    shadow:     L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
+}
+
 function StatCard({ label, value, icon, colorClass, loading }) {
+  const T = useT();
   const colorMap = {
     green:  { text: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.30)",  card: "var(--card-green)" },
     blue:   { text: "#3b82f6", bg: "rgba(59,130,246,0.1)",  border: "rgba(59,130,246,0.30)", card: "var(--card-blue)" },
@@ -25,7 +45,7 @@ function StatCard({ label, value, icon, colorClass, loading }) {
     );
   }
   return (
-    <div className="group rounded-2xl p-4 transition-all duration-200 hover:-translate-y-1 cursor-default" style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+    <div className="group rounded-2xl p-4 transition-all duration-200 cursor-default" style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: "var(--text-dim)" }}>{label.toUpperCase()}</p>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: c.bg }}>
@@ -57,6 +77,7 @@ function QuickAction({ emoji, label, description, path }) {
 }
 
 function StatusItem({ label, value, last }) {
+  const T = useT();
   return (
     <div className="flex items-center justify-between py-3" style={{ borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.2)" }}>
       <span className="text-sm" style={{ color: "var(--text-muted)", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
@@ -161,7 +182,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Welcome Banner */}
-      <div className="dash-in d1 rounded-3xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f2e10 0%, #071a0b 60%, #040d06 100%)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+      <div className="dash-in d1 rounded-3xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, var(--card-green-start,#0f2e10) 0%, var(--card-green-mid,#071a0b) 60%, var(--bg,#040d06) 100%)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
         <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)", filter: "blur(20px)" }} />
         <div className="absolute inset-0 pointer-events-none rounded-3xl" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.04) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">

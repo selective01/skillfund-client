@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBars, faXmark, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
 import useThemeStore from "../../store/useThemeStore";
 import useNotificationStore from "../../store/notificationStore";
@@ -8,6 +8,7 @@ import useNotificationStore from "../../store/notificationStore";
 export default function Header({ title, onMenuClick, sidebarOpen }) {
   const user = useAuthStore((s) => s.user);
   const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
   const location = useLocation();
   const isMessages = location.pathname === "/messages";
@@ -53,6 +54,21 @@ export default function Header({ title, onMenuClick, sidebarOpen }) {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          title={isLight ? "Switch to dark mode" : "Switch to light mode"}
+          className="flex items-center justify-center w-9 h-9 rounded-xl transition-all"
+          style={{
+            background: isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)",
+            border: `1px solid ${t.border}`,
+            color: t.icon,
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = t.iconHover)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = t.icon)}
+        >
+          <FontAwesomeIcon icon={isLight ? faMoon : faSun} style={{ fontSize: "15px" }} />
+        </button>
         <Link
           to="/notifications"
           className="relative transition-colors"

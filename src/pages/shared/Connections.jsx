@@ -10,6 +10,7 @@ import {
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
+import useThemeStore from "../../store/useThemeStore";
 
 const TABS = [
   { key: "connections", label: "Connections",  faIcon: faUsers,                 color: "#22c55e" },
@@ -19,24 +20,55 @@ const TABS = [
 
 // ── DS tokens ──────────────────────────────────────────────────────────────────
 const DS = {
-  bg:     "#040806",
-  card:   "#070d08",
-  input:  "#0a1209",
-  border: "#2d5235",
+  bg:     "var(--bg)",
+  card:   "var(--bg-card)",
+  input:  "var(--bg-input)",
+  border: "var(--border)",
   text:   { primary: "#fff", secondary: "#9ca3af", muted: "#6b7280", dim: "#4a5568", ghost: "#2d4a31" },
   accent: "#22c55e",
 };
 
 const CARD_THEMES = [
-  { bg: "linear-gradient(135deg,#0f2e10,#091e09)", border: "rgba(34,197,94,0.30)",   accent: "#22c55e"  },
-  { bg: "linear-gradient(135deg,#0f2244,#091830)", border: "rgba(59,130,246,0.30)",  accent: "#3b82f6"  },
+  { bg: "var(--card-green)", border: "rgba(34,197,94,0.30)",   accent: "#22c55e"  },
+  { bg: "var(--card-blue)", border: "rgba(59,130,246,0.30)",  accent: "#3b82f6"  },
   { bg: "linear-gradient(135deg,#220f44,#180930)", border: "rgba(168,85,247,0.30)",  accent: "#a855f7"  },
   { bg: "linear-gradient(135deg,#0f3d38,#092820)", border: "rgba(20,184,166,0.30)",  accent: "#14b8a6"  },
   { bg: "linear-gradient(135deg,#3d0f22,#280918)", border: "rgba(244,63,94,0.15)",   accent: "#f43f5e"  },
   { bg: "linear-gradient(135deg,#3d2200,#2a1600)", border: "rgba(245,158,11,0.30)",  accent: "#f59e0b"  },
 ];
 
+function useT() {
+  const _t = useThemeStore((s) => s.theme);
+  const L = _t === "light";
+  return {
+    card:      L ? "#ffffff"              : "#070d08",
+    cardAlt:   L ? "#f0fdf4"              : "#0a1209",
+    border:    L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    text:      L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     L ? "#4b5563"              : "#9ca3af",
+    dim:       L ? "#6b7280"              : "#4b5563",
+    hover:     L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+    heroGrad:  L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)",
+    heroBorder:L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)",
+  };
+}
+
 export default function Connections() {
+  const _theme = useThemeStore((s) => s.theme);
+  const _L = _theme === "light";
+  const T = {
+    bg:        _L ? "#f4faf5"              : "#040806",
+    card:      _L ? "#ffffff"              : "#070d08",
+    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
+    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
+    text:      _L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     _L ? "#4b5563"              : "#9ca3af",
+    dim:       _L ? "#6b7280"              : "#4b5563",
+    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
   useNotificationReadOnView();
   const { user }   = useAuthStore();
   const navigate   = useNavigate();
@@ -148,14 +180,14 @@ export default function Connections() {
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         .cn-in { animation: fadeUp 0.35s ease forwards; opacity: 0; }
-        .cn-search { background: #0a1209; border: 1px solid #1a2e1d; color: #fff; border-radius: 14px; padding: 11px 12px 11px 2.4rem; width: 100%; font-family: 'DM Sans',sans-serif; font-size: 14px; transition: border-color 0.2s; }
+        .cn-search { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); border-radius: 14px; padding: 11px 12px 11px 2.4rem; width: 100%; font-family: 'DM Sans',sans-serif; font-size: 14px; transition: border-color 0.2s; }
         .cn-search::placeholder { color: #2d4a31; }
         .cn-search:focus { outline: none; border-color: rgba(34,197,94,0.4); box-shadow: 0 0 0 3px rgba(34,197,94,0.07); }
       `}</style>
 
       {/* ── Header ── */}
         <div className="cn-in" style={{ animationDelay: "0s" }}>
-          <div className="relative rounded-3xl overflow-hidden p-6" style={{ background: "linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+          <div className="relative rounded-3xl overflow-hidden p-6" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: T.shadow }}>
             <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter: "blur(20px)" }} />
             <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
             <div className="relative flex items-center justify-between flex-wrap gap-3">
@@ -167,7 +199,7 @@ export default function Connections() {
                 <h1 className="font-black text-white mb-1" style={{ fontFamily: "'Fraunces',serif", fontSize: "clamp(1.4rem,2.5vw,1.9rem)" }}>
                   My Connections
                 </h1>
-                <p style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif", fontSize: "14px" }}>
+                <p style={{ color: T.dim, fontFamily: "'DM Sans',sans-serif", fontSize: "14px" }}>
                   {connections.length} connection{connections.length !== 1 ? "s" : ""}
                   {pendingCount > 0 && (
                     <span style={{ color: "#f59e0b", fontWeight: 600, marginLeft: "8px" }}>
@@ -183,7 +215,7 @@ export default function Connections() {
         {/* ── Tabs + Search ── */}
         <div className="cn-in flex flex-col sm:flex-row sm:items-center gap-3" style={{ animationDelay: ".06s" }}>
           {/* Tabs */}
-          <div className="flex gap-1 p-1 rounded-2xl" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+          <div className="flex gap-1 p-1 rounded-2xl" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
             {TABS.map(tab => {
               const isActive = activeTab === tab.key;
               const count = tab.key === "received" ? received.length : tab.key === "sent" ? sent.length : connections.length;
@@ -256,6 +288,7 @@ export default function Connections() {
 }
 
 function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAccept, onReject, onRemove, onMessage, onViewProfile, currentUserRole }) {
+  const T = useT();
   const name     = person?.name || "User";
   const avatar   = person?.avatar || null;
   const isVerified = person?.isVerified || false;
@@ -304,16 +337,16 @@ function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAc
 
       {/* Details */}
       <div className="space-y-1.5">
-        {skill && <p className="text-xs flex items-center gap-1.5" style={{ color: "#6b7280" }}><span style={{ color: theme.accent }}>⚡</span>{skill}</p>}
-        {location && <p className="text-xs flex items-center gap-1.5" style={{ color: "#6b7280" }}><FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px", color: "#4a5568" }} />{location}</p>}
+        {skill && <p className="text-xs flex items-center gap-1.5" style={{ color: T.dim }}><span style={{ color: theme.accent }}>⚡</span>{skill}</p>}
+        {location && <p className="text-xs flex items-center gap-1.5" style={{ color: T.dim }}><FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px", color: "#4a5568" }} />{location}</p>}
         {role === "creator" && fundingGoal && (
-          <p className="text-xs flex items-center gap-1.5" style={{ color: "#6b7280" }}>
+          <p className="text-xs flex items-center gap-1.5" style={{ color: T.dim }}>
             <span style={{ color: "#22c55e" }}>💰</span> Goal: ${Number(fundingGoal).toLocaleString()}
             {profitShare && <span style={{ color: theme.accent, marginLeft: "4px" }}>· {profitShare}% share</span>}
           </p>
         )}
         {role === "investor" && investmentBudget && (
-          <p className="text-xs flex items-center gap-1.5" style={{ color: "#6b7280" }}><span style={{ color: "#3b82f6" }}>📊</span> Budget: ${Number(investmentBudget).toLocaleString()}</p>
+          <p className="text-xs flex items-center gap-1.5" style={{ color: T.dim }}><span style={{ color: "#3b82f6" }}>📊</span> Budget: ${Number(investmentBudget).toLocaleString()}</p>
         )}
       </div>
 
@@ -340,9 +373,9 @@ function ConnectionCard({ person, connectionId, type, theme, actionLoading, onAc
               <FontAwesomeIcon icon={faMessage} style={{ fontSize: "11px" }} /> Message
             </button>
             {currentUserRole === "investor" && (
-              <button onClick={onViewProfile} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid #1a2e1d", color: "#6b7280" }}
+              <button onClick={onViewProfile} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = `${theme.accent}33`; e.currentTarget.style.color = theme.accent; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#2d5235"; e.currentTarget.style.color = "#6b7280"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}
               >
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: "11px" }} />
               </button>
@@ -361,19 +394,19 @@ function ConnectionsSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-2xl p-5 animate-pulse space-y-4" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+        <div key={i} className="rounded-2xl p-5 animate-pulse space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl" style={{ background: "#2d5235" }} />
+            <div className="w-11 h-11 rounded-xl" style={{ background: "var(--border)" }} />
             <div className="flex-1 space-y-2">
-              <div className="h-3.5 rounded-full w-1/2" style={{ background: "#2d5235" }} />
-              <div className="h-3 rounded-full w-1/3" style={{ background: "#2d5235" }} />
+              <div className="h-3.5 rounded-full w-1/2" style={{ background: "var(--border)" }} />
+              <div className="h-3 rounded-full w-1/3" style={{ background: "var(--border)" }} />
             </div>
           </div>
-          <div className="h-3 rounded-full w-full" style={{ background: "#2d5235" }} />
-          <div className="h-3 rounded-full w-2/3" style={{ background: "#2d5235" }} />
+          <div className="h-3 rounded-full w-full" style={{ background: "var(--border)" }} />
+          <div className="h-3 rounded-full w-2/3" style={{ background: "var(--border)" }} />
           <div className="flex gap-2">
-            <div className="flex-1 h-9 rounded-xl" style={{ background: "#2d5235" }} />
-            <div className="w-9 h-9 rounded-xl" style={{ background: "#2d5235" }} />
+            <div className="flex-1 h-9 rounded-xl" style={{ background: "var(--border)" }} />
+            <div className="w-9 h-9 rounded-xl" style={{ background: "var(--border)" }} />
           </div>
         </div>
       ))}
@@ -382,11 +415,12 @@ function ConnectionsSkeleton() {
 }
 
 function EmptyState({ icon, iconColor = "#4a5568", title, message, action, navigate }) {
+  const T = useT();
   return (
-    <div className="rounded-2xl p-16 text-center" style={{ background: "#070d08", border: "1px solid #1a2e1d" }}>
+    <div className="rounded-2xl p-16 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
       <FontAwesomeIcon icon={icon} style={{ fontSize: "36px", color: iconColor, display: "block", margin: "0 auto 12px" }} />
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem" }}>{title}</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#6b7280", fontFamily: "'DM Sans',sans-serif" }}>{message}</p>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: T.dim, fontFamily: "'DM Sans',sans-serif" }}>{message}</p>
       {action && (
         <button onClick={() => navigate(action.path)} className="px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02]" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
           {action.label}

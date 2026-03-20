@@ -13,31 +13,36 @@ import {
 import toast from "react-hot-toast";
 import api from "../../utils/api";
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const C = {
-  bg:      "#040806",
-  card:    "#070d08",
-  input:   "#0a1209",
-  border:  "rgba(255,255,255,0.2)",
-  accent:  "#22c55e",
-  text:    "#f1f5f9",
-  muted:   "#9ca3af",
-  dim:     "#5a8a63",
-};
+function useC() {
+  const _t = useThemeStore((s) => s.theme);
+  const L = _t === "light";
+  return {
+    bg:     L ? "#f4faf5"              : "#040806",
+    card:   L ? "#ffffff"              : "#070d08",
+    input:  L ? "#f0fdf4"              : "#0a1209",
+    border: L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.2)",
+    accent: "#22c55e",
+    text:   L ? "#0a1a0c"              : "#f1f5f9",
+    muted:  L ? "#4b5563"              : "#9ca3af",
+    dim:    L ? "#6b7280"              : "#5a8a63",
+  };
+}
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
   @keyframes msIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .ms-in  { animation: msIn .3s ease forwards; opacity:0; }
-  .ms-inp { background:${C.input}; border:1px solid ${C.border}; color:${C.text}; border-radius:12px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .2s; resize:none; box-sizing:border-box; }
-  .ms-inp::placeholder { color:${C.dim}; }
+  .ms-inp { background:var(--sf-bg-input, #0a1209); border:1px solid var(--sf-border, rgba(255,255,255,0.08)); color:var(--sf-text-primary, #f1f5f9); border-radius:12px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .2s; resize:none; box-sizing:border-box; }
+  .ms-inp::placeholder { color:var(--sf-text-muted, #6b7280); }
   .ms-inp:focus { border-color:rgba(34,197,94,0.4); }
 `;
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS = {
-  locked:          { label:"Locked",          color:"#6b7280", bg:"rgba(107,114,128,0.1)", border:"rgba(107,114,128,0.2)", icon:faLock          },
+  locked:          { label:"Locked",          color: "#6b7280", bg:"rgba(107,114,128,0.1)", border:"rgba(107,114,128,0.2)", icon:faLock          },
   proof_submitted: { label:"Proof Submitted", color:"#f59e0b", bg:"rgba(245,158,11,0.1)",  border:"rgba(245,158,11,0.35)",  icon:faHourglassHalf },
   approved:        { label:"Approved",        color:"#22c55e", bg:"rgba(34,197,94,0.1)",   border:"rgba(34,197,94,0.35)",   icon:faCircleCheck   },
   auto_released:   { label:"Auto-Released",   color:"#3b82f6", bg:"rgba(59,130,246,0.1)",  border:"rgba(59,130,246,0.35)",  icon:faRotate        },
@@ -73,6 +78,7 @@ function Countdown({ autoReleaseAt }) {
 
 // ── EscrowPanel (investor only) ───────────────────────────────────────────────
 function EscrowPanel({ investment, milestones, summary, onRefresh }) {
+  const C = useC();
   const [showRefund, setShowRefund]     = useState(false);
   const [refundReason, setRefundReason] = useState("");
   const [refundLoading, setRefundLoading] = useState(false);
@@ -156,7 +162,7 @@ function EscrowPanel({ investment, milestones, summary, onRefresh }) {
       </div>
 
       {/* ── Fund release timeline ── */}
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"16px" }}>
+      <div style={{ background:C.card, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, borderRadius:"16px", padding:"16px" }}>
         <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"11px", color:C.muted, textTransform:"uppercase", letterSpacing:".08em", margin:"0 0 12px" }}>
           Fund Release Timeline
         </p>
@@ -189,7 +195,7 @@ function EscrowPanel({ investment, milestones, summary, onRefresh }) {
       </div>
 
       {/* ── Investor protections ── */}
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"14px 16px" }}>
+      <div style={{ background:C.card, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, borderRadius:"16px", padding:"14px 16px" }}>
         <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"11px", color:C.muted, textTransform:"uppercase", letterSpacing:".08em", margin:"0 0 10px" }}>
           Your Protections
         </p>
@@ -249,7 +255,7 @@ function EscrowPanel({ investment, milestones, summary, onRefresh }) {
                 </button>
                 <button
                   onClick={() => { setShowRefund(false); setRefundReason(""); }}
-                  style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}
+                  style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}
                 >
                   Cancel
                 </button>
@@ -264,6 +270,7 @@ function EscrowPanel({ investment, milestones, summary, onRefresh }) {
 
 // ── MilestoneCard ─────────────────────────────────────────────────────────────
 function MilestoneCard({ milestone, isCreator, onRefresh }) {
+  const C = useC();
   const [expanded, setExpanded]           = useState(false);
   const [proofNotes, setProofNotes]       = useState("");
   const [files, setFiles]                 = useState([]);
@@ -350,7 +357,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
 
       {/* Body */}
       {expanded && (
-        <div style={{ borderTop:`1px solid ${C.border}`, padding:"16px", display:"flex", flexDirection:"column", gap:"14px" }}>
+        <div style={{ borderTop:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, padding:"16px", display:"flex", flexDirection:"column", gap:"14px" }}>
           {milestone.description && (
             <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"13px", color:C.muted, margin:0, lineHeight:1.65 }}>{milestone.description}</p>
           )}
@@ -435,7 +442,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
                       {loading ? "Submitting…" : "Submit Dispute"}
                     </button>
                     <button onClick={() => setShowDispute(false)}
-                      style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}>
+                      style={{ padding:"10px 16px", borderRadius:"11px", cursor:"pointer", background:C.input, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, color:C.muted, fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px" }}>
                       Cancel
                     </button>
                   </div>
@@ -458,6 +465,7 @@ function MilestoneCard({ milestone, isCreator, onRefresh }) {
 
 // ── CreateMilestonesForm ──────────────────────────────────────────────────────
 function CreateMilestonesForm({ investment, onCreated }) {
+  const C = useC();
   const [rows, setRows]       = useState([{ title:"", description:"", amount:"" }]);
   const [loading, setLoading] = useState(false);
 
@@ -506,7 +514,7 @@ function CreateMilestonesForm({ investment, onCreated }) {
 
       {/* Rows */}
       {rows.map((row, i) => (
-        <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"14px", padding:"14px", display:"flex", flexDirection:"column", gap:"10px" }}>
+        <div key={i} style={{ background:C.card, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, borderRadius:"14px", padding:"14px", display:"flex", flexDirection:"column", gap:"10px" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"12px", color:C.muted, margin:0 }}>Milestone {i+1}</p>
             {rows.length > 1 && (
@@ -530,7 +538,7 @@ function CreateMilestonesForm({ investment, onCreated }) {
       </button>
 
       <button onClick={handleSubmit} disabled={loading || Math.abs(remaining) > 1}
-        style={{ width:"100%", padding:"12px 0", borderRadius:"12px", cursor: loading || Math.abs(remaining)>1 ? "not-allowed" : "pointer", background: Math.abs(remaining)>1 ? C.input : "linear-gradient(135deg,#22c55e,#16a34a)", border: Math.abs(remaining)>1 ? `1px solid ${C.border}` : "none", color: Math.abs(remaining)>1 ? C.muted : "#000", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"13px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:loading?0.7:1 }}>
+        style={{ width:"100%", padding:"12px 0", borderRadius:"12px", cursor: loading || Math.abs(remaining)>1 ? "not-allowed" : "pointer", background: Math.abs(remaining)>1 ? C.input : "linear-gradient(135deg,#22c55e,#16a34a)", border: Math.abs(remaining)>1 ? `1px solid var(--sf-border, rgba(255,255,255,0.08))` : "none", color: Math.abs(remaining)>1 ? C.muted : "#000", fontFamily:"'Syne',sans-serif", fontWeight:900, fontSize:"13px", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", opacity:loading?0.7:1 }}>
         <FontAwesomeIcon icon={loading ? faCircleNotch : faCircleCheck} spin={loading} style={{ fontSize:"12px" }} />
         {loading ? "Saving…" : "Save Milestones"}
       </button>
@@ -540,6 +548,21 @@ function CreateMilestonesForm({ investment, onCreated }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function Milestones() {
+  const C = useC();
+  const _theme = useThemeStore((s) => s.theme);
+  const _L = _theme === "light";
+  const T = {
+    bg:        _L ? "#f4faf5"              : "#040806",
+    card:      _L ? "#ffffff"              : "#070d08",
+    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
+    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
+    text:      _L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     _L ? "#4b5563"              : "#9ca3af",
+    dim:       _L ? "#6b7280"              : "#4b5563",
+    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
   const { investmentId } = useParams();
   const navigate         = useNavigate();
   const { user }         = useAuthStore();
@@ -613,7 +636,7 @@ export default function Milestones() {
               {fmt(investment.amount)} · {investment.profitSharePercentage}% share · {investment.duration} months
             </p>
           </div>
-          <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"11px", padding:"4px 12px", borderRadius:"999px", background: investment.status === "active" ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.18)", color: investment.status === "active" ? C.accent : C.muted, border: investment.status === "active" ? "1px solid rgba(34,197,94,0.35)" : `1px solid ${C.border}` }}>
+          <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"11px", padding:"4px 12px", borderRadius:"999px", background: investment.status === "active" ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.18)", color: investment.status === "active" ? C.accent : C.muted, border: investment.status === "active" ? "1px solid rgba(34,197,94,0.35)" : `1px solid var(--sf-border, rgba(255,255,255,0.08))` }}>
             {investment.status}
           </span>
         </div>
@@ -662,7 +685,7 @@ export default function Milestones() {
 
         {noMilestones && isCreator  && <CreateMilestonesForm investment={investment} onCreated={fetchData} />}
         {noMilestones && !isCreator && (
-          <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:"16px", padding:"40px 20px", textAlign:"center" }}>
+          <div style={{ background:C.card, border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, borderRadius:"16px", padding:"40px 20px", textAlign:"center" }}>
             <FontAwesomeIcon icon={faClock} style={{ fontSize:"28px", color:C.muted, marginBottom:"12px", display:"block" }} />
             <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"14px", color:C.muted, margin:"0 0 4px" }}>Awaiting milestone setup</p>
             <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"12px", color:C.dim, margin:0 }}>The creator hasn't set up their milestones yet.</p>
@@ -676,7 +699,7 @@ export default function Milestones() {
 
       {/* How it works */}
       {!noMilestones && (
-        <div style={{ background:"rgba(255,255,255,0.02)", border:`1px solid ${C.border}`, borderRadius:"16px", padding:"16px" }}>
+        <div style={{ background:"rgba(255,255,255,0.02)", border:`1px solid var(--sf-border, rgba(255,255,255,0.08))`, borderRadius:"16px", padding:"16px" }}>
           <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"12px", color:C.muted, margin:"0 0 10px" }}>How milestones work</p>
           {[
             "Creator completes a milestone task and submits photo / receipt / video proof.",

@@ -14,6 +14,7 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
 
@@ -23,11 +24,11 @@ const STATUS_CONFIG = {
   pending:   { label:"Pending",   color:"#f59e0b", bg:"rgba(245,158,11,0.08)",   border:"rgba(245,158,11,0.35)",   faIcon:faClock        },
   completed: { label:"Completed", color:"#60a5fa", bg:"rgba(59,130,246,0.08)",   border:"rgba(59,130,246,0.35)",   faIcon:faCircleCheck  },
   disputed:  { label:"Disputed",  color:"#f87171", bg:"rgba(239,68,68,0.08)",    border:"rgba(239,68,68,0.35)",    faIcon:faCircleExclamation },
-  cancelled: { label:"Cancelled", color:"#6b7280", bg:"rgba(255,255,255,0.18)",  border:"rgba(255,255,255,0.2)", faIcon:faCircleXmark  },
+  cancelled: { label:"Cancelled", color:"var(--text-muted)", bg:"rgba(255,255,255,0.18)",  border:"rgba(255,255,255,0.2)", faIcon:faCircleXmark  },
 };
 const PIE_COLORS = ["#22c55e","#3b82f6","#a855f7","#f59e0b","#ef4444","#06b6d4"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const CHART_STYLE = { contentStyle:{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)", borderRadius:"12px" }, labelStyle:{ color:"#fff", fontFamily:"'Syne',sans-serif", fontSize:"12px" } };
+const CHART_STYLE = { contentStyle:{ background:"var(--bg-card)", border:"1px solid var(--border)", borderRadius:"12px" }, labelStyle:{ color:"var(--text-primary)", fontFamily:"'Syne',sans-serif", fontSize:"12px" } };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 const fmt = val => { const n = parseFloat(val)||0; return n>=1000 ? `$${(n/1000).toFixed(1)}k` : `$${n.toFixed(0)}`; };
@@ -46,15 +47,33 @@ const DS_STYLES = `
 `;
 
 const CARD_THEMES = [
-  { bg:"linear-gradient(135deg,#0f2e10,#091e09)", border:"rgba(34,197,94,0.30)",  accent:"#22c55e" },
-  { bg:"linear-gradient(135deg,#0f2244,#091830)", border:"rgba(59,130,246,0.30)", accent:"#3b82f6" },
-  { bg:"linear-gradient(135deg,#220f44,#180930)", border:"rgba(168,85,247,0.30)", accent:"#a855f7" },
-  { bg:"linear-gradient(135deg,#3d2200,#2a1600)", border:"rgba(245,158,11,0.30)", accent:"#f59e0b" },
+  { bg:"var(--card-green)", border:"rgba(34,197,94,0.30)",  accent:"#22c55e" },
+  { bg:"var(--card-blue)",  border:"rgba(59,130,246,0.30)", accent:"#3b82f6" },
+  { bg:"var(--card-purple)",border:"rgba(168,85,247,0.30)", accent:"#a855f7" },
+  { bg:"var(--card-amber)", border:"rgba(245,158,11,0.30)", accent:"#f59e0b" },
 ];
 
+function useT() {
+  const _t = useThemeStore((s) => s.theme);
+  const L = _t === "light";
+  return {
+    card:      L ? "#ffffff"              : "#070d08",
+    cardAlt:   L ? "#f0fdf4"              : "#0a1209",
+    border:    L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    text:      L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     L ? "#4b5563"              : "#9ca3af",
+    dim:       L ? "#6b7280"              : "#4b5563",
+    hover:     L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+    heroGrad:  L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)",
+    heroBorder:L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)",
+  };
+}
+
 function PageHeader({ title, subtitle, accentLabel, accentIcon }) {
+  const T = useT();
   return (
-    <div className="ie-in relative rounded-3xl p-6 mb-6 overflow-hidden" style={{ background:"linear-gradient(135deg,#0f2e10,#071a0b,#040806)", border:"1px solid rgba(34,197,94,0.35)", boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
+    <div className="ie-in relative rounded-3xl p-6 mb-6 overflow-hidden" style={{ background:"linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg,#040806))", border:"1px solid rgba(34,197,94,0.35)", boxShadow: T.shadow }}>
       <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background:"radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter:"blur(20px)" }} />
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage:"linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize:"32px 32px" }} />
       <div className="relative">
@@ -63,7 +82,7 @@ function PageHeader({ title, subtitle, accentLabel, accentIcon }) {
           <span className="text-xs font-bold tracking-widest" style={{ fontFamily:"'Syne',sans-serif", color:"#22c55e" }}>{accentLabel}</span>
         </div>
         <h1 className="font-black text-white" style={{ fontFamily:"'Fraunces',serif", fontSize:"clamp(1.4rem,2.5vw,1.9rem)" }}>{title}</h1>
-        <p style={{ color:"#6b7280", fontFamily:"'DM Sans',sans-serif", fontSize:"14px", marginTop:"4px" }}>{subtitle}</p>
+        <p style={{ color:"var(--text-muted)", fontFamily:"'DM Sans',sans-serif", fontSize:"14px", marginTop:"4px" }}>{subtitle}</p>
       </div>
     </div>
   );
@@ -71,7 +90,7 @@ function PageHeader({ title, subtitle, accentLabel, accentIcon }) {
 
 function Section({ title, accentColor="#22c55e", children, action }) {
   return (
-    <div className="rounded-2xl p-6" style={{ background:"#070d08", border:`1px solid ${accentColor}18` }}>
+    <div className="rounded-2xl p-6" style={{ background:"var(--bg-card)", border:`1px solid ${accentColor}18` }}>
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <div className="w-1 h-5 rounded-full" style={{ background:`linear-gradient(to bottom,${accentColor},${accentColor}88)` }} />
@@ -88,7 +107,7 @@ function StatCard({ label, value, faIcon, iconColor, theme }) {
   return (
     <div className="rounded-2xl p-5" style={{ background:theme.bg, border:`1px solid ${theme.border}`, boxShadow:"0 4px 24px rgba(0,0,0,0.35)" }}>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-bold tracking-widest" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>{label.toUpperCase()}</p>
+        <p className="text-xs font-bold tracking-widest" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>{label.toUpperCase()}</p>
         <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:`${iconColor}18` }}>
           <FontAwesomeIcon icon={faIcon} style={{ fontSize:"14px", color:iconColor }} />
         </div>
@@ -113,7 +132,7 @@ function ViewToggle({ view, setView, isCreator }) {
     { key: "earnings", label: "Earnings", faIcon: faChartBar },
   ];
   return (
-    <div className="flex gap-1 p-1 rounded-2xl" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
+    <div className="flex gap-1 p-1 rounded-2xl" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
       {tabs.map(t => {
         const isActive = view === t.key;
         return (
@@ -131,7 +150,7 @@ function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {Array.from({length:4}).map((_,i) => (
-        <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
+        <div key={i} className="rounded-2xl p-5 animate-pulse" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
           <div className="h-3 rounded-full w-1/2 mb-5" style={{ background:"rgba(255,255,255,0.2)" }} />
           <div className="h-8 rounded-full w-1/3" style={{ background:"rgba(255,255,255,0.2)" }} />
         </div>
@@ -144,7 +163,7 @@ function ListSkeleton() {
   return (
     <div className="space-y-3">
       {Array.from({length:3}).map((_,i) => (
-        <div key={i} className="rounded-xl p-4 animate-pulse" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
+        <div key={i} className="rounded-xl p-4 animate-pulse" style={{ background:"var(--bg-input)", border:"1px solid var(--border)" }}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl" style={{ background:"rgba(255,255,255,0.2)" }} />
             <div className="flex-1 space-y-1.5">
@@ -163,7 +182,7 @@ function EmptyBox({ faIcon, iconColor="#9ca3af", title, message, btnLabel, onBtn
     <div className="text-center py-14">
       <FontAwesomeIcon icon={faIcon} style={{ fontSize:"34px", color:iconColor, display:"block", margin:"0 auto 12px" }} />
       <h4 className="font-black text-white mb-1.5" style={{ fontFamily:"'Fraunces',serif", fontSize:"1.05rem" }}>{title}</h4>
-      <p className="text-sm mb-5 max-w-xs mx-auto" style={{ color:"#6b7280", fontFamily:"'DM Sans',sans-serif" }}>{message}</p>
+      <p className="text-sm mb-5 max-w-xs mx-auto" style={{ color:"var(--text-muted)", fontFamily:"'DM Sans',sans-serif" }}>{message}</p>
       {btnLabel && <button onClick={onBtnClick} className="px-6 py-2.5 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#000" }}>{btnLabel}</button>}
     </div>
   );
@@ -173,6 +192,20 @@ function EmptyBox({ faIcon, iconColor="#9ca3af", title, message, btnLabel, onBtn
 // MAIN EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 export default function InvestmentsEarnings() {
+  const _theme = useThemeStore((s) => s.theme);
+  const _L = _theme === "light";
+  const T = {
+    bg:        _L ? "#f4faf5"              : "#040806",
+    card:      _L ? "#ffffff"              : "#070d08",
+    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
+    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
+    text:      _L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     _L ? "#4b5563"              : "#9ca3af",
+    dim:       _L ? "#6b7280"              : "#4b5563",
+    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
   useNotificationReadOnView();
   const { user } = useAuthStore();
   return user?.role === "investor" ? <InvestorView /> : <CreatorView />;
@@ -281,7 +314,7 @@ function InvestorView() {
             </Section>
           )}
           <Section title="All Earnings" accentColor="#22c55e"
-            action={<span className="text-xs font-bold" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>{allEarnings.length} records</span>}
+            action={<span className="text-xs font-bold" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>{allEarnings.length} records</span>}
           >
             {loading ? <ListSkeleton /> : allEarnings.length===0
               ? <EmptyBox faIcon={faDollarSign} title="No earnings yet" message="Earnings appear once your creators report monthly income." />
@@ -318,19 +351,19 @@ function InvestorView() {
                     <div className="space-y-1.5 mt-2">
                       {pieData.slice(0,4).map((d,i)=>(
                         <div key={i} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background:PIE_COLORS[i%PIE_COLORS.length] }} /><span className="truncate max-w-[100px]" style={{ color:"#9ca3af" }}>{d.name}</span></div>
+                          <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background:PIE_COLORS[i%PIE_COLORS.length] }} /><span className="truncate max-w-[100px]" style={{ color:"var(--text-muted)" }}>{d.name}</span></div>
                           <span className="font-black text-white" style={{ fontFamily:"'Fraunces',serif" }}>${d.value.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
                   </>
-                ) : <div className="h-40 flex items-center justify-center text-sm" style={{ color:"#9ca3af" }}>No active investments</div>}
+                ) : <div className="h-40 flex items-center justify-center text-sm" style={{ color:"var(--text-muted)" }}>No active investments</div>}
               </Section>
             </div>
           )}
           <Section title="My Investments" accentColor="#22c55e"
             action={
-              <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background:"var(--bg-input)", border:"1px solid var(--border)" }}>
                 {["all","active","pending","completed"].map(tab=>(
                   <button key={tab} onClick={()=>setActiveTab(tab)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:activeTab===tab?"rgba(34,197,94,0.12)":"transparent", border:activeTab===tab?"1px solid rgba(34,197,94,0.35)":"1px solid transparent", color:activeTab===tab?"#22c55e":"#9ca3af" }}>
                     {tab}
@@ -359,7 +392,7 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
   const creator=inv.creator||{}, name=creator.name||inv.creatorName||"Creator", avatar=creator.avatar||null;
 
   return (
-    <div className="rounded-xl overflow-hidden transition-all" style={{ background:"#0a1209", border:`1px solid ${sc.border}` }}>
+    <div className="rounded-xl overflow-hidden transition-all" style={{ background:"var(--bg-input)", border:`1px solid ${sc.border}` }}>
       <div className="flex items-center gap-3 p-4 cursor-pointer" onClick={onToggle}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:`${sc.color}15`, border:`1px solid ${sc.color}25`, color:sc.color }}>
           {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name.charAt(0).toUpperCase()}
@@ -369,27 +402,27 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
             <span className="font-bold text-white text-sm truncate" style={{ fontFamily:"'Syne',sans-serif" }}>{name}</span>
             {creator.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"11px", color:"#22c55e", flexShrink:0 }} />}
           </div>
-          <span className="text-xs capitalize" style={{ color:"#9ca3af", fontFamily:"'DM Sans',sans-serif" }}>{creator.profile?.skill||creator.skill||inv.skillCategory||"—"}</span>
+          <span className="text-xs capitalize" style={{ color:"var(--text-muted)", fontFamily:"'DM Sans',sans-serif" }}>{creator.profile?.skill||creator.skill||inv.skillCategory||"—"}</span>
         </div>
         <div className="text-right hidden sm:block">
           <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>${amount.toLocaleString()}</p>
-          <p className="text-xs" style={{ color:"#9ca3af" }}>{profitShare}% · {duration}mo</p>
+          <p className="text-xs" style={{ color:"var(--text-muted)" }}>{profitShare}% · {duration}mo</p>
         </div>
         <div className="text-right hidden md:block">
           <p className="font-bold text-sm" style={{ color:"#22c55e" }}>${((amount*profitShare)/100).toFixed(0)}/mo</p>
-          <p className="text-xs" style={{ color:"#9ca3af" }}>est. return</p>
+          <p className="text-xs" style={{ color:"var(--text-muted)" }}>est. return</p>
         </div>
         <StatusBadge status={inv.status} />
-        <button className="ml-1 flex-shrink-0" style={{ color:"#9ca3af" }}>
+        <button className="ml-1 flex-shrink-0" style={{ color:"var(--text-muted)" }}>
           <FontAwesomeIcon icon={expanded?faChevronUp:faChevronDown} style={{ fontSize:"13px" }} />
         </button>
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
+        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid var(--border)" }}>
           <div className="pt-3">
             <div className="flex justify-between mb-1.5 text-xs">
-              <span style={{ color:"#6b7280" }}>Returns received</span>
+              <span style={{ color:"var(--text-muted)" }}>Returns received</span>
               <span className="font-bold text-white">${totalReturns.toLocaleString()} / ${projectedTotal.toLocaleString()} ({progressPct}%)</span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.2)" }}>
@@ -398,20 +431,20 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[{label:"Invested",value:`$${amount.toLocaleString()}`},{label:"Profit Share",value:`${profitShare}%`},{label:"Duration",value:`${duration}mo`},{label:"Projected ROI",value:`$${projectedTotal.toLocaleString()}`}].map(d=>(
-              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
-                <p className="text-xs mb-1" style={{ color:"#9ca3af", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
+              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
+                <p className="text-xs mb-1" style={{ color:"var(--text-muted)", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
                 <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>{d.value}</p>
               </div>
             ))}
           </div>
           {inv.earnings?.length>0 && (
             <div>
-              <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>EARNINGS HISTORY</p>
+              <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>EARNINGS HISTORY</p>
               <div className="space-y-1.5 max-h-40 overflow-y-auto">
                 {inv.earnings.map((e,i)=>(
-                  <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
-                    <span style={{ color:"#6b7280" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
-                    <span style={{ color:"#6b7280" }}>Earned: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
+                  <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
+                    <span style={{ color:"var(--text-muted)" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
+                    <span style={{ color:"var(--text-muted)" }}>Earned: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
                     <span style={{ color:"#22c55e", fontWeight:700 }}>+${parseFloat(e.investorShare||0).toLocaleString()}</span>
                     <span style={{ color:e.isPaid?"#22c55e":"#f59e0b", fontWeight:700 }}>{e.isPaid?"✓ Paid":"Pending"}</span>
                   </div>
@@ -423,11 +456,11 @@ function InvestorRow({ inv, expanded, onToggle, navigate }) {
             <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.35)", color:"#22c55e" }}>
               <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"12px" }} /> Milestones
             </button>
-            <button onClick={()=>navigate(`/messages?userId=${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+            <button onClick={()=>navigate(`/messages?userId=${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid var(--border)", color:"var(--text-muted)" }}
               onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               Message Creator
             </button>
-            <button onClick={()=>navigate(`/creators/${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+            <button onClick={()=>navigate(`/creators/${creator._id||inv.creatorId}`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid var(--border)", color:"var(--text-muted)" }}
               onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize:"12px" }} /> View Profile
             </button>
@@ -447,20 +480,20 @@ function EarningsList({ earnings, type }) {
         const avatar = type==="investor" ? e.creatorAvatar : e.investorAvatar;
         const net    = type==="creator" ? (parseFloat(e.creatorIncome)||0)-(parseFloat(e.investorShare)||0)-(parseFloat(e.platformFee)||0) : null;
         return (
-          <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}
+          <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all" style={{ background:"var(--bg-input)", border:"1px solid var(--border)" }}
             onMouseEnter={ev=>ev.currentTarget.style.borderColor="rgba(34,197,94,0.35)"} onMouseLeave={ev=>ev.currentTarget.style.borderColor="rgba(255,255,255,0.2)"}>
             <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:type==="investor"?"rgba(34,197,94,0.12)":"rgba(59,130,246,0.12)", border:`1px solid ${type==="investor"?"rgba(34,197,94,0.35)":"rgba(59,130,246,0.35)"}`, color:type==="investor"?"#22c55e":"#3b82f6" }}>
               {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-white text-sm truncate" style={{ fontFamily:"'Syne',sans-serif" }}>{name}</p>
-              <p className="text-xs" style={{ color:"#9ca3af", fontFamily:"'DM Sans',sans-serif" }}>{MONTHS[(e.month||1)-1]} {e.year}</p>
+              <p className="text-xs" style={{ color:"var(--text-muted)", fontFamily:"'DM Sans',sans-serif" }}>{MONTHS[(e.month||1)-1]} {e.year}</p>
             </div>
-            {type==="creator" && <div className="text-right hidden md:block"><p className="text-xs" style={{ color:"#9ca3af" }}>Gross</p><p className="text-sm font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>${parseFloat(e.creatorIncome||0).toLocaleString()}</p></div>}
-            {type==="creator" && <div className="text-right hidden sm:block"><p className="text-xs" style={{ color:"#9ca3af" }}>Investor share</p><p className="text-sm font-bold" style={{ color:"#f87171" }}>-${parseFloat(e.investorShare||0).toLocaleString()}</p></div>}
-            {type==="investor" && <div className="text-right hidden sm:block"><p className="text-xs" style={{ color:"#9ca3af" }}>Earned</p><p className="text-sm font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>${parseFloat(e.creatorIncome||0).toLocaleString()}</p></div>}
+            {type==="creator" && <div className="text-right hidden md:block"><p className="text-xs" style={{ color:"var(--text-muted)" }}>Gross</p><p className="text-sm font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>${parseFloat(e.creatorIncome||0).toLocaleString()}</p></div>}
+            {type==="creator" && <div className="text-right hidden sm:block"><p className="text-xs" style={{ color:"var(--text-muted)" }}>Investor share</p><p className="text-sm font-bold" style={{ color:"#f87171" }}>-${parseFloat(e.investorShare||0).toLocaleString()}</p></div>}
+            {type==="investor" && <div className="text-right hidden sm:block"><p className="text-xs" style={{ color:"var(--text-muted)" }}>Earned</p><p className="text-sm font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>${parseFloat(e.creatorIncome||0).toLocaleString()}</p></div>}
             <div className="text-right">
-              <p className="text-xs" style={{ color:"#9ca3af" }}>{type==="investor"?"Your share":"Your net"}</p>
+              <p className="text-xs" style={{ color:"var(--text-muted)" }}>{type==="investor"?"Your share":"Your net"}</p>
               <p className="text-sm font-black" style={{ fontFamily:"'Fraunces',serif", color:"#22c55e" }}>
                 {type==="investor" ? `+$${parseFloat(e.investorShare||0).toLocaleString()}` : `$${Math.max(0,net).toFixed(0)}`}
               </p>
@@ -585,16 +618,16 @@ function CreatorView() {
                 </BarChart>
               </ResponsiveContainer>
               <div className="flex gap-4 mt-2 justify-end">
-                <div className="flex items-center gap-1.5 text-xs" style={{ color:"#9ca3af" }}><span className="w-3 h-3 rounded" style={{ background:"#22c55e" }} /> Your Income</div>
-                <div className="flex items-center gap-1.5 text-xs" style={{ color:"#9ca3af" }}><span className="w-3 h-3 rounded" style={{ background:"#3b82f6" }} /> Investor Share</div>
+                <div className="flex items-center gap-1.5 text-xs" style={{ color:"var(--text-muted)" }}><span className="w-3 h-3 rounded" style={{ background:"#22c55e" }} /> Your Income</div>
+                <div className="flex items-center gap-1.5 text-xs" style={{ color:"var(--text-muted)" }}><span className="w-3 h-3 rounded" style={{ background:"#3b82f6" }} /> Investor Share</div>
               </div>
             </Section>
           )}
           <Section title="Earnings History" accentColor="#22c55e"
             action={
               <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faFilter} style={{ fontSize:"11px", color:"#9ca3af" }} />
-                <div className="flex gap-1 p-1 rounded-xl" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
+                <FontAwesomeIcon icon={faFilter} style={{ fontSize:"11px", color:"var(--text-muted)" }} />
+                <div className="flex gap-1 p-1 rounded-xl" style={{ background:"var(--bg-input)", border:"1px solid var(--border)" }}>
                   {["all","paid","pending"].map(f=>(
                     <button key={f} onClick={()=>setEarningsFilter(f)} className="px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all" style={{ fontFamily:"'Syne',sans-serif", background:earningsFilter===f?"rgba(34,197,94,0.12)":"transparent", border:earningsFilter===f?"1px solid rgba(34,197,94,0.35)":"1px solid transparent", color:earningsFilter===f?"#22c55e":"#9ca3af" }}>
                       {f}
@@ -637,7 +670,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
   const alreadyReported=(inv.earnings||[]).some(e=>e.month===month&&e.year===year);
 
   return (
-    <div className="rounded-xl overflow-hidden transition-all" style={{ background:"#0a1209", border:`1px solid ${sc.border}` }}>
+    <div className="rounded-xl overflow-hidden transition-all" style={{ background:"var(--bg-input)", border:`1px solid ${sc.border}` }}>
       <div className="flex items-center gap-3 p-4 cursor-pointer" onClick={onToggle}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1px solid rgba(59,130,246,0.35)", color:"#3b82f6" }}>
           {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name.charAt(0).toUpperCase()}
@@ -647,15 +680,15 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
             <span className="font-bold text-white text-sm truncate" style={{ fontFamily:"'Syne',sans-serif" }}>{name}</span>
             {investor.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"11px", color:"#22c55e", flexShrink:0 }} />}
           </div>
-          <span className="text-xs" style={{ color:"#9ca3af" }}>Investor</span>
+          <span className="text-xs" style={{ color:"var(--text-muted)" }}>Investor</span>
         </div>
         <div className="text-right hidden sm:block">
           <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>${amount.toLocaleString()}</p>
-          <p className="text-xs" style={{ color:"#9ca3af" }}>funded</p>
+          <p className="text-xs" style={{ color:"var(--text-muted)" }}>funded</p>
         </div>
         <div className="text-right hidden md:block">
           <p className="font-bold text-sm" style={{ color:"#f87171" }}>-${monthlyPayout.toFixed(0)}/mo</p>
-          <p className="text-xs" style={{ color:"#9ca3af" }}>payout</p>
+          <p className="text-xs" style={{ color:"var(--text-muted)" }}>payout</p>
         </div>
         <StatusBadge status={inv.status} />
         {inv.status==="active" && !alreadyReported && (
@@ -663,17 +696,17 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
             <FontAwesomeIcon icon={faClock} style={{ fontSize:"9px" }} /> Report due
           </span>
         )}
-        <button className="ml-1 flex-shrink-0" style={{ color:"#9ca3af" }}>
+        <button className="ml-1 flex-shrink-0" style={{ color:"var(--text-muted)" }}>
           <FontAwesomeIcon icon={expanded?faChevronUp:faChevronDown} style={{ fontSize:"13px" }} />
         </button>
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
+        <div className="px-4 pb-4 space-y-4" style={{ borderTop:"1px solid var(--border)" }}>
           <div className="pt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[{label:"Amount Received",value:`$${amount.toLocaleString()}`},{label:"Profit Share",value:`${profitShare}%`},{label:"Duration",value:`${duration}mo`},{label:"Monthly Payout",value:`$${monthlyPayout.toFixed(0)}`}].map(d=>(
-              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
-                <p className="text-xs mb-1" style={{ color:"#9ca3af", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
+              <div key={d.label} className="rounded-xl p-3 text-center" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
+                <p className="text-xs mb-1" style={{ color:"var(--text-muted)", fontFamily:"'Syne',sans-serif", fontWeight:600 }}>{d.label}</p>
                 <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>{d.value}</p>
               </div>
             ))}
@@ -696,14 +729,14 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
 
           {inv.earnings?.length>0 && (
             <div>
-              <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>EARNINGS HISTORY</p>
+              <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>EARNINGS HISTORY</p>
               <div className="space-y-1.5 max-h-40 overflow-y-auto">
                 {[...inv.earnings].reverse().map((e,i)=>{
                   const net=(parseFloat(e.creatorIncome)||0)-(parseFloat(e.investorShare)||0)-(parseFloat(e.platformFee)||0);
                   return (
-                    <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
-                      <span style={{ color:"#6b7280" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
-                      <span style={{ color:"#6b7280" }}>Income: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
+                    <div key={i} className="flex items-center justify-between text-xs rounded-lg px-3 py-2" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
+                      <span style={{ color:"var(--text-muted)" }}>{MONTHS[(e.month||1)-1]} {e.year}</span>
+                      <span style={{ color:"var(--text-muted)" }}>Income: ${parseFloat(e.creatorIncome||0).toLocaleString()}</span>
                       <span style={{ color:"#f87171", fontWeight:700 }}>-${parseFloat(e.investorShare||0).toLocaleString()}</span>
                       <span style={{ color:"#22c55e", fontWeight:700 }}>Net: ${Math.max(0,net).toFixed(0)}</span>
                     </div>
@@ -714,8 +747,8 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
           )}
 
           {/* Investor profile */}
-          <div className="rounded-xl p-4" style={{ background:"#070d08", border:"1px solid rgba(255,255,255,0.2)" }}>
-            <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>INVESTOR PROFILE</p>
+          <div className="rounded-xl p-4" style={{ background:"var(--bg-card)", border:"1px solid var(--border)" }}>
+            <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>INVESTOR PROFILE</p>
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-base overflow-hidden flex-shrink-0" style={{ background:"rgba(59,130,246,0.12)", border:"1.5px solid rgba(59,130,246,0.35)", color:"#3b82f6" }}>
                 {avatar?<img src={avatar} alt={name} className="w-full h-full object-cover" />:name.charAt(0).toUpperCase()}
@@ -726,13 +759,13 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
                   {investor.isVerified && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"11px", color:"#22c55e" }} />}
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(59,130,246,0.1)", color:"#3b82f6" }}>Investor</span>
                 </div>
-                {investor.email && <p className="text-xs" style={{ color:"#9ca3af" }}>{investor.email}</p>}
-                {investor.profile?.location && <p className="text-xs" style={{ color:"#6b7280" }}>📍 {investor.profile.location}</p>}
-                {investor.profile?.investmentBudget && <p className="text-xs" style={{ color:"#6b7280" }}>💼 Budget: ${Number(investor.profile.investmentBudget).toLocaleString()}</p>}
+                {investor.email && <p className="text-xs" style={{ color:"var(--text-muted)" }}>{investor.email}</p>}
+                {investor.profile?.location && <p className="text-xs" style={{ color:"var(--text-muted)" }}>📍 {investor.profile.location}</p>}
+                {investor.profile?.investmentBudget && <p className="text-xs" style={{ color:"var(--text-muted)" }}>💼 Budget: ${Number(investor.profile.investmentBudget).toLocaleString()}</p>}
                 {investor.profile?.industriesOfInterest?.length>0 && (
                   <div className="flex flex-wrap gap-1 pt-1">
                     {investor.profile.industriesOfInterest.slice(0,4).map(ind=>(
-                      <span key={ind} className="text-xs capitalize px-2 py-0.5 rounded-full" style={{ background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}>{ind}</span>
+                      <span key={ind} className="text-xs capitalize px-2 py-0.5 rounded-full" style={{ background:"rgba(255,255,255,0.18)", border:"1px solid var(--border)", color:"var(--text-muted)" }}>{ind}</span>
                     ))}
                   </div>
                 )}
@@ -741,7 +774,7 @@ function CreatorRow({ inv, expanded, onToggle, reporting, onReport, onReported, 
           </div>
 
           <div className="flex gap-2 flex-wrap">
-            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}
+            <button onClick={()=>navigate(`/investments/${inv._id}/milestones`)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid var(--border)", color:"var(--text-muted)" }}
               onMouseEnter={e=>{e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#374151";}} onMouseLeave={e=>{e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
               <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize:"12px" }} /> Milestones
             </button>
@@ -776,34 +809,34 @@ function ReportForm({ inv, onReported, onClose }) {
   };
 
   return (
-    <div className="rounded-2xl p-5 space-y-4" style={{ background:"#070d08", border:"1px solid rgba(34,197,94,0.35)" }}>
+    <div className="rounded-2xl p-5 space-y-4" style={{ background:"var(--bg-card)", border:"1px solid rgba(34,197,94,0.35)" }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCalendarDays} style={{ fontSize:"13px", color:"#22c55e" }} />
           <p className="font-black text-white text-sm" style={{ fontFamily:"'Fraunces',serif" }}>Report — {MONTHS[month-1]} {year}</p>
         </div>
-        <button onClick={onClose} style={{ color:"#9ca3af" }}><FontAwesomeIcon icon={faChevronUp} style={{ fontSize:"13px" }} /></button>
+        <button onClick={onClose} style={{ color:"var(--text-muted)" }}><FontAwesomeIcon icon={faChevronUp} style={{ fontSize:"13px" }} /></button>
       </div>
       <div>
-        <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>TOTAL INCOME THIS MONTH ($) *</label>
+        <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>TOTAL INCOME THIS MONTH ($) *</label>
         <input type="number" value={income} onChange={e=>setIncome(e.target.value)} placeholder="e.g. 800" className="ie-inp" />
       </div>
       {income&&parseFloat(income)>0 && (
-        <div className="rounded-xl p-3.5 space-y-2" style={{ background:"#0a1209", border:"1px solid rgba(255,255,255,0.2)" }}>
-          {[{label:"Your total income",value:`$${parseFloat(income).toLocaleString()}`,color:"#9ca3af"},{label:`Investor share (${profitShare}%)`,value:`-$${investorShare}`,color:"#f87171"},{label:"Platform fee (1%)",value:`-$${platformFee}`,color:"#f87171"}].map(r=>(
+        <div className="rounded-xl p-3.5 space-y-2" style={{ background:"var(--bg-input)", border:"1px solid var(--border)" }}>
+          {[{label:"Your total income",value:`$${parseFloat(income).toLocaleString()}`,color:"var(--text-muted)"},{label:`Investor share (${profitShare}%)`,value:`-$${investorShare}`,color:"#f87171"},{label:"Platform fee (1%)",value:`-$${platformFee}`,color:"#f87171"}].map(r=>(
             <div key={r.label} className="flex justify-between text-sm">
-              <span style={{ color:"#9ca3af", fontFamily:"'DM Sans',sans-serif" }}>{r.label}</span>
+              <span style={{ color:"var(--text-muted)", fontFamily:"'DM Sans',sans-serif" }}>{r.label}</span>
               <span style={{ color:r.color, fontFamily:"'Syne',sans-serif", fontWeight:700 }}>{r.value}</span>
             </div>
           ))}
-          <div className="flex justify-between text-sm pt-2" style={{ borderTop:"1px solid rgba(255,255,255,0.2)" }}>
+          <div className="flex justify-between text-sm pt-2" style={{ borderTop:"1px solid var(--border)" }}>
             <span className="font-bold text-white" style={{ fontFamily:"'Syne',sans-serif" }}>Your net earnings</span>
             <span className="font-black" style={{ fontFamily:"'Fraunces',serif", color:"#22c55e", fontSize:"1.05rem" }}>${yourNet}</span>
           </div>
         </div>
       )}
       <div>
-        <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily:"'Syne',sans-serif", color:"#9ca3af" }}>NOTES (OPTIONAL)</label>
+        <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>NOTES (OPTIONAL)</label>
         <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Updates for your investor..." rows={2} className="ie-ta" />
       </div>
       <div className="flex gap-2">
@@ -811,7 +844,7 @@ function ReportForm({ inv, onReported, onClose }) {
           {submitting?<FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize:"12px" }} />:<FontAwesomeIcon icon={faFileLines} style={{ fontSize:"12px" }} />}
           {submitting?"Submitting...":"Submit Report"}
         </button>
-        <button onClick={onClose} className="px-4 py-3 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.2)", color:"#6b7280" }}>Cancel</button>
+        <button onClick={onClose} className="px-4 py-3 rounded-xl font-bold text-sm" style={{ fontFamily:"'Syne',sans-serif", background:"rgba(255,255,255,0.18)", border:"1px solid var(--border)", color:"var(--text-muted)" }}>Cancel</button>
       </div>
     </div>
   );
