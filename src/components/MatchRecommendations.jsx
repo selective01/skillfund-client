@@ -9,6 +9,7 @@ import {
   faArrowTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../store/authStore";
+import useThemeStore from "../store/useThemeStore";
 import api from "../utils/api";
 
 const SKILL_CATEGORIES = [
@@ -40,6 +41,31 @@ const CATEGORY_EMOJI = {
 export default function MatchRecommendations() {
   const { token } = useAuthStore();
   const navigate = useNavigate();
+  const theme = useThemeStore((s) => s.theme);
+  const L = theme === "light";
+  const T = {
+    section:     L ? "#ffffff" : "#070d08",
+    card:        L ? "#ffffff" : "#070d08",
+    cardHover:   L ? "rgba(34,197,94,0.08)" : "rgba(34,197,94,0.25)",
+    cardBorder:  L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.08)",
+    filter:      L ? "#f0faf2" : "#070d08",
+    filterBorder:L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.1)",
+    input:       L ? "#edf7ef" : "#0a1209",
+    inputBorder: L ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)",
+    text:        L ? "#0a1a0c" : "#ffffff",
+    sub:         L ? "#4b5563" : "#9ca3af",
+    muted:       L ? "#6b7280" : "#6b7280",
+    statBg:      L ? "rgba(0,0,0,0.04)" : "rgba(0,0,0,0.3)",
+    statBorder:  L ? "rgba(0,0,0,0.06)"  : "rgba(255,255,255,0.05)",
+    empty:       L ? "#f0faf2" : "#070d08",
+    filterBtn:   L ? "#f4faf5" : "#070d08",
+    filterBtnBorder: L ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)",
+    selectBg:    L ? "#edf7ef" : "#0a1209",
+    selectText:  L ? "#0a1a0c" : "#ffffff",
+    selectOptBg: L ? "#ffffff" : "#070d08",
+    clearBtn:    L ? "#f0faf2" : "#0a1209",
+    clearBorder: L ? "rgba(0,0,0,0.1)"  : "rgba(255,255,255,0.1)",
+  };
   const [matches,     setMatches]     = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [filterOpen,  setFilterOpen]  = useState(false);
@@ -82,13 +108,13 @@ export default function MatchRecommendations() {
   return (
     <section style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
-        .mr-field { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:9px 14px; font-size:13px; outline:none; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
-        .mr-field:focus { border-color:rgba(34,197,94,0.35); }
+        .mr-field { background:${T.input}; border:1px solid ${T.inputBorder}; color:${T.text}; border-radius:12px; padding:9px 14px; font-size:13px; outline:none; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .mr-field:focus { border-color:rgba(34,197,94,0.4); }
         .mr-field::placeholder { color:#5a8a63; }
-        .mr-select { background:#0a1209; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:12px; padding:9px 32px 9px 12px; font-size:13px; outline:none; appearance:none; font-family:'DM Sans',sans-serif; cursor:pointer; }
-        .mr-select option { background:#070d08; }
-        .mr-card { background:#070d08; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px; transition:border-color .15s, box-shadow .15s; }
-        .mr-card:hover { border-color:rgba(34,197,94,0.25); box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+        .mr-select { background:${T.selectBg}; border:1px solid ${T.inputBorder}; color:${T.selectText}; border-radius:12px; padding:9px 32px 9px 12px; font-size:13px; outline:none; appearance:none; font-family:'DM Sans',sans-serif; cursor:pointer; }
+        .mr-select option { background:${T.selectOptBg}; }
+        .mr-card { background:${T.card}; border:1px solid ${T.cardBorder}; border-radius:16px; padding:16px; transition:border-color .15s, box-shadow .15s; }
+        .mr-card:hover { border-color:rgba(34,197,94,0.3); box-shadow:0 8px 32px rgba(0,0,0,0.15); }
         .mr-pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; font-family:'Syne',sans-serif; }
         .mr-view-btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 0; border-radius:10px; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; font-family:'Syne',sans-serif; font-weight:900; font-size:12px; border:none; cursor:pointer; width:100%; transition:opacity .15s; margin-top:auto; }
         .mr-view-btn:hover { opacity:.85; }
@@ -101,8 +127,8 @@ export default function MatchRecommendations() {
             <FontAwesomeIcon icon={faWandMagicSparkles} style={{ fontSize: "13px", color: "#000" }} />
           </div>
           <div>
-            <p style={{ fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "15px", color: "#fff", margin: 0 }}>Recommended for You</p>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#9ca3af", margin: 0 }}>Matched by skill, budget &amp; profile quality</p>
+            <p style={{ fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: "15px", color: T.text, margin: 0 }}>Recommended for You</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: T.sub, margin: 0 }}>Matched by skill, budget &amp; profile quality</p>
           </div>
         </div>
         <button
@@ -111,9 +137,9 @@ export default function MatchRecommendations() {
             display: "flex", alignItems: "center", gap: "6px",
             padding: "8px 14px", borderRadius: "10px", cursor: "pointer",
             fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "12px",
-            background: filterOpen ? "rgba(34,197,94,0.1)" : "#070d08",
-            color: filterOpen ? "#22c55e" : "#9ca3af",
-            border: `1px solid ${filterOpen ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.1)"}`,
+            background: filterOpen ? "rgba(34,197,94,0.1)" : T.filterBtn,
+            color: filterOpen ? "#22c55e" : T.sub,
+            border: `1px solid ${filterOpen ? "rgba(34,197,94,0.3)" : T.filterBtnBorder}`,
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "11px" }} /> Filter
@@ -122,10 +148,10 @@ export default function MatchRecommendations() {
 
       {/* Filter panel */}
       {filterOpen && (
-        <div style={{ marginBottom: "16px", padding: "16px", borderRadius: "16px", background: "#070d08", border: "1px solid rgba(255,255,255,0.1)" }}>
+        <div style={{ marginBottom: "16px", padding: "16px", borderRadius: "16px", background: T.filter, border: `1px solid ${T.filterBorder}` }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "flex-end" }}>
             <div>
-              <label style={{ display: "block", fontSize: "10px", fontWeight: 700, fontFamily: "'Syne',sans-serif", textTransform: "uppercase", letterSpacing: ".05em", color: "#9ca3af", marginBottom: "5px" }}>Category</label>
+              <label style={{ display: "block", fontSize: "10px", fontWeight: 700, fontFamily: "'Syne',sans-serif", textTransform: "uppercase", letterSpacing: ".05em", color: T.sub, marginBottom: "5px" }}>Category</label>
               <div style={{ position: "relative" }}>
                 <select value={category} onChange={e => setCategory(e.target.value)} className="mr-select">
                   {SKILL_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -134,7 +160,7 @@ export default function MatchRecommendations() {
               </div>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "10px", fontWeight: 700, fontFamily: "'Syne',sans-serif", textTransform: "uppercase", letterSpacing: ".05em", color: "#9ca3af", marginBottom: "5px" }}>Max Budget (USD)</label>
+              <label style={{ display: "block", fontSize: "10px", fontWeight: 700, fontFamily: "'Syne',sans-serif", textTransform: "uppercase", letterSpacing: ".05em", color: T.sub, marginBottom: "5px" }}>Max Budget (USD)</label>
               <input
                 type="number" min="0" placeholder="e.g. 500"
                 value={maxBudget} onChange={e => setMaxBudget(e.target.value)}
@@ -150,7 +176,7 @@ export default function MatchRecommendations() {
               </button>
               <button
                 onClick={() => { setCategory(""); setMaxBudget(""); }}
-                style={{ padding: "9px 12px", borderRadius: "10px", background: "#0a1209", color: "#9ca3af", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "12px", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer" }}
+                style={{ padding: "9px 12px", borderRadius: "10px", background: T.clearBtn, color: T.sub, fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "12px", border: `1px solid ${T.clearBorder}`, cursor: "pointer" }}
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
@@ -169,9 +195,9 @@ export default function MatchRecommendations() {
 
       {/* Empty */}
       {!loading && matches.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px 20px", borderRadius: "16px", background: "#070d08", border: "1px dashed rgba(34,197,94,0.2)" }}>
+        <div style={{ textAlign: "center", padding: "40px 20px", borderRadius: "16px", background: T.empty, border: "1px dashed rgba(34,197,94,0.2)" }}>
           <FontAwesomeIcon icon={faWandMagicSparkles} style={{ fontSize: "28px", color: "#5a8a63", marginBottom: "10px" }} />
-          <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "13px", color: "#9ca3af", margin: "0 0 4px" }}>No matches found</p>
+          <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "13px", color: T.sub, margin: "0 0 4px" }}>No matches found</p>
           <p style={{ fontSize: "12px", color: "#5a8a63", margin: 0 }}>Try adjusting your filters or budget</p>
         </div>
       )}
@@ -203,7 +229,7 @@ export default function MatchRecommendations() {
 
                 {/* Name + skill */}
                 <div>
-                  <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: "14px", color: "#fff", margin: "0 0 2px" }}>{creator.name}</p>
+                  <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: "14px", color: T.text, margin: "0 0 2px" }}>{creator.name}</p>
                   <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "12px", color: "#22c55e", fontWeight: 600, margin: 0 }}>
                     {emoji} {categoryData?.label ?? creator.skill}
                   </p>
@@ -224,7 +250,7 @@ export default function MatchRecommendations() {
                         <FontAwesomeIcon icon={faArrowTrendUp} style={{ fontSize: "9px", color: "#22c55e" }} />
                         <span style={{ fontSize: "10px", color: "#9ca3af" }}>Goal</span>
                       </div>
-                      <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 900, fontSize: "13px", color: "#fff", margin: 0 }}>
+                      <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 900, fontSize: "13px", color: T.text, margin: 0 }}>
                         ${creator.fundingGoal.toLocaleString()}
                       </p>
                     </div>

@@ -15,7 +15,7 @@ export default function Layout({ children, title = "Dashboard", noPadding = fals
       {/* Mobile overlay — tap outside to close */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-30 lg:hidden"
           style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(2px)" }}
           onClick={() => setSidebarOpen(false)}
         />

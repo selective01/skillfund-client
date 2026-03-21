@@ -248,7 +248,7 @@ export default function ReferralProgramme() {
       )}
 
       {/* ── Stats row ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "10px", marginBottom: "16px" }}>
         <StatCard icon={faUsers}        label="Total Referrals"  value={totalReferrals}                  accent="#22c55e" />
         <StatCard icon={faChartLine}    label="Active"           value={activeReferrals}                 accent="#3b82f6" sub="subscribed or invested" />
         <StatCard icon={faArrowTrendDown} label="Rate Saved"     value={fmtPct(totalReduction)}          accent="#a855f7" sub="total reduction earned" />

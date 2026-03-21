@@ -53,7 +53,7 @@ export default function Header({ title, onMenuClick, sidebarOpen }) {
         </Link>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
@@ -88,11 +88,15 @@ export default function Header({ title, onMenuClick, sidebarOpen }) {
         </Link>
 
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden"
-          style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}
+          style={{
+            width: "36px", height: "36px", minWidth: "36px", flexShrink: 0,
+            borderRadius: "50%", display: "flex", alignItems: "center",
+            justifyContent: "center", fontWeight: 700, fontSize: "14px",
+            overflow: "hidden", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000",
+          }}
         >
           {user?.avatar ? (
-            <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+            <img src={user.avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
           ) : (
             user?.name?.charAt(0)?.toUpperCase()
           )}

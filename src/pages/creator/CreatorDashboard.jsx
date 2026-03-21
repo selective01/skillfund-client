@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useThemeStore from "../../store/useThemeStore";
 import {
   faChartLine, faCoins, faHandshake, faArrowTrendUp,
   faCircleNotch, faArrowRight, faCalendarCheck,
@@ -12,35 +13,27 @@ import {
   faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
-import useThemeStore from "../../store/useThemeStore";
-
-function useC() {
-  const theme = useThemeStore((s) => s.theme);
-  const L = theme === "light";
-  return {
-    bg:     L ? "#f4faf5"              : "#0b0f0c",
-    card:   L ? "#ffffff"              : "#111812",
-    border: L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.18)",
-    green:  "#22c55e",
-    dim:    "#16a34a",
-    text:   L ? "#0a1a0c"             : "#e2e8f0",
-    sub:    L ? "#4b5563"             : "#9ca3af",
-    muted:  L ? "#6b7280"             : "#4b5563",
-    cardAlt: L ? "#f0fdf4"              : "#0a1209",
-    hover:  L ? "rgba(0,0,0,0.04)"   : "rgba(255,255,255,0.04)",
-    font:   "'Inter', sans-serif",
-    display:"'Inter', sans-serif",
-    ui:     "'Inter', sans-serif",
-    radius: "16px",
-  };
-}
+// Base tokens (used by sub-components that don't have direct theme access)
+const C_DARK = {
+  bg: "#0b0f0c", card: "#111812", border: "rgba(34,197,94,0.18)",
+  green: "#22c55e", dim: "#16a34a", text: "#e2e8f0", sub: "#9ca3af", muted: "#4b5563",
+  font: "'Inter', sans-serif", display: "'Inter', sans-serif", ui: "'Inter', sans-serif",
+  radius: "16px",
+};
+const C_LIGHT = {
+  bg: "#f4faf5", card: "#ffffff", border: "rgba(34,197,94,0.18)",
+  green: "#16a34a", dim: "#15803d", text: "#0a1a0c", sub: "#4b5563", muted: "#6b7280",
+  font: "'Inter', sans-serif", display: "'Inter', sans-serif", ui: "'Inter', sans-serif",
+  radius: "16px",
+};
+// Default to dark for sub-components; main component overrides via useThemeStore
+let C = C_DARK;
 
 function fmt(n, decimals = 2) { return (n || 0).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }); }
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function StatCard({ icon, label, value, sub, color = "#22c55e", onClick }) {
-  const C = useC();
   return (
     <div onClick={onClick}
       style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: C.radius, padding: "22px", cursor: onClick ? "pointer" : "default", transition: "border-color .2s" }}
@@ -59,7 +52,6 @@ function StatCard({ icon, label, value, sub, color = "#22c55e", onClick }) {
 
 // Mini bar chart
 function BarChart({ data, color = "#22c55e" }) {
-  const C = useC();
   if (!data?.length) return null;
   const max = Math.max(...data.map(d => d.value), 1);
   return (
@@ -76,7 +68,6 @@ function BarChart({ data, color = "#22c55e" }) {
 
 // ─── Verification Status Strip ───────────────────────────────────────────────
 function VerificationStrip() {
-  const C = useC();
   const navigate = useNavigate();
   const [kycStatus,   setKycStatus]   = useState(null);
   const [voiceStatus, setVoiceStatus] = useState(null);
@@ -150,11 +141,11 @@ function VerificationStrip() {
             style={{
               display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px",
               borderRadius: "12px", cursor: "pointer", transition: "all .15s",
-              background: item.done ? `${item.color}10` : C.card,
-              border: `1px solid ${item.done ? `${item.color}30` : C.border}`,
+              background: item.done ? `${item.color}10` : "rgba(255,255,255,0.03)",
+              border: `1px solid ${item.done ? `${item.color}30` : "rgba(255,255,255,0.07)"}`,
             }}
             onMouseEnter={e => e.currentTarget.style.borderColor = `${item.color}40`}
-            onMouseLeave={e => e.currentTarget.style.borderColor = item.done ? `${item.color}30` : C.border}
+            onMouseLeave={e => e.currentTarget.style.borderColor = item.done ? `${item.color}30` : "rgba(255,255,255,0.07)"}
           >
             <FontAwesomeIcon icon={item.done ? faCircleCheck : faCircleExclamation} style={{ fontSize: "14px", color: item.done ? item.color : C.muted, flexShrink: 0 }} />
             <div style={{ minWidth: 0 }}>
@@ -170,7 +161,6 @@ function VerificationStrip() {
 
 // ─── Quick Actions ────────────────────────────────────────────────────────────
 function QuickActions({ navigate }) {
-  const C = useC();
   const actions = [
     { icon: faBullseye,    label: "View My Campaign",   sub: "See your public page",    color: "#22c55e", path: "/campaign/setup" },
     { icon: faArrowTrendUp, label: "Set Up Campaign",   sub: "Edit funding & milestones", color: "#3b82f6", path: "/campaign/setup" },
@@ -206,8 +196,10 @@ function QuickActions({ navigate }) {
 }
 
 export default function CreatorDashboard() {
-  const C = useC();
   const navigate = useNavigate();
+  const _theme = useThemeStore((s) => s.theme);
+  // Keep C in sync so all inline styles respond to theme toggle
+  C = _theme === "light" ? C_LIGHT : C_DARK;
   const [investments, setInvestments] = useState([]);
   const [allEarnings, setAllEarnings] = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -329,7 +321,7 @@ export default function CreatorDashboard() {
               <div key={inv._id}
                 onClick={() => navigate(`/investments/${inv._id}/milestones`)}
                 style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px 20px", borderBottom: idx < activeInvs.length - 1 ? `1px solid ${C.border}` : "none", cursor: "pointer" }}
-                onMouseEnter={e => e.currentTarget.style.background = C.hover}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 {/* Avatar */}
                 <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: `${C.green}15`, border: `1px solid ${C.green}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: C.ui, fontWeight: 700, fontSize: "14px", color: C.green, flexShrink: 0, overflow: "hidden" }}>
@@ -392,7 +384,7 @@ export default function CreatorDashboard() {
                     <tr key={inv._id}
                       onClick={() => navigate(`/investments/${inv._id}/milestones`)}
                       style={{ borderBottom: `1px solid ${C.border}`, cursor: "pointer", transition: "background .1s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = C.hover}
+                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "14px 20px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -449,7 +441,6 @@ export default function CreatorDashboard() {
 
 // ─── Growth Timeline ─────────────────────────────────────────────────────────
 function GrowthTimeline() {
-  const C = useC();
   const [entries, setEntries]   = useState([]);
   const [loading, setLoading]   = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -503,12 +494,12 @@ function GrowthTimeline() {
       {showForm && (
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(34,197,94,0.03)" }}>
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Milestone title (e.g. Machine delivered!)" maxLength={120}
-            style={{ width: "100%", background: C.card, border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "var(--bg-input)", border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: "var(--text-primary)", outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
           <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Tell your investors what you achieved..." rows={3}
-            style={{ width: "100%", background: C.card, border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "var(--bg-input)", border: `1px solid ${C.border}`, borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: "var(--text-primary)", outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button onClick={() => fileRef.current?.click()}
-              style={{ display: "flex", alignItems: "center", gap: "6px", background: C.cardAlt, border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
               <FontAwesomeIcon icon={faImage} style={{ fontSize: "11px" }} />
               {mediaFiles.length > 0 ? `${mediaFiles.length} file(s)` : "Attach photos"}
             </button>
@@ -567,7 +558,6 @@ function GrowthTimeline() {
 
 // ─── Campaign Update Feed ─────────────────────────────────────────────────────
 function CampaignUpdateFeed() {
-  const C = useC();
   const [updates, setUpdates]       = useState([]);
   const [campaignId, setCampaignId] = useState(null);
   const [loading, setLoading]       = useState(true);
@@ -629,12 +619,12 @@ function CampaignUpdateFeed() {
       {showForm && (
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(245,158,11,0.03)" }}>
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Update title" maxLength={120}
-            style={{ width: "100%", background: C.card, border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "var(--bg-input)", border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: "var(--text-primary)", outline: "none", marginBottom: "10px", boxSizing: "border-box" }} />
           <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Share your latest progress with investors..." rows={3}
-            style={{ width: "100%", background: C.card, border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: C.text, outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "var(--bg-input)", border: "1px solid rgba(245,158,11,0.28)", borderRadius: "10px", padding: "9px 12px", fontFamily: C.font, fontSize: "13px", color: "var(--text-primary)", outline: "none", resize: "vertical", marginBottom: "10px", boxSizing: "border-box" }} />
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button onClick={() => fileRef.current?.click()}
-              style={{ display: "flex", alignItems: "center", gap: "6px", background: C.cardAlt, border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, borderRadius: "9px", padding: "7px 12px", fontFamily: C.font, fontSize: "12px", color: C.sub, cursor: "pointer" }}>
               <FontAwesomeIcon icon={faImage} style={{ fontSize: "11px" }} />
               {mediaFiles.length > 0 ? `${mediaFiles.length} file(s)` : "Attach photos"}
             </button>

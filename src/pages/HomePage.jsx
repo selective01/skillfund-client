@@ -9,7 +9,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../store/authStore";
 import useThemeStore from "../store/useThemeStore";
-import { Helmet } from "react-helmet-async";
 
 // ─── Animated Counter ─────────────────────────────────────────────────────────
 function Counter({ end, prefix = "", suffix = "", duration = 2000, decimals = 0 }) {
@@ -276,8 +275,6 @@ function TestimonialCard({ quote, name, role, emoji, color = "card-green" }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN
 // ═══════════════════════════════════════════════════════════════════════════════
-const SF_URL = "https://skillfund-client.vercel.app";
-
 export default function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -317,20 +314,7 @@ export default function HomePage() {
   const pageText = isLight ? "#0a1a0c" : "#ffffff";
 
   return (
-    <>
-      <Helmet>
-        <title>SkillFund — Invest in African Creators</title>
-        <meta name="description" content="SkillFund connects skilled African creators with investors through profit-sharing agreements, milestone-based escrow, and transparent earnings reporting." />
-        <meta property="og:title" content="SkillFund — Invest in African Creators" />
-        <meta property="og:description" content="Fund creators. Earn from their success. Browse verified creator profiles and invest with milestone-protected escrow." />
-        <meta property="og:url" content={SF_URL} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="SkillFund — Invest in African Creators" />
-        <meta name="twitter:description" content="Fund creators. Earn from their success. Milestone-protected escrow, profit-share agreements, real-time earnings." />
-        <link rel="canonical" href={SF_URL} />
-      </Helmet>
-      <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif", background: pageBg, color: pageText }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif", background: pageBg, color: pageText }}>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
@@ -389,15 +373,6 @@ export default function HomePage() {
         [data-theme="light"] .card-rose   { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border-color: #fda4af; color: #5e1a2a; }
         [data-theme="light"] .card-green  { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: rgba(34,197,94,0.45); color: #0a2e0c; }
         [data-theme="light"] .card-blue:hover   { border-color: #3b82f6; box-shadow: 0 24px 48px rgba(59,130,246,0.15); }
-        /* Light mode button hover overrides inside cards */
-        [data-theme="light"] .card-blue   button:hover,
-        [data-theme="light"] .card-purple button:hover,
-        [data-theme="light"] .card-teal   button:hover,
-        [data-theme="light"] .card-rose   button:hover,
-        [data-theme="light"] .card-green  button:hover,
-        [data-theme="light"] .card-amber  button:hover { background: rgba(34,197,94,0.1) !important; color: #0a2e0c !important; }
-        /* Pricing plan non-highlight button hover */
-        [data-theme="light"] .hp-plan-btn:hover { background: rgba(34,197,94,0.08) !important; border-color: rgba(34,197,94,0.4) !important; color: #0a2e0c !important; }
         [data-theme="light"] .card-purple:hover { border-color: #a855f7; box-shadow: 0 24px 48px rgba(168,85,247,0.15); }
         [data-theme="light"] .card-amber:hover  { border-color: #f59e0b; box-shadow: 0 24px 48px rgba(245,158,11,0.15); }
         [data-theme="light"] .card-teal:hover   { border-color: #14b8a6; box-shadow: 0 24px 48px rgba(20,184,166,0.15); }
@@ -412,72 +387,6 @@ export default function HomePage() {
         [data-theme="light"] .card-rose   .text-white,
         [data-theme="light"] .card-green  .text-white { color: inherit !important; }
 
-        /* Light mode opacity text variants on cards */
-        [data-theme="light"] .card-blue   [class*="text-white"],
-        [data-theme="light"] .card-purple [class*="text-white"],
-        [data-theme="light"] .card-amber  [class*="text-white"],
-        [data-theme="light"] .card-teal   [class*="text-white"],
-        [data-theme="light"] .card-rose   [class*="text-white"],
-        [data-theme="light"] .card-green  [class*="text-white"] { color: inherit !important; opacity: 1 !important; }
-
-        /* text-white/80 → 80% of card text color */
-        [data-theme="light"] .card-blue   .text-white/80,
-        [data-theme="light"] .card-purple .text-white/80,
-        [data-theme="light"] .card-amber  .text-white/80,
-        [data-theme="light"] .card-teal   .text-white/80,
-        [data-theme="light"] .card-rose   .text-white/80,
-        [data-theme="light"] .card-green  .text-white/80 { color: inherit !important; opacity: 0.85 !important; }
-
-        [data-theme="light"] .card-blue   .text-white/70,
-        [data-theme="light"] .card-purple .text-white/70,
-        [data-theme="light"] .card-amber  .text-white/70,
-        [data-theme="light"] .card-teal   .text-white/70,
-        [data-theme="light"] .card-rose   .text-white/70,
-        [data-theme="light"] .card-green  .text-white/70 { color: inherit !important; opacity: 0.75 !important; }
-
-        [data-theme="light"] .card-blue   .text-white/50,
-        [data-theme="light"] .card-purple .text-white/50,
-        [data-theme="light"] .card-amber  .text-white/50,
-        [data-theme="light"] .card-teal   .text-white/50,
-        [data-theme="light"] .card-rose   .text-white/50,
-        [data-theme="light"] .card-green  .text-white/50 { color: inherit !important; opacity: 0.6 !important; }
-
-        [data-theme="light"] .card-blue   .text-white/40,
-        [data-theme="light"] .card-purple .text-white/40,
-        [data-theme="light"] .card-amber  .text-white/40,
-        [data-theme="light"] .card-teal   .text-white/40,
-        [data-theme="light"] .card-rose   .text-white/40,
-        [data-theme="light"] .card-green  .text-white/40 { color: inherit !important; opacity: 0.5 !important; }
-
-        [data-theme="light"] .card-blue   .text-white/20,
-        [data-theme="light"] .card-purple .text-white/20,
-        [data-theme="light"] .card-amber  .text-white/20,
-        [data-theme="light"] .card-teal   .text-white/20,
-        [data-theme="light"] .card-rose   .text-white/20,
-        [data-theme="light"] .card-green  .text-white/20 { color: inherit !important; opacity: 0.3 !important; }
-
-        [data-theme="light"] .card-blue   .text-white/10,
-        [data-theme="light"] .card-purple .text-white/10,
-        [data-theme="light"] .card-amber  .text-white/10,
-        [data-theme="light"] .card-teal   .text-white/10,
-        [data-theme="light"] .card-rose   .text-white/10,
-        [data-theme="light"] .card-green  .text-white/10 { color: inherit !important; opacity: 0.15 !important; }
-
-        /* bg-white/10 overlays on light cards — make them use dark tint */
-        [data-theme="light"] .card-blue   .bg-white/10,
-        [data-theme="light"] .card-purple .bg-white/10,
-        [data-theme="light"] .card-amber  .bg-white/10,
-        [data-theme="light"] .card-teal   .bg-white/10,
-        [data-theme="light"] .card-rose   .bg-white/10,
-        [data-theme="light"] .card-green  .bg-white/10 { background: rgba(0,0,0,0.06) !important; }
-
-        [data-theme="light"] .card-blue   .bg-white/15,
-        [data-theme="light"] .card-purple .bg-white/15,
-        [data-theme="light"] .card-amber  .bg-white/15,
-        [data-theme="light"] .card-teal   .bg-white/15,
-        [data-theme="light"] .card-rose   .bg-white/15,
-        [data-theme="light"] .card-green  .bg-white/15 { background: rgba(0,0,0,0.08) !important; }
-
         /* Global text-white override in light mode (non-card contexts) */
         [data-theme="light"] .text-white { color: #0a1a0c !important; }
         /* Tailwind arbitrary-value class overrides handled in theme.css */
@@ -485,7 +394,7 @@ export default function HomePage() {
         /* Navbar light */
         [data-theme="light"] .hp-nav { background: rgba(255,255,255,0.95) !important; border-bottom-color: rgba(34,197,94,0.2) !important; }
         [data-theme="light"] .hp-nav a { color: #374151 !important; }
-        [data-theme="light"] .hp-nav a:hover { color: #0a1a0c !important; background: rgba(34,197,94,0.08) !important; }
+        [data-theme="light"] .hp-nav a:hover { color: #0a1a0c !important; background: rgba(34,197,94,0.06) !important; }
 
         /* Hero section — keep dark (it has a video/canvas background) */
         [data-theme="light"] .hp-hero { background: linear-gradient(135deg, #f0fdf4, #dcfce7, #f0fdf4) !important; }
@@ -631,7 +540,7 @@ export default function HomePage() {
             <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#22c55e", color: "#000" }}>
               Start Investing
             </button>
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: isLight ? "rgba(34,197,94,0.12)" : "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.5)", color: isLight ? "#0a2e0c" : "#fff", backdropFilter: "blur(8px)" }}>
+            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.35)", color: "#fff", backdropFilter: "blur(8px)" }}>
               Explore Campaigns
             </button>
           </div>
@@ -789,7 +698,7 @@ export default function HomePage() {
           {/* Dashboard mockup */}
           <div className="bg-[#070d08] border border-[#2d5235] rounded-3xl p-6 relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-56 h-56 bg-[#22c55e]/6 rounded-full blur-3xl pointer-events-none"/>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-start justify-between mb-6 gap-3 flex-wrap">
               <div>
                 <p className="text-[#4a5568] text-xs mb-1" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>PORTFOLIO VALUE</p>
                 <p className="font-black text-4xl" style={{ fontFamily:"'Fraunces',serif" }}>
@@ -797,7 +706,7 @@ export default function HomePage() {
                   <span className="text-[#22c55e] text-base ml-2 align-middle">+18%</span>
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right" style={{ flexShrink: 0 }}>
                 <p className="text-[#22c55e] font-black text-xl" style={{ fontFamily:"'Fraunces',serif" }}>+$3,420</p>
                 <p className="text-[#4a5568] text-xs" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600 }}>TOTAL EARNED</p>
               </div>
@@ -893,7 +802,7 @@ export default function HomePage() {
             ].map((story, i) => (
               <div key={i} className={`border rounded-3xl overflow-hidden transition-all card-hover flex flex-col ${story.color} ${story.highlight ? "scale-105 shadow-2xl" : ""}`}>
                 {/* Top colored header */}
-                <div className="p-7 pb-5" style={{ borderBottom: isLight ? "1px solid rgba(34,197,94,0.15)" : isLight ? "1px solid rgba(34,197,94,0.15)" : "1px solid rgba(255,255,255,0.18)" }}>
+                <div className="p-7 pb-5" style={{ borderBottom:"1px solid rgba(255,255,255,0.18)" }}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">{story.emoji}</div>
                     <div>
@@ -1153,7 +1062,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"hp-plan-btn border border-[#2d5235] text-white hover:border-[#22c55e]/60 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"border border-[#2d5235] text-white hover:border-[#22c55e]/60 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                   Get started
                 </button>
               </div>
@@ -1214,12 +1123,12 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-3">
               {[
-                { label:"Twitter/X", icon:"𝕏", bg: isLight ? "#dbeafe" : "#0d1a2e", accent:"#3b82f6" },
-                { label:"LinkedIn",  icon:"in", bg: isLight ? "#dbeafe" : "#0d1a2e", accent:"#3b82f6" },
-                { label:"Instagram", icon:"ig", bg: isLight ? "#ffe4e6" : "#2e0d1a", accent:"#f43f5e" },
-                { label:"YouTube",   icon:"▶",  bg: isLight ? "#fee2e2" : "#2e0d0d", accent:"#ef4444" },
+                { label:"Twitter/X", icon:"𝕏", bg:"#0d1a2e", accent:"#3b82f6" },
+                { label:"LinkedIn",  icon:"in", bg:"#0d1a2e", accent:"#3b82f6" },
+                { label:"Instagram", icon:"ig", bg:"#2e0d1a", accent:"#f43f5e" },
+                { label:"YouTube",   icon:"▶",  bg:"#2e0d0d", accent:"#ef4444" },
               ].map(s => (
-                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", background:s.bg, color: s.accent }}>
+                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", background:s.bg }}>
                   {s.icon}
                 </a>
               ))}
@@ -1241,7 +1150,7 @@ export default function HomePage() {
                   <p className="font-black text-sm mb-5" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", color:col.accent }}>{col.heading}</p>
                   <div className="space-y-3">
                     {col.links.map(l => (
-                      <a key={l.label} href={l.href} className="block text-[#6b7280] text-sm hover:text-[#0a1a0c] transition-colors">{l.label}</a>
+                      <a key={l.label} href={l.href} className="block text-[#6b7280] text-sm hover:text-white transition-colors">{l.label}</a>
                     ))}
                   </div>
                 </div>
@@ -1254,15 +1163,15 @@ export default function HomePage() {
         <div className="py-14" style={{ background: isLight ? "linear-gradient(135deg,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#071a0b,#040806)" }}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
-              <p className="font-black text-xl mb-2" style={{ fontFamily:"'Fraunces',serif", color: isLight ? "#0a1a0c" : "#ffffff" }}>Stay in the loop</p>
+              <p className="text-white font-black text-xl mb-2" style={{ fontFamily:"'Fraunces',serif" }}>Stay in the loop</p>
               <p className="text-[#6b7280] text-sm">Get updates on new creators, investment opportunities, and platform features.</p>
             </div>
             <div className="flex gap-2 w-full md:w-auto md:min-w-96">
               <input
                 type="email"
                 placeholder="your@email.com"
-                className="flex-1 rounded-xl px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[#22c55e]/40 transition-all"
-                style={{ background: isLight ? "#f0fdf4" : "#0a1a0b", color: isLight ? "#0a1a0c" : "#ffffff", border: isLight ? "1px solid rgba(34,197,94,0.2)" : "none", fontFamily:"'DM Sans',sans-serif" }}
+                className="flex-1 bg-[#0a1a0b] rounded-xl px-4 py-3 text-sm text-white placeholder-[#2d4a31] outline-none focus:ring-1 focus:ring-[#22c55e]/40 transition-all"
+                style={{ fontFamily:"'DM Sans',sans-serif" }}
               />
               <button className="bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold text-sm px-6 py-3 rounded-xl transition-all flex-shrink-0" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 Subscribe
@@ -1284,6 +1193,5 @@ export default function HomePage() {
 
       </footer>
     </div>
-    </>
   );
 }
