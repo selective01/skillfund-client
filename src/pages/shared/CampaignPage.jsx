@@ -9,10 +9,11 @@ import {
   BarChart2, Lock, Unlock, MessageSquare, Camera,
 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
+import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
 import { ScoreCard } from "../../components/layout/ScoreBadge";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
-import useThemeStore from "../../store/useThemeStore";
+import { Helmet } from "react-helmet-async";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CATEGORY_EMOJI = {
@@ -55,6 +56,7 @@ function StatCard({ icon, label, value, accent = "#22c55e", sub }) {
 }
 
 function MilestoneLine({ milestone, index, isLast }) {
+  const _t = useThemeStore((s) => s.theme); const isLight = _t === "light";
   const [open, setOpen] = useState(false);
   const cfg = MILESTONE_STATUS_CONFIG[milestone.status] || MILESTONE_STATUS_CONFIG.locked;
   const StatusIcon = cfg.icon;
@@ -68,14 +70,14 @@ function MilestoneLine({ milestone, index, isLast }) {
           className="sf-ml-dot"
           style={{ background: cfg.color, boxShadow: `0 0 10px ${cfg.color}60` }}
         />
-        {!isLast && <div className="sf-ml-line" style={{ background: milestone.status === "approved" || milestone.status === "completed" ? cfg.color + "50" : "rgba(255,255,255,0.06)" }} />}
+        {!isLast && <div className="sf-ml-line" style={{ background: milestone.status === "approved" || milestone.status === "completed" ? cfg.color + "50" : isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)" }} />}
       </div>
 
       {/* Content */}
       <div
         className="sf-ml-content"
         onClick={() => setOpen(!open)}
-        style={{ borderColor: open ? cfg.border : "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: open ? cfg.border : isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)" }}
       >
         <div className="sf-ml-header">
           <div className="sf-ml-left">
@@ -195,19 +197,7 @@ function CampaignSkeleton() {
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function CampaignPage() {
   const _theme = useThemeStore((s) => s.theme);
-  const _L = _theme === "light";
-  const T = {
-    bg:        _L ? "#f4faf5"              : "#040806",
-    card:      _L ? "#ffffff"              : "#070d08",
-    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
-    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
-    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
-    text:      _L ? "#0a1a0c"              : "#f1f5f9",
-    muted:     _L ? "#4b5563"              : "#9ca3af",
-    dim:       _L ? "#6b7280"              : "#4b5563",
-    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
-    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
-  };
+  const isLight = _theme === "light";
   useNotificationReadOnView();
   const { id } = useParams(); // creator's userId
   const navigate = useNavigate();
@@ -310,10 +300,10 @@ export default function CampaignPage() {
 
   if (!campaign) {
     return (
-      <div className="rounded-3xl p-16 text-center" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+      <div className="rounded-3xl p-16 text-center" style={{ background: isLight ? "#ffffff" : "#070d08", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.08)"}` }}>
         <Shield size={36} className="mx-auto mb-4" style={{ color: "#2d4a31" }} />
-        <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Inter', sans-serif", fontSize: "1.4rem" }}>Campaign not found</h3>
-        <p className="text-sm mb-6" style={{ color: T.dim }}>This campaign doesn't exist or has been removed.</p>
+        <h3 className="font-black mb-2" style={{ fontFamily: "'Inter', sans-serif", fontSize: "1.4rem", color: "var(--sf-text-primary,#f1f5f9)" }}>Campaign not found</h3>
+        <p className="text-sm mb-6" style={{ color: "#6b7280" }}>This campaign doesn't exist or has been removed.</p>
         <button onClick={() => navigate(-1)} className="sf-btn-green" style={{ display: "inline-flex", width: "auto", padding: "10px 24px" }}>
           <ChevronLeft size={14} /> Go Back
         </button>
@@ -333,15 +323,36 @@ export default function CampaignPage() {
 
   const tabs = ["story", "milestones", "portfolio", "updates"];
 
+  const pageTitle = campaign?.name
+    ? `${campaign.name} — ${profile?.skillCategory || "Creator"} | SkillFund`
+    : "SkillFund — Creator Campaign";
+  const pageDesc = campaign?.name
+    ? `Invest in ${campaign.name}, a ${profile?.skillCategory || "creator"} on SkillFund. ${(profile?.bio || "").slice(0, 120)}...`
+    : "Discover and invest in African creators on SkillFund.";
+
   return (
-    <div className="space-y-0">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:image" content={campaign?.avatar || ""} />
+        <meta property="og:url" content={`https://skillfund-client.vercel.app/campaign/${id}`} />
+        <meta property="og:type" content="profile" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:image" content={campaign?.avatar || ""} />
+        <link rel="canonical" href={`https://skillfund-client.vercel.app/campaign/${id}`} />
+      </Helmet>
+      <div className="space-y-0">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         /* ── Base cards ── */
-        .sf-card { background:#070d08; border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:22px; }
+        .sf-card { background:var(--sf-bg-card,#070d08); border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:22px; }
         .sf-card-green { background:rgba(34,197,94,0.03); border:1px solid rgba(34,197,94,0.18); border-radius:20px; padding:22px; }
-        .sf-skeleton { background:linear-gradient(90deg,#070d08 25%,#0a1209 50%,#070d08 75%); background-size:200% 100%; animation:shimmer 1.8s infinite; border:1px solid rgba(255,255,255,0.05); border-radius:20px; }
+        .sf-skeleton { background:linear-gradient(90deg,var(--sf-bg-card,#070d08) 25%,var(--sf-bg-input,#0a1209) 50%,var(--sf-bg-card,#070d08) 75%); background-size:200% 100%; animation:shimmer 1.8s infinite; border:1px solid var(--sf-border,rgba(255,255,255,0.05)); border-radius:20px; }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
         /* ── Cover ── */
@@ -355,7 +366,7 @@ export default function CampaignPage() {
 
         /* ── Progress bar ── */
         .sf-progress-wrap { margin:0; }
-        .sf-progress-track { height:8px; background:rgba(255,255,255,0.05); border-radius:100px; overflow:hidden; border:1px solid rgba(255,255,255,0.07); }
+        .sf-progress-track { height:8px; background:var(--sf-bg-input,rgba(255,255,255,0.05)); border-radius:100px; overflow:hidden; border:1px solid var(--sf-border,rgba(255,255,255,0.07)); }
         .sf-progress-fill { height:100%; border-radius:100px; transition:width 1s ease; }
 
         /* ── Stats grid ── */
@@ -367,33 +378,33 @@ export default function CampaignPage() {
 
         /* ── ROI box ── */
         .sf-roi-box { background:linear-gradient(135deg,#071a0b,#040806); border:1px solid rgba(34,197,94,0.2); border-radius:16px; padding:16px; }
-        .sf-roi-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .sf-roi-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--sf-border,rgba(255,255,255,0.05)); }
         .sf-roi-row:last-child { border-bottom:none; }
         .sf-roi-label { font-family:'Inter', sans-serif; font-size:12px; color:#6b7280; }
-        .sf-roi-val { font-family:'Inter', sans-serif; font-size:13px; font-weight:900; color:white; }
+        .sf-roi-val { font-family:'Inter', sans-serif; font-size:13px; font-weight:900; color:var(--sf-text-primary,#f1f5f9); }
 
         /* ── Tabs ── */
-        .sf-tabs { display:flex; gap:6px; padding-bottom:1px; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:20px; overflow-x:auto; }
+        .sf-tabs { display:flex; gap:6px; padding-bottom:1px; border-bottom:1px solid var(--sf-border,rgba(255,255,255,0.07)); margin-bottom:20px; overflow-x:auto; }
         .sf-tab { padding:8px 18px; border-radius:10px 10px 0 0; font-family:'Inter', sans-serif; font-size:12px; font-weight:700; letter-spacing:.04em; cursor:pointer; transition:all .15s; border:1px solid transparent; white-space:nowrap; color:#4a5568; background:transparent; }
         .sf-tab:hover { color:#9ca3af; }
-        .sf-tab.on { background:#070d08; border-color:rgba(255,255,255,0.07); border-bottom-color:#040806; color:#22c55e; margin-bottom:-1px; }
+        .sf-tab.on { background:var(--sf-bg-card,#070d08); border-color:var(--sf-border,rgba(255,255,255,0.07)); border-bottom-color:var(--sf-bg,#040806); color:#22c55e; margin-bottom:-1px; }
 
         /* ── Milestones ── */
         .sf-milestone-row { display:flex; gap:14px; }
         .sf-ml-connector { display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:14px; }
         .sf-ml-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
         .sf-ml-line { width:1px; flex:1; min-height:20px; margin-top:4px; }
-        .sf-ml-content { flex:1; background:#070d08; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px 16px; cursor:pointer; transition:all .15s; margin-bottom:10px; }
-        .sf-ml-content:hover { border-color:rgba(255,255,255,0.12); }
+        .sf-ml-content { flex:1; background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); border-radius:16px; padding:14px 16px; cursor:pointer; transition:all .15s; margin-bottom:10px; }
+        .sf-ml-content:hover { border-color:var(--sf-border-hover,rgba(255,255,255,0.12)); }
         .sf-ml-header { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
         .sf-ml-left { display:flex; align-items:flex-start; gap:10px; flex:1; min-width:0; }
         .sf-ml-index { font-family:'Inter', sans-serif; font-size:11px; font-weight:900; color:#2d4a31; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.12); border-radius:6px; padding:2px 7px; flex-shrink:0; margin-top:1px; }
         .sf-ml-title { font-family:'Inter', sans-serif; font-size:13px; font-weight:700; color:white; line-height:1.3; }
         .sf-ml-desc { font-family:'Inter', sans-serif; font-size:12px; color:#6b7280; margin-top:3px; line-height:1.4; }
         .sf-ml-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
-        .sf-ml-amount { font-family:'Inter', sans-serif; font-size:14px; font-weight:900; color:white; }
+        .sf-ml-amount { font-family:'Inter', sans-serif; font-size:14px; font-weight:900; color:var(--sf-text-primary,#f1f5f9); }
         .sf-ml-badge { display:inline-flex; align-items:center; gap:4px; font-family:'Inter', sans-serif; font-size:10px; font-weight:700; padding:3px 8px; border-radius:100px; white-space:nowrap; }
-        .sf-ml-body { margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05); space-y:8px; }
+        .sf-ml-body { margin-top:12px; padding-top:12px; border-top:1px solid var(--sf-border,rgba(255,255,255,0.05)); space-y:8px; }
         .sf-ml-proof-note { display:flex; gap:8px; font-family:'Inter', sans-serif; font-size:12px; color:#9ca3af; line-height:1.5; margin-bottom:8px; }
         .sf-ml-proof-files { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
         .sf-ml-proof-file { display:inline-flex; align-items:center; gap:5px; font-family:'Inter', sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); color:#22c55e; text-decoration:none; transition:.15s; }
@@ -401,43 +412,43 @@ export default function CampaignPage() {
         .sf-ml-approved-at { display:flex; align-items:center; gap:5px; font-family:'Inter', sans-serif; font-size:11px; color:#4a5568; margin-top:4px; }
 
         /* ── Updates ── */
-        .sf-update-card { background:#070d08; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:18px; }
+        .sf-update-card { background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); border-radius:16px; padding:18px; }
         .sf-update-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
         .sf-update-dot { width:6px; height:6px; border-radius:50%; background:#22c55e; }
         .sf-update-date { font-family:'Inter', sans-serif; font-size:11px; font-weight:700; color:#4a5568; letter-spacing:.06em; }
         .sf-update-title { font-family:'Inter', sans-serif; font-size:1rem; font-weight:900; color:white; margin-bottom:6px; }
         .sf-update-body { font-family:'Inter', sans-serif; font-size:13px; color:#9ca3af; line-height:1.6; }
         .sf-update-media { display:flex; gap:6px; margin-top:12px; }
-        .sf-update-thumb { width:72px; height:56px; border-radius:10px; overflow:hidden; background:#0a1209; border:1px solid rgba(255,255,255,0.07); flex-shrink:0; }
+        .sf-update-thumb { width:72px; height:56px; border-radius:10px; overflow:hidden; background:var(--sf-bg-input,#0a1209); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); flex-shrink:0; }
 
         /* ── Portfolio ── */
         .sf-portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
-        .sf-portfolio-item { border-radius:16px; overflow:hidden; background:#070d08; border:1px solid rgba(255,255,255,0.07); }
+        .sf-portfolio-item { border-radius:16px; overflow:hidden; background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); }
         .sf-portfolio-img { height:120px; overflow:hidden; }
 
         /* ── Buttons ── */
-        .sf-btn-green { display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Inter', sans-serif; font-weight:800; font-size:13px; padding:12px 20px; border-radius:14px; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; width:100%; transition:.15s; box-shadow:0 2px 8px rgba(34,197,94,0.18); }
+        .sf-btn-green { display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Inter', sans-serif; font-weight:800; font-size:13px; padding:12px 20px; border-radius:14px; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; width:100%; transition:.15s; box-shadow:0 4px 20px rgba(34,197,94,0.25); }
         .sf-btn-green:hover:not(:disabled) { transform:scale(1.02); box-shadow:0 6px 24px rgba(34,197,94,0.35); }
         .sf-btn-green:disabled { opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
-        .sf-btn-ghost { display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:10px 16px; border-radius:12px; cursor:pointer; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#9ca3af; transition:.15s; }
-        .sf-btn-ghost:hover { border-color:rgba(34,197,94,0.25); color:white; }
-        .sf-btn-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; cursor:pointer; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#6b7280; transition:.15s; flex-shrink:0; }
-        .sf-btn-icon:hover { border-color:rgba(34,197,94,0.25); color:white; }
+        .sf-btn-ghost { display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:10px 16px; border-radius:12px; cursor:pointer; background:var(--sf-bg-input,rgba(0,0,0,0.3)); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); color:var(--sf-text-muted,#9ca3af); transition:.15s; }
+        .sf-btn-ghost:hover { border-color:rgba(34,197,94,0.25); color:var(--sf-text-primary,#f1f5f9); }
+        .sf-btn-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; cursor:pointer; background:var(--sf-bg-input,rgba(0,0,0,0.3)); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); color:var(--sf-text-muted,#6b7280); transition:.15s; flex-shrink:0; }
+        .sf-btn-icon:hover { border-color:rgba(34,197,94,0.25); color:var(--sf-text-primary,#f1f5f9); }
         .sf-btn-icon.active { background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.3); color:#22c55e; }
 
         /* ── Modal ── */
         .sf-modal-overlay { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); padding:16px; }
-        .sf-modal-box { position:relative; width:100%; max-width:700px; border-radius:24px; overflow:hidden; background:var(--sf-bg-card,#070d08); border:1px solid rgba(34,197,94,0.2); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
-        .sf-modal-close { position:absolute; top:12px; right:12px; z-index:10; width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; color:white; transition:.15s; }
+        .sf-modal-box { position:relative; width:100%; max-width:700px; border-radius:24px; overflow:hidden; background:#070d08; border:1px solid rgba(34,197,94,0.2); box-shadow:0 40px 80px rgba(0,0,0,0.6); }
+        .sf-modal-close { position:absolute; top:12px; right:12px; z-index:10; width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,0.6); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); display:flex; align-items:center; justify-content:center; cursor:pointer; color:white; transition:.15s; }
         .sf-modal-close:hover { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.3); }
         .sf-modal-video { aspect-ratio:16/9; background:#040806; }
 
         /* ── Share toast ── */
-        .sf-share-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#070d08; border:1px solid rgba(34,197,94,0.3); color:#22c55e; font-family:'Inter', sans-serif; font-size:12px; font-weight:700; padding:10px 20px; border-radius:100px; z-index:200; box-shadow:0 2px 8px rgba(0,0,0,0.12); white-space:nowrap; pointer-events:none; }
+        .sf-share-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--sf-bg-card,#070d08); border:1px solid rgba(34,197,94,0.3); color:#22c55e; font-family:'Inter', sans-serif; font-size:12px; font-weight:700; padding:10px 20px; border-radius:100px; z-index:200; box-shadow:0 8px 32px rgba(0,0,0,0.4); white-space:nowrap; pointer-events:none; }
 
         /* ── Misc ── */
         .sf-section-label { font-family:'Inter', sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; color:#22c55e; margin-bottom:12px; }
-        .sf-divider { height:1px; background:rgba(255,255,255,0.06); margin:4px 0; }
+        .sf-divider { height:1px; background:var(--sf-border,rgba(255,255,255,0.06)); margin:4px 0; }
         .sf-empty { text-align:center; padding:40px 16px; font-family:'Inter', sans-serif; font-size:13px; color:#4a5568; }
         .sf-tag { display:inline-flex; align-items:center; gap:4px; font-family:'Inter', sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; }
       `}</style>
@@ -447,7 +458,7 @@ export default function CampaignPage() {
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm mb-5 transition-colors"
         style={{ color: "#4a5568", fontFamily: "'Inter', sans-serif", fontWeight: 700 }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--sf-text-primary,#f1f5f9)")}
         onMouseLeave={(e) => (e.currentTarget.style.color = "#4a5568")}
       >
         <ChevronLeft size={14} /> Back to campaigns
@@ -522,8 +533,8 @@ export default function CampaignPage() {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h1
-                  className="font-black text-white"
-                  style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1.5rem,3vw,2rem)", lineHeight: 1.1 }}
+                  className="font-black"
+                  style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Inter', sans-serif", fontSize: "clamp(1.5rem,3vw,2rem)", lineHeight: 1.1 }}
                 >
                   {campaign.name}
                 </h1>
@@ -536,7 +547,7 @@ export default function CampaignPage() {
               )}
               <div className="flex items-center gap-4 mt-2 flex-wrap">
                 {profile.location && (
-                  <span className="flex items-center gap-1 text-xs" style={{ color: T.dim }}>
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "#6b7280" }}>
                     <MapPin size={11} /> {profile.location}
                   </span>
                 )}
@@ -594,11 +605,11 @@ export default function CampaignPage() {
                   <p className="sf-stat-label">Raised</p>
                 </div>
                 <div className="text-center">
-                  <p className="sf-stat-value" style={{ color: "white", fontFamily: "'Inter', sans-serif" }}>{pct}%</p>
+                  <p className="sf-stat-value" style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Inter', sans-serif" }}>{pct}%</p>
                   <p className="sf-stat-label">Funded</p>
                 </div>
                 <div className="text-right">
-                  <p className="sf-stat-value" style={{ color: T.dim, fontFamily: "'Inter', sans-serif" }}>{fmt$(profile.fundingGoal)}</p>
+                  <p className="sf-stat-value" style={{ color: "#6b7280", fontFamily: "'Inter', sans-serif" }}>{fmt$(profile.fundingGoal)}</p>
                   <p className="sf-stat-label">Goal</p>
                 </div>
               </div>
@@ -662,7 +673,7 @@ export default function CampaignPage() {
               {profile.bio ? (
                 <div className="sf-card">
                   <p className="sf-section-label">ABOUT</p>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", color: T.muted, lineHeight: 1.7 }}>
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", color: "#9ca3af", lineHeight: 1.7 }}>
                     {profile.bio}
                   </p>
                 </div>
@@ -671,7 +682,7 @@ export default function CampaignPage() {
               {profile.fundingPurpose && (
                 <div className="sf-card">
                   <p className="sf-section-label">FUNDING PURPOSE</p>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", color: T.muted, lineHeight: 1.7 }}>
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", color: "#9ca3af", lineHeight: 1.7 }}>
                     {profile.fundingPurpose}
                   </p>
                 </div>
@@ -721,15 +732,15 @@ export default function CampaignPage() {
                         <img
                           src={item.imageUrl}
                           alt={item.title}
-                          className="w-full h-full object-cover opacity-80 group-hover:opacity-95 transition-opacity duration-300"
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
                         />
                       </div>
                       <div className="p-3">
-                        <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "12px", color: "white" }}>
+                        <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "12px", color: "var(--sf-text-primary,#f1f5f9)" }}>
                           {item.title}
                         </p>
                         {item.description && (
-                          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "11px", color: T.dim, marginTop: "3px" }} className="line-clamp-2">
+                          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "11px", color: "#6b7280", marginTop: "3px" }} className="line-clamp-2">
                             {item.description}
                           </p>
                         )}
@@ -768,13 +779,13 @@ export default function CampaignPage() {
               >
                 {profile.isAcceptingInvestments
                   ? <CheckCircle size={15} style={{ color: "#22c55e" }} />
-                  : <Clock size={15} style={{ color: T.dim }} />}
+                  : <Clock size={15} style={{ color: "#6b7280" }} />}
               </div>
               <div>
-                <p className="text-white text-sm font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <p className="text-sm font-bold" style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Inter', sans-serif" }}>
                   {profile.isAcceptingInvestments ? "Open to Investment" : "Not Accepting"}
                 </p>
-                <p className="text-xs" style={{ color: T.dim }}>
+                <p className="text-xs" style={{ color: "#6b7280" }}>
                   {profile.isAcceptingInvestments ? "This creator is actively seeking investors" : "Campaign is currently closed"}
                 </p>
               </div>
@@ -883,7 +894,7 @@ export default function CampaignPage() {
                   <BadgeCheck size={17} style={{ color: "#22c55e" }} />
                 </div>
                 <div>
-                  <p className="text-white text-sm font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="text-sm font-bold" style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Inter', sans-serif" }}>
                     Payment Verified
                   </p>
                   <p className="text-xs" style={{ color: "#4a5568" }}>Identity and payment confirmed</p>
@@ -906,5 +917,6 @@ export default function CampaignPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

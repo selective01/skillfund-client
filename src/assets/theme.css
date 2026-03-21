@@ -797,3 +797,48 @@ body,
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────
+   HomePage card text — Tailwind text-white/* opacity variants
+   These are invisible on light pastel card backgrounds
+   ────────────────────────────────────────────────────────────── */
+
+[data-theme="light"] .card-blue   [class*="text-white\/"],
+[data-theme="light"] .card-purple [class*="text-white\/"],
+[data-theme="light"] .card-amber  [class*="text-white\/"],
+[data-theme="light"] .card-teal   [class*="text-white\/"],
+[data-theme="light"] .card-rose   [class*="text-white\/"],
+[data-theme="light"] .card-green  [class*="text-white\/"] {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* Softer opacity versions for secondary text on cards */
+[data-theme="light"] .card-blue   .text-white\/50,
+[data-theme="light"] .card-purple .text-white\/50,
+[data-theme="light"] .card-amber  .text-white\/50,
+[data-theme="light"] .card-teal   .text-white\/50,
+[data-theme="light"] .card-rose   .text-white\/50,
+[data-theme="light"] .card-green  .text-white\/50 { opacity: 0.55 !important; }
+
+[data-theme="light"] .card-blue   .text-white\/40,
+[data-theme="light"] .card-purple .text-white\/40,
+[data-theme="light"] .card-amber  .text-white\/40,
+[data-theme="light"] .card-teal   .text-white\/40,
+[data-theme="light"] .card-rose   .text-white\/40,
+[data-theme="light"] .card-green  .text-white\/40 { opacity: 0.45 !important; }
+
+[data-theme="light"] .card-blue   .text-white\/20,
+[data-theme="light"] .card-purple .text-white\/20,
+[data-theme="light"] .card-amber  .text-white\/20,
+[data-theme="light"] .card-teal   .text-white\/20,
+[data-theme="light"] .card-rose   .text-white\/20,
+[data-theme="light"] .card-green  .text-white\/20 { opacity: 0.25 !important; }
+
+/* bg-white/* overlays → dark tint on light cards */
+[data-theme="light"] .card-blue   .bg-white\/10,
+[data-theme="light"] .card-purple .bg-white\/10,
+[data-theme="light"] .card-amber  .bg-white\/10,
+[data-theme="light"] .card-teal   .bg-white\/10,
+[data-theme="light"] .card-rose   .bg-white\/10,
+[data-theme="light"] .card-green  .bg-white\/10 { background: rgba(0,0,0,0.06) !important; }

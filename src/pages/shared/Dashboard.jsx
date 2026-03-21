@@ -92,6 +92,7 @@ function StatusItem({ label, value, last }) {
 }
 
 export default function Dashboard() {
+  const T = useT();
   const { user } = useAuthStore();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -216,7 +217,7 @@ export default function Dashboard() {
 
       {/* Bottom Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="dash-in d5 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+        <div className="dash-in d5 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: T.shadow }}>
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
             <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Quick Actions</h3>
@@ -226,7 +227,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="dash-in d6 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+        <div className="dash-in d6 rounded-3xl p-6" style={{ background: "linear-gradient(145deg,var(--bg-card),var(--bg))", border: "1px solid var(--border)", boxShadow: T.shadow }}>
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #22c55e, #16a34a)" }} />
             <h3 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem" }}>Account Status</h3>

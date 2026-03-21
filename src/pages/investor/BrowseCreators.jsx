@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import useThemeStore from "../../store/useThemeStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass, faSliders, faLocationDot, faArrowTrendUp, faUsers,
   faCircleCheck, faXmark, faChevronDown, faWallet, faArrowUpRightFromSquare,
   faCircleNotch, faUserPlus, faMessage, faBolt, faShirt, faHammer, faLeaf,
-  faCamera, faCookieBite, faWrench, faLaptopCode, faScissors, faPaintbrush,
+  faCamera, faCookieBite, faWrench, faLaptopCode, faCut, faPaintBrush,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuthStore from "../../store/authStore";
-import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
+import { Helmet } from "react-helmet-async";
 
 const MatchRecommendations = lazy(() =>
   import("../../components/MatchRecommendations").catch(() => ({ default: () => null }))
@@ -31,18 +32,18 @@ const SKILL_CATEGORIES = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "newest",      label: "Newest First"       },
-  { value: "mostFunded",  label: "Most Funded"        },
-  { value: "goalAsc",     label: "Goal: Low to High"  },
-  { value: "goalDesc",    label: "Goal: High to Low"  },
-  { value: "profitShare", label: "Best Profit Share"  },
-  { value: "score",       label: "Highest Trust Score"},
+  { value: "newest",      label: "Newest First"      },
+  { value: "mostFunded",  label: "Most Funded"       },
+  { value: "goalAsc",     label: "Goal: Low to High" },
+  { value: "goalDesc",    label: "Goal: High to Low" },
+  { value: "profitShare", label: "Best Profit Share" },
+  { value: "score",       label: "Highest Trust Score" },
 ];
 
 const CATEGORY_EMOJI = {
   fashion: faShirt, carpentry: faHammer, farming: faLeaf,
   photography: faCamera, baking: faCookieBite, mechanics: faWrench,
-  technology: faLaptopCode, hair: faScissors, artisan: faPaintbrush, other: faBolt,
+  technology: faLaptopCode, hair: faCut, artisan: faPaintBrush, other: faBolt,
 };
 
 const CARD_COLORS_DARK = [
@@ -55,40 +56,26 @@ const CARD_COLORS_DARK = [
 ];
 
 const CARD_COLORS_LIGHT = [
-  "linear-gradient(135deg,#f0fdf4,#dcfce7)",   // green
-  "linear-gradient(135deg,#eff6ff,#dbeafe)",   // blue
-  "linear-gradient(135deg,#f5f3ff,#ede9fe)",   // purple
-  "linear-gradient(135deg,#f0fdfa,#ccfbf1)",   // teal
-  "linear-gradient(135deg,#fff1f2,#ffe4e6)",   // rose
-  "linear-gradient(135deg,#fffbeb,#fef3c7)",   // amber
+  "linear-gradient(135deg,#f0fdf4,#dcfce7)",
+  "linear-gradient(135deg,#eff6ff,#dbeafe)",
+  "linear-gradient(135deg,#f5f3ff,#ede9fe)",
+  "linear-gradient(135deg,#f0fdfa,#ccfbf1)",
+  "linear-gradient(135deg,#fff1f2,#ffe4e6)",
+  "linear-gradient(135deg,#fffbeb,#fef3c7)",
 ];
 
-// Text colors that match each light card
 const CARD_LIGHT_TEXT = [
-  "#0a2e0c", "#1e3a5f", "#3b1f6e", "#0f3d38", "#5e1a2a", "#5a3a00",
+  "#0a2e0c", "#1e3a5f", "#3b1f6e", "#0f3d38", "#5e1a2a", "#5a3a00"
 ];
 
-function useT() {
-  const theme = useThemeStore((s) => s.theme);
-  const L = theme === "light";
-  return {
-    L,
-    card:      L ? "#ffffff"               : "#070d08",
-    cardAlt:   L ? "#f0fdf4"               : "#0a1209",
-    border:    L ? "rgba(34,197,94,0.2)"   : "rgba(255,255,255,0.1)",
-    text:      L ? "#0a1a0c"               : "#ffffff",
-    muted:     L ? "#4b5563"               : "#9ca3af",
-    dim:       L ? "#6b7280"               : "#6b7280",
-    skeletonBg:L ? "rgba(0,0,0,0.06)"      : "rgba(255,255,255,0.1)",
-    ghostBtn:  L ? "rgba(0,0,0,0.05)"      : "rgba(0,0,0,0.3)",
-    ghostBorder:L? "rgba(34,197,94,0.2)"   : "rgba(255,255,255,0.1)",
-  };
-}
+
+const SF_URL = "https://skillfund-client.vercel.app";
 
 export default function BrowseCreators() {
+  const _theme = useThemeStore((s) => s.theme);
+  const isLight = _theme === "light";
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const T = useT();
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -184,31 +171,43 @@ export default function BrowseCreators() {
   const hasActiveFilters = search || category || minGoal || maxGoal || minScore || verifiedOnly || !acceptingOnly;
 
   const selectStyle = {
-    background: T.card, border: `1px solid ${T.border}`, color: T.text,
+    background: isLight ? "#f0fdf4" : "#070d08", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.2)"}`, color: isLight ? "#0a1a0c" : "#ffffff",
     borderRadius: "12px", padding: "10px 36px 10px 14px", fontSize: "14px",
     outline: "none", width: "100%", appearance: "none", WebkitAppearance: "none",
     fontFamily: "'Inter', sans-serif",
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Browse Creators — SkillFund</title>
+        <meta name="description" content="Discover skilled African creators looking for investment. Filter by industry, funding goal, and credit score. Invest with milestone-protected escrow." />
+        <meta property="og:title" content="Browse Creators — SkillFund" />
+        <meta property="og:description" content="Discover skilled African creators looking for investment. Filter by industry, funding goal, and credit score." />
+        <meta property="og:url" content={`${SF_URL}/browse`} />
+        <link rel="canonical" href={`${SF_URL}/browse`} />
+      </Helmet>
+      <div className="space-y-6">
       <style>{`
-        .browse-input { background:${T.card}; border:1px solid ${T.border}; color:${T.text}; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; transition:border-color .2s; }
+        .browse-input { background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); color:var(--sf-text-primary,#ffffff); border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; transition:border-color .2s; }
         .browse-input:focus { border-color:rgba(34,197,94,0.4); }
         .browse-input::placeholder { color:#5a8a63; }
-        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid ${T.border}; background:${T.card}; color:${T.muted}; font-family:'Inter', sans-serif; white-space:nowrap; }
-        .cat-pill:hover { border-color:rgba(34,197,94,0.4); }
+        .cat-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid var(--sf-border,rgba(255,255,255,0.1)); background:var(--sf-bg-card,#070d08); color:var(--sf-text-muted,#9ca3af); font-family:'Inter', sans-serif; white-space:nowrap; }
+        .cat-pill:hover { border-color:rgba(34,197,94,0.3); color:#9ca3af; }
         .cat-pill.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid ${T.border}; background:${T.card}; color:${T.muted}; font-family:'Inter', sans-serif; }
-        .page-btn:hover:not(:disabled) { border-color:rgba(34,197,94,0.4); color:${T.text}; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid var(--sf-border,rgba(255,255,255,0.1)); background:var(--sf-bg-card,#070d08); color:var(--sf-text-muted,#9ca3af); font-family:'Inter', sans-serif; }
+        .page-btn:hover:not(:disabled) { border-color:rgba(34,197,94,0.3); color:#ffffff; }
         .page-btn.active { background:linear-gradient(135deg,#22c55e,#16a34a); border-color:transparent; color:#000; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-        select option { background:${T.card}; color:${T.text}; }
+        select option { background:#070d08; color:#ffffff; }
       `}</style>
 
+      {/* ── AI Match Recommendations (investors only) ── */}
       {user?.role === "investor" && (
         <div className="mb-2">
-          <Suspense fallback={null}><MatchRecommendations /></Suspense>
+          <Suspense fallback={null}>
+            <MatchRecommendations />
+          </Suspense>
         </div>
       )}
 
@@ -217,9 +216,9 @@ export default function BrowseCreators() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Inter', sans-serif", color: "#22c55e" }}>DISCOVER</p>
-            <h2 className="font-black" style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1.5rem,2.5vw,2rem)", color: T.text }}>Browse Creators</h2>
-            <p className="text-sm mt-0.5" style={{ color: T.muted }}>
-              {loading ? "Loading..." : <><span style={{ color: T.text, fontWeight: 600 }}>{total}</span> skilled creators looking for investors</>}
+            <h2 className="font-black" style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1.5rem,2.5vw,2rem)", color: "var(--sf-text-primary,#f1f5f9)" }}>Browse Creators</h2>
+            <p className="text-sm mt-0.5" style={{ color: "#9ca3af" }}>
+              {loading ? "Loading..." : <><span className="font-semibold" style={{ color: "var(--sf-text-primary,#f1f5f9)" }}>{total}</span> skilled creators looking for investors</>}
             </p>
           </div>
           {user?.role === "creator" && (
@@ -241,7 +240,7 @@ export default function BrowseCreators() {
             style={{ paddingLeft: "38px", paddingRight: search ? "38px" : "14px" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: T.muted }}>
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#9ca3af" }}>
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
             </button>
           )}
@@ -250,22 +249,22 @@ export default function BrowseCreators() {
           <select value={category} onChange={e => setCategory(e.target.value)} style={selectStyle}>
             {SKILL_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <div className="relative" style={{ minWidth: "180px" }}>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={selectStyle}>
             {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: "11px", pointerEvents: "none" }} />
+          <FontAwesomeIcon icon={faChevronDown} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: "11px", pointerEvents: "none" }} />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex-shrink-0"
           style={{
             fontFamily: "'Inter', sans-serif",
-            background: showFilters || hasActiveFilters ? "rgba(34,197,94,0.1)" : T.card,
-            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(34,197,94,0.35)" : T.border}`,
-            color: showFilters || hasActiveFilters ? "#22c55e" : T.muted,
+            background: showFilters || hasActiveFilters ? "rgba(34,197,94,0.1)" : isLight ? "#ffffff" : "#070d08",
+            border: `1px solid ${showFilters || hasActiveFilters ? "rgba(34,197,94,0.35)" : isLight ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.2)"}`,
+            color: showFilters || hasActiveFilters ? "#22c55e" : isLight ? "#4b5563" : "#9ca3af",
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "13px" }} /> Filters
@@ -275,9 +274,9 @@ export default function BrowseCreators() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="rounded-2xl p-5 mb-4" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+        <div className="rounded-2xl p-5 mb-4" style={{ background: isLight ? "#ffffff" : "#070d08", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}` }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="font-bold text-sm" style={{ color: T.text, fontFamily: "'Inter', sans-serif" }}>Advanced Filters</p>
+            <p className="font-bold text-sm" style={{ fontFamily: "'Inter', sans-serif", color: "var(--sf-text-primary,#f1f5f9)" }}>Advanced Filters</p>
             {hasActiveFilters && (
               <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Inter', sans-serif" }}>
                 <FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Clear all
@@ -286,15 +285,15 @@ export default function BrowseCreators() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: T.muted }}>MIN GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: "#9ca3af" }}>MIN GOAL ($)</label>
               <input type="number" value={minGoal} onChange={e => setMinGoal(e.target.value)} placeholder="0" className="browse-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: T.muted }}>MAX GOAL ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: "#9ca3af" }}>MAX GOAL ($)</label>
               <input type="number" value={maxGoal} onChange={e => setMaxGoal(e.target.value)} placeholder="Any" className="browse-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: T.muted }}>MIN TRUST SCORE</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Inter', sans-serif", color: "#9ca3af" }}>MIN TRUST SCORE</label>
               <select value={minScore} onChange={e => setMinScore(e.target.value)} style={selectStyle}>
                 <option value="">Any Score</option>
                 <option value="40">40+ (Developing)</option>
@@ -303,15 +302,17 @@ export default function BrowseCreators() {
                 <option value="85">85+ (Elite Only)</option>
               </select>
             </div>
-            <div className="flex flex-col justify-end gap-2">
-              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: T.cardAlt, border: `1px solid ${T.border}` }}>
+            <div className="flex flex-col justify-end">
+              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: isLight ? "#f0fdf4" : "#0a1209", border: `1px solid ${isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)"}` }}>
                 <input type="checkbox" checked={verifiedOnly} onChange={e => setVerifiedOnly(e.target.checked)} className="w-4 h-4 accent-green-500" />
-                <span className="text-sm" style={{ color: T.muted }}>Verified only</span>
+                <span className="text-sm" style={{ color: "#9ca3af" }}>Verified only</span>
                 <FontAwesomeIcon icon={faCircleCheck} className="ml-auto" style={{ fontSize: "12px", color: "#22c55e" }} />
               </label>
-              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: T.cardAlt, border: `1px solid ${T.border}` }}>
+            </div>
+            <div className="flex flex-col justify-end">
+              <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style={{ background: isLight ? "#f0fdf4" : "#0a1209", border: `1px solid ${isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)"}` }}>
                 <input type="checkbox" checked={acceptingOnly} onChange={e => setAcceptingOnly(e.target.checked)} className="w-4 h-4 accent-green-500" />
-                <span className="text-sm" style={{ color: T.muted }}>Accepting investments</span>
+                <span className="text-sm" style={{ color: "#9ca3af" }}>Accepting investments</span>
                 <FontAwesomeIcon icon={faArrowTrendUp} className="ml-auto" style={{ fontSize: "12px", color: "#22c55e" }} />
               </label>
             </div>
@@ -324,7 +325,7 @@ export default function BrowseCreators() {
         <button onClick={() => setCategory("")} className={`cat-pill ${category === "" ? "active" : ""}`}>All</button>
         {SKILL_CATEGORIES.slice(1).map(cat => (
           <button key={cat.value} onClick={() => setCategory(cat.value === category ? "" : cat.value)} className={`cat-pill ${category === cat.value ? "active" : ""}`}>
-            <FontAwesomeIcon icon={CATEGORY_EMOJI[cat.value] || faBolt} style={{ fontSize: "11px", marginRight: "4px" }} />{cat.label.split(" ")[0]}
+            <FontAwesomeIcon icon={CATEGORY_EMOJI[cat.value] || faBolt} style={{ fontSize:"11px", marginRight:"4px" }} />{cat.label.split(" ")[0]}
           </button>
         ))}
       </div>
@@ -346,7 +347,7 @@ export default function BrowseCreators() {
                 onInvest={handleInvest}
                 onMessage={handleMessage}
                 actionLoading={actionLoading}
-                cardColor={T.L ? CARD_COLORS_LIGHT[idx % CARD_COLORS_LIGHT.length] : CARD_COLORS_DARK[idx % CARD_COLORS_DARK.length]}
+                cardColor={isLight ? CARD_COLORS_LIGHT[idx % CARD_COLORS_LIGHT.length] : CARD_COLORS_DARK[idx % CARD_COLORS_DARK.length]}
                 colorIdx={idx % CARD_COLORS_LIGHT.length}
               />
             ))}
@@ -363,22 +364,20 @@ export default function BrowseCreators() {
         </>
       )}
     </div>
+    </>
   );
 }
 
 // ─── Creator Card ─────────────────────────────────────────────────────────────
 function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, actionLoading, cardColor, colorIdx = 0 }) {
+  const _t = useThemeStore((s) => s.theme); const isLight = _t === "light";
+  const cardText   = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#ffffff";
+  const cardMuted  = isLight ? CARD_LIGHT_TEXT[colorIdx] : "rgba(255,255,255,0.5)";
+  const cardDim    = isLight ? CARD_LIGHT_TEXT[colorIdx] : "rgba(255,255,255,0.4)";
+  const cardBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}25` : "rgba(255,255,255,0.06)";
+  const cardStatBg = isLight ? "rgba(0,0,0,0.04)" : "rgba(0,0,0,0.25)";
+  const cardStatBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}15` : "rgba(255,255,255,0.05)";
   const navigate = useNavigate();
-  const T = useT();
-  // On light cards use the matching dark text; on dark cards always use white
-  const cardText   = T.L ? CARD_LIGHT_TEXT[colorIdx] : "#ffffff";
-  const cardMuted  = T.L ? CARD_LIGHT_TEXT[colorIdx] : "rgba(255,255,255,0.5)";
-  const cardDim    = T.L ? CARD_LIGHT_TEXT[colorIdx] : "rgba(255,255,255,0.4)";
-  const cardBorder = T.L ? `${CARD_LIGHT_TEXT[colorIdx]}25` : "rgba(255,255,255,0.05)";
-  const cardOverlay= T.L ? "rgba(0,0,0,0.04)"  : "rgba(0,0,0,0.2)";
-  const cardStatBg = T.L ? "rgba(0,0,0,0.06)"  : "rgba(0,0,0,0.25)";
-  const cardHoverBorder = T.L ? `${CARD_LIGHT_TEXT[colorIdx]}50` : "rgba(34,197,94,0.25)";
-  const cardDefaultBorder = T.L ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.06)";
   const id = creator.userId?._id || creator.userId || creator._id;
   const name = creator.name || creator.user?.name || "Creator";
   const avatar = creator.avatar || creator.user?.avatar || null;
@@ -395,7 +394,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
   const isAcceptingInvestments = creator.isAcceptingInvestments ?? true;
   const portfolio = creator.portfolio || [];
   const connectionStatus = creator.connectionStatus || null;
-  const trustScore = creator.trustScore || creator.score?.totalScore || null;
+  const trustScore  = creator.trustScore || creator.score?.totalScore || null;
   const progressPercent = fundingGoal > 0 ? Math.min(100, Math.round((amountRaised / fundingGoal) * 100)) : 0;
   const connectLoading = actionLoading[`connect_${id}`];
   const isInvestor = currentUser?.role === "investor";
@@ -403,19 +402,18 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
 
   return (
     <div
-      className="group rounded-2xl cursor-pointer transition-all duration-200 "
-      style={{ background: cardColor, border: `1px solid ${cardDefaultBorder}`, boxShadow: T.L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.12)", position: "relative", overflow: "visible" }}
+      className="group rounded-2xl cursor-pointer"
+      style={{ background: cardColor, border: `1px solid ${cardBorder}`, boxShadow: isLight ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/creators/${id}`)}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"; e.currentTarget.style.borderColor = cardHoverBorder; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.12)"; e.currentTarget.style.borderColor = cardDefaultBorder; }}
+      
     >
       {/* Cover */}
-      <div className="relative h-32 overflow-hidden rounded-t-2xl" style={{ background: cardOverlay }}>
+      <div className="relative h-32 overflow-hidden rounded-t-2xl" style={{ background: "rgba(0,0,0,0.2)" }}>
         {portfolio[0]?.imageUrl ? (
-          <img src={portfolio[0].imageUrl} alt={portfolio[0].title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+          <img src={portfolio[0].imageUrl} alt={portfolio[0].title} className="w-full h-full object-cover opacity-60" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center select-none" style={{ opacity: 0.12 }}>
-            <FontAwesomeIcon icon={faBolt} style={{ fontSize: "48px", color: T.L ? CARD_LIGHT_TEXT[colorIdx] : "#fff" }} />
+          <div className="absolute inset-0 flex items-center justify-center text-6xl select-none" style={{ opacity: 0.12 }}>
+            <FontAwesomeIcon icon={faBolt} style={{ fontSize:"13px" }} />
           </div>
         )}
         <div className="absolute top-3 left-3 flex gap-1.5">
@@ -428,20 +426,21 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
           {plan === "pro"   && <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ fontFamily: "'Inter', sans-serif", background: "rgba(168,85,247,0.85)", color: "#ffffff" }}>Pro</span>}
         </div>
         <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
-          <span className="text-xs px-2.5 py-1 rounded-full capitalize" style={{ background: "rgba(0,0,0,0.45)", color: "#e5e7eb", backdropFilter: "blur(4px)" }}>
-            <FontAwesomeIcon icon={CATEGORY_EMOJI[skillCategory] || faBolt} style={{ fontSize: "11px", marginRight: "4px" }} />{skillCategory}
+          <span className="text-xs px-2.5 py-1 rounded-full capitalize" style={{ background: "rgba(0,0,0,0.5)", color: "#9ca3af", backdropFilter: "blur(4px)" }}>
+            <FontAwesomeIcon icon={CATEGORY_EMOJI[skillCategory] || faBolt} style={{ fontSize:"11px", marginRight:"4px" }} />{skillCategory}
           </span>
           {trustScore !== null && (
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.5)", color: trustScore >= 70 ? "#22c55e" : trustScore >= 40 ? "#f59e0b" : "#ef4444", backdropFilter: "blur(4px)" }}>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.6)", color: trustScore >= 70 ? "#22c55e" : trustScore >= 40 ? "#f59e0b" : "#ef4444", backdropFilter: "blur(4px)" }}>
               Trust: {trustScore}
             </span>
           )}
         </div>
-        {portfolio.length > 1 && <div className="absolute bottom-2 right-3 text-xs" style={{ color: T.L ? CARD_LIGHT_TEXT[colorIdx] : "rgba(255,255,255,0.4)" }}>+{portfolio.length - 1} more</div>}
+        {portfolio.length > 1 && <div className="absolute bottom-2 right-3 text-xs" style={{ color: cardMuted }}>+{portfolio.length - 1} more</div>}
       </div>
 
       {/* Body */}
       <div className="p-5 pt-10">
+        {/* Avatar */}
         <div className="mb-3">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-xl mb-2" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "3px solid rgba(34,197,94,0.5)", position: "absolute", top: "calc(128px - 28px)", left: "20px" }}>
             {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
@@ -454,26 +453,26 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
         </div>
 
         {location && (
-          <div className="flex items-center gap-1 mb-2" style={{ color: cardMuted }}>
+          <div className="flex items-center gap-1 mb-2" style={{ color: "#9ca3af" }}>
             <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: "10px" }} /><span className="text-xs">{location}</span>
           </div>
         )}
 
-        {bio && <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: cardMuted }}>{bio}</p>}
+        {bio && <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: "#6b7280" }}>{bio}</p>}
 
         {fundingGoal > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs" style={{ color: cardDim }}>${amountRaised.toLocaleString()} raised</span>
+              <span className="text-xs" style={{ color: "#9ca3af" }}>${amountRaised.toLocaleString()} raised</span>
               <span className="text-xs font-black" style={{ color: "#22c55e", fontFamily: "'Inter', sans-serif" }}>{progressPercent}%</span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: T.L ? "rgba(0,0,0,0.1)" : "rgba(0,0,0,0.3)" }}>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
               <div className="h-full rounded-full transition-all duration-500" style={{
                 width: `${progressPercent}%`,
                 background: progressPercent >= 90 ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#16a34a,#22c55e,#4ade80)",
               }} />
             </div>
-            <span className="text-xs mt-1 block" style={{ color: T.L ? CARD_LIGHT_TEXT[colorIdx] : "#5a8a63" }}>Goal: ${fundingGoal.toLocaleString()}</span>
+            <span className="text-xs mt-1 block" style={{ color: "#5a8a63" }}>Goal: ${fundingGoal.toLocaleString()}</span>
           </div>
         )}
 
@@ -482,11 +481,11 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
             { faIcon: faArrowTrendUp, color: "#22c55e", label: "Profit Share", value: profitSharePercentage > 0 ? `${profitSharePercentage}%` : "—" },
             { faIcon: faWallet,       color: "#3b82f6", label: "Duration",     value: profitShareDuration > 0 ? `${profitShareDuration}mo` : "—" },
           ].map(({ faIcon, color, label, value }) => (
-            <div key={label} className="rounded-xl p-3" style={{ background: cardStatBg, border: `1px solid ${cardBorder}` }}>
+            <div key={label} className="rounded-xl p-3" style={{ background: cardStatBg, border: `1px solid ${cardStatBorder}` }}>
               <div className="flex items-center gap-1 mb-1">
                 <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: cardDim }}>{label}</span>
               </div>
-              <p className="font-black text-sm" style={{ color: cardText, fontFamily: "'Inter', sans-serif" }}>{value}</p>
+              <p className="font-black text-sm" style={{ fontFamily: "'Inter', sans-serif", color: cardText }}>{value}</p>
             </div>
           ))}
         </div>
@@ -497,7 +496,14 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
               <button
                 onClick={e => onInvest(creator, e)}
                 className="flex-1 flex items-center justify-center gap-1.5 font-black text-sm rounded-xl transition-all hover:scale-105 whitespace-nowrap"
-                style={{ fontFamily: "'Inter', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 2px 8px rgba(34,197,94,0.2)", padding: "0 16px", height: "42px" }}
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  background: "linear-gradient(135deg,#22c55e,#16a34a)",
+                  color: "#000",
+                  boxShadow: "0 4px 16px rgba(34,197,94,0.3)",
+                  padding: "0 16px",
+                  height: "42px",
+                }}
               >
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: "12px" }} /> View Campaign
               </button>
@@ -509,10 +515,12 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
                   disabled={connectLoading || connectionStatus === "pending" || connectionStatus === "accepted"}
                   className="flex items-center justify-center gap-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
                   style={{
-                    fontFamily: "'Inter', sans-serif", padding: "0 14px", height: "42px",
-                    background: connectionStatus === "accepted" ? "rgba(34,197,94,0.1)" : connectionStatus === "pending" ? "rgba(245,158,11,0.1)" : T.L ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.3)",
-                    border: `1px solid ${connectionStatus === "accepted" ? "rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "rgba(245,158,11,0.3)" : cardBorder}`,
-                    color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : cardMuted,
+                    fontFamily: "'Inter', sans-serif",
+                    padding: "0 14px",
+                    height: "42px",
+                    background: connectionStatus === "accepted" ? "rgba(34,197,94,0.1)" : connectionStatus === "pending" ? "rgba(245,158,11,0.1)" : "rgba(0,0,0,0.3)",
+                    border: `1px solid ${connectionStatus === "accepted" ? "rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "rgba(245,158,11,0.3)" : "rgba(34,197,94,0.2)"}`,
+                    color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "#9ca3af",
                     cursor: connectionStatus ? "default" : "pointer",
                   }}
                 >
@@ -524,7 +532,7 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
                 <button
                   onClick={e => onMessage(id, e)}
                   className="flex items-center justify-center rounded-xl transition-all"
-                  style={{ padding: "0 14px", height: "42px", background: T.L ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.3)", border: `1px solid ${cardBorder}`, color: cardMuted }}
+                  style={{ padding: "0 14px", height: "42px", background: isLight ? "rgba(0,0,0,0.05)" : "rgba(0,0,0,0.3)", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.2)"}`, color: isLight ? "#4b5563" : "#9ca3af" }}
                 >
                   <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} />
                 </button>
@@ -534,14 +542,14 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
               <button
                 onClick={e => onMessage(id, e)}
                 className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold rounded-xl transition-all whitespace-nowrap"
-                style={{ fontFamily: "'Inter', sans-serif", padding: "0 16px", height: "42px", background: T.L ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.3)", border: `1px solid ${cardBorder}`, color: cardMuted }}
+                style={{ fontFamily: "'Inter', sans-serif", padding: "0 16px", height: "42px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}
               >
                 <FontAwesomeIcon icon={faMessage} style={{ fontSize: "13px" }} /> Message
               </button>
             )}
           </div>
         )}
-        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: T.L ? CARD_LIGHT_TEXT[colorIdx] : "#5a8a63", fontFamily: "'Inter', sans-serif" }}>Your profile</div>}
+        {isOwn && <div className="text-center py-2 text-xs font-bold" style={{ color: "#5a8a63", fontFamily: "'Inter', sans-serif" }}>Your profile</div>}
       </div>
     </div>
   );
@@ -549,24 +557,24 @@ function CreatorCard({ creator, currentUser, onConnect, onInvest, onMessage, act
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function CreatorsGridSkeleton() {
-  const T = useT();
+  const _t = useThemeStore((s) => s.theme); const isLight = _t === "light";
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: T.card, border: `1px solid ${T.border}` }}>
-          <div className="h-32" style={{ background: T.cardAlt }} />
+        <div key={i} className="rounded-2xl overflow-hidden animate-pulse" style={{ background: isLight ? "#ffffff" : "#070d08", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}` }}>
+          <div className="h-32" style={{ background: isLight ? "#f0fdf4" : "#0a1209" }} />
           <div className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: T.skeletonBg }} />
-            <div className="h-3.5 rounded-full w-3/4" style={{ background: T.skeletonBg }} />
-            <div className="h-3 rounded-full w-1/2" style={{ background: T.skeletonBg }} />
-            <div className="h-3 rounded-full" style={{ background: T.skeletonBg }} />
-            <div className="h-3 rounded-full w-2/3" style={{ background: T.skeletonBg }} />
-            <div className="h-1.5 rounded-full" style={{ background: T.skeletonBg }} />
+            <div className="w-12 h-12 rounded-xl -mt-9" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-1/2" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-3 rounded-full w-2/3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
             <div className="grid grid-cols-2 gap-2">
-              <div className="h-14 rounded-xl" style={{ background: T.skeletonBg }} />
-              <div className="h-14 rounded-xl" style={{ background: T.skeletonBg }} />
+              <div className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="h-14 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
             </div>
-            <div className="h-10 rounded-xl" style={{ background: T.skeletonBg }} />
+            <div className="h-10 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
       ))}
@@ -576,12 +584,12 @@ function CreatorsGridSkeleton() {
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onClear, hasFilters }) {
-  const T = useT();
+  const _t = useThemeStore((s) => s.theme); const isLight = _t === "light";
   return (
-    <div className="rounded-3xl p-16 text-center" style={{ background: T.card, border: `1px solid ${T.border}` }}>
-      <div className="text-5xl mb-4"><FontAwesomeIcon icon={faMagnifyingGlass} style={{ fontSize: "36px", color: T.muted }} /></div>
-      <h3 className="font-black mb-2" style={{ fontFamily: "'Inter', sans-serif", fontSize: "1.3rem", color: T.text }}>No creators found</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: T.muted }}>
+    <div className="rounded-3xl p-16 text-center" style={{ background: isLight ? "#ffffff" : "#070d08", border: `1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}` }}>
+      <div className="text-5xl mb-4"><FontAwesomeIcon icon={faMagnifyingGlass} style={{ fontSize: "36px", color: "#9ca3af" }} /></div>
+      <h3 className="font-black mb-2" style={{ fontFamily: "'Inter', sans-serif", fontSize: "1.3rem", color: "var(--sf-text-primary,#f1f5f9)" }}>No creators found</h3>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "#9ca3af" }}>
         {hasFilters ? "No creators match your current filters. Try adjusting your search." : "No creators are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (

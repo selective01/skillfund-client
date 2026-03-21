@@ -76,17 +76,12 @@ function validate(step, form) {
 export default function CampaignSetup() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
+  const _dim = _L ? "#6b7280" : "#4a5568";
+  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
-  const _dim = _L ? "#6b7280" : "#4b5563";
-  const _heroGrad = _L
-    ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)"
-    : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
-  const _heroBorder = _L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)";
 
   useNotificationReadOnView();
   const navigate   = useNavigate();
@@ -244,10 +239,10 @@ export default function CampaignSetup() {
       data.append("image", file);
       data.append("title", file.name.replace(/\.[^.]+$/, ""));
       data.append("description", "");
-      const res = await api.post("/profiles/portfolio", data, {
+      const res2 = await api.post("/profiles/portfolio", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setProfile((p) => ({ ...p, portfolio: res.data.portfolio }));
+      setProfile((p) => ({ ...p, portfolio: res2.data.portfolio }));
       toast.success("Portfolio item added!");
     } catch {
       toast.error("Upload failed");
@@ -259,8 +254,8 @@ export default function CampaignSetup() {
 
   const handlePortfolioDelete = async (itemId) => {
     try {
-      const res = await api.delete(`/profiles/portfolio/${itemId}`);
-      setProfile((p) => ({ ...p, portfolio: res.data.portfolio }));
+      const res3 = await api.delete(`/profiles/portfolio/${itemId}`);
+      setProfile((p) => ({ ...p, portfolio: res3.data.portfolio }));
       toast.success("Item removed");
     } catch {
       toast.error("Failed to delete");
@@ -269,16 +264,16 @@ export default function CampaignSetup() {
 
   // ─── Video upload ─────────────────────────────────────────────────────────
   const handleVideoUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file2 = e.target.files?.[0];
+    if (!file2) return;
     setVideoUploading(true);
     try {
-      const data = new FormData();
-      data.append("video", file);
-      const res = await api.post("/profiles/pitch-video", data, {
+      const data2 = new FormData();
+      data2.append("video", file2);
+      const res4 = await api.post("/profiles/pitch-video", data2, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      set("pitchVideoUrl", res.data.pitchVideoUrl);
+      set("pitchVideoUrl", res4.data2.pitchVideoUrl);
       toast.success("Pitch video uploaded!");
     } catch {
       toast.error("Video upload failed");
@@ -322,7 +317,7 @@ export default function CampaignSetup() {
         .cs-select option { background:var(--bg-card); }
         .cs-label { display:block; font-size:11px; font-weight:700; font-family:'Inter', sans-serif; text-transform:uppercase; letter-spacing:.06em; color:#9ca3af; margin-bottom:6px; }
         .cs-err { font-size:11px; color:#f87171; font-family:'Inter', sans-serif; margin-top:4px; display:flex; align-items:center; gap:4px; }
-        .cs-card { background:#070d08; border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:22px; }
+        .cs-card { background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); border-radius:20px; padding:22px; }
         .cs-section-title { font-family:'Inter', sans-serif; font-size:1.1rem; font-weight:900; color:white; margin:0 0 4px; }
         .cs-section-sub { font-family:'Inter', sans-serif; font-size:13px; color:#6b7280; margin:0 0 20px; }
         .cs-toggle { position:relative; width:44px; height:24px; border-radius:12px; border:none; cursor:pointer; transition:background .2s; flex-shrink:0; }
@@ -330,15 +325,15 @@ export default function CampaignSetup() {
         .cs-btn-green { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:900; font-size:13px; padding:11px 22px; border-radius:13px; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; transition:.15s; box-shadow:0 4px 16px rgba(34,197,94,0.2); white-space:nowrap; }
         .cs-btn-green:hover:not(:disabled) { transform:scale(1.02); box-shadow:0 6px 24px rgba(34,197,94,0.3); }
         .cs-btn-green:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-        .cs-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:11px 22px; border-radius:13px; cursor:pointer; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#9ca3af; transition:.15s; white-space:nowrap; }
+        .cs-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:11px 22px; border-radius:13px; cursor:pointer; background:var(--sf-bg-input,rgba(0,0,0,0.3)); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); color:var(--sf-text-muted,#9ca3af); transition:.15s; white-space:nowrap; }
         .cs-btn-ghost:hover { border-color:rgba(34,197,94,0.25); color:white; }
-        .cs-ms-card { background:#0a1209; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px 16px; }
+        .cs-ms-card { background:var(--sf-bg-input,#0a1209); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); border-radius:14px; padding:14px 16px; }
         .cs-ms-card.has-error { border-color:rgba(239,68,68,0.3); }
-        .cs-preview-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .cs-preview-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--sf-border,rgba(255,255,255,0.05)); }
         .cs-preview-row:last-child { border-bottom:none; }
         .cs-preview-label { font-family:'Inter', sans-serif; font-size:12px; color:#6b7280; }
         .cs-preview-val { font-family:'Inter', sans-serif; font-size:13px; font-weight:900; color:white; }
-        .cs-checklist-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .cs-checklist-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--sf-border,rgba(255,255,255,0.04)); }
         .cs-checklist-item:last-child { border-bottom:none; }
         .cs-char-count { font-family:'Inter', sans-serif; font-size:11px; color:#4a5568; text-align:right; margin-top:3px; }
       `}</style>
@@ -373,7 +368,7 @@ export default function CampaignSetup() {
                 >
                   <div style={{
                     width: "34px", height: "34px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                    background: done ? "linear-gradient(135deg,#22c55e,#16a34a)" : active ? "rgba(34,197,94,0.15)" : "#0a1209",
+                    background: done ? "linear-gradient(135deg,#22c55e,#16a34a)" : active ? "rgba(34,197,94,0.15)" : _input,
                     border: active ? "1.5px solid rgba(34,197,94,0.5)" : done ? "none" : `1px solid ${_cardBorder}`,
                     transition: ".2s",
                   }}>
@@ -393,7 +388,7 @@ export default function CampaignSetup() {
 
                 {/* Connector */}
                 {i < STEPS.length - 1 && (
-                  <div style={{ flex: 1, height: "2px", borderRadius: "1px", margin: "0 2px", marginBottom: "18px", background: done ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.05)", transition: ".3s" }} />
+                  <div style={{ flex: 1, height: "2px", borderRadius: "1px", margin: "0 2px", marginBottom: "18px", background: done ? "rgba(34,197,94,0.4)" : _cardBorder, transition: ".3s" }} />
                 )}
               </div>
             );
@@ -778,9 +773,9 @@ export default function CampaignSetup() {
             {!profile?.portfolio?.length ? (
               <div
                 onClick={() => portfolioInputRef.current?.click()}
-                style={{ border: "2px dashed rgba(255,255,255,0.08)", borderRadius: "14px", padding: "48px 20px", textAlign: "center", cursor: "pointer", transition: ".15s" }}
+                style={{ border: `2px dashed ${_cardBorder}`, borderRadius: "14px", padding: "48px 20px", textAlign: "center", cursor: "pointer", transition: ".15s" }}
                 onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(34,197,94,0.3)")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = _cardBorder)}
               >
                 <FontAwesomeIcon icon={faImages} style={{ fontSize: "32px", color: "#2d4a31", marginBottom: "12px" }} />
                 <p style={{ color: _dim, fontSize: "13px", fontFamily: "'Inter', sans-serif" }}>Click to upload your first portfolio item</p>
@@ -841,9 +836,9 @@ export default function CampaignSetup() {
             ) : (
               <div
                 onClick={() => videoInputRef.current?.click()}
-                style={{ border: "2px dashed rgba(255,255,255,0.08)", borderRadius: "14px", padding: "48px 20px", textAlign: "center", cursor: "pointer", transition: ".15s" }}
+                style={{ border: `2px dashed ${_cardBorder}`, borderRadius: "14px", padding: "48px 20px", textAlign: "center", cursor: "pointer", transition: ".15s" }}
                 onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(34,197,94,0.3)")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = _cardBorder)}
               >
                 {videoUploading ? (
                   <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "28px", color: "#22c55e", marginBottom: "10px" }} />
@@ -909,7 +904,7 @@ export default function CampaignSetup() {
               { label: "Pitch video added",             done: !!form.pitchVideoUrl },
             ].map((item) => (
               <div key={item.label} className="cs-checklist-item">
-                <div style={{ width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: item.done ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.05)", border: `1px solid ${item.done ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.1)"}` }}>
+                <div style={{ width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: item.done ? "rgba(34,197,94,0.15)" : _input, border: `1px solid ${item.done ? "rgba(34,197,94,0.3)" : _cardBorder}` }}>
                   {item.done && <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: "10px", color: "#22c55e" }} />}
                 </div>
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: "13px", color: item.done ? "#9ca3af" : "#6b7280", textDecoration: item.done ? "none" : "none" }}>
@@ -968,13 +963,8 @@ export default function CampaignSetup() {
 function SetupSkeleton() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const _input = _L ? "#edf7ef" : "#0a1209";
-  const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
-  const _dim = _L ? "#6b7280" : "#4b5563";
   return (
     <div className="space-y-5 animate-pulse">
       <div style={{ height: "60px", background: _card, borderRadius: "16px", border: `1px solid ${_cardBorder}` }} />

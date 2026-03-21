@@ -10,6 +10,7 @@ import {
 import useAuthStore from "../../store/authStore";
 import useThemeStore from "../../store/useThemeStore";
 import api from "../../utils/api";
+import { Helmet } from "react-helmet-async";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const INDUSTRIES = [
@@ -39,33 +40,37 @@ const RISK_COLORS = {
 };
 
 const CARD_COLORS_DARK = [
-  "linear-gradient(135deg,#0f2244,#091830)",
   "linear-gradient(135deg,#0f2e10,#091e09)",
+  "linear-gradient(135deg,#0f2244,#091830)",
   "linear-gradient(135deg,#220f44,#180930)",
   "linear-gradient(135deg,#0f3d38,#092820)",
-  "linear-gradient(135deg,#3d2200,#2a1600)",
   "linear-gradient(135deg,#3d0f22,#280918)",
+  "linear-gradient(135deg,#3d2200,#2a1600)",
 ];
 
 const CARD_COLORS_LIGHT = [
-  "linear-gradient(135deg,#eff6ff,#dbeafe)",   // blue
-  "linear-gradient(135deg,#f0fdf4,#dcfce7)",   // green
-  "linear-gradient(135deg,#f5f3ff,#ede9fe)",   // purple
-  "linear-gradient(135deg,#f0fdfa,#ccfbf1)",   // teal
-  "linear-gradient(135deg,#fffbeb,#fef3c7)",   // amber
-  "linear-gradient(135deg,#fff1f2,#ffe4e6)",   // rose
+  "linear-gradient(135deg,#f0fdf4,#dcfce7)",
+  "linear-gradient(135deg,#eff6ff,#dbeafe)",
+  "linear-gradient(135deg,#f5f3ff,#ede9fe)",
+  "linear-gradient(135deg,#f0fdfa,#ccfbf1)",
+  "linear-gradient(135deg,#fff1f2,#ffe4e6)",
+  "linear-gradient(135deg,#fffbeb,#fef3c7)",
 ];
 
 const CARD_LIGHT_TEXT = [
-  "#1e3a5f", "#0a2e0c", "#3b1f6e", "#0f3d38", "#5a3a00", "#5e1a2a",
+  "#0a2e0c", "#1e3a5f", "#3b1f6e", "#0f3d38", "#5e1a2a", "#5a3a00"
 ];
 
+
 // ─── Main Component ───────────────────────────────────────────────────────────
+const SF_URL = "https://skillfund-client.vercel.app";
+
 export default function BrowseInvestors() {
   const theme = useThemeStore((s) => s.theme);
   const isLight = theme === "light";
   const card = isLight ? "#ffffff" : "#070d08";
   const cardBorder = isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.08)";
+  const cardMuted  = isLight ? "#4b5563" : "#9ca3af";
   const textMuted = isLight ? "#4b5563" : "#9ca3af";
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -150,20 +155,29 @@ export default function BrowseInvestors() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Browse Investors — SkillFund</title>
+        <meta name="description" content="Find investors ready to fund your skill on SkillFund. Connect with verified investors interested in fashion, tech, photography, baking, and more." />
+        <meta property="og:title" content="Browse Investors — SkillFund" />
+        <meta property="og:description" content="Find investors ready to fund your skill. Connect with verified investors interested in fashion, tech, photography, baking, and more." />
+        <meta property="og:url" content={`${SF_URL}/investors`} />
+        <link rel="canonical" href={`${SF_URL}/investors`} />
+      </Helmet>
+      <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        .bi-input { background:${isLight ? "#f0fdf4" : "#070d08"}; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; color:${isLight ? "#0a1a0c" : "#ffffff"}; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .bi-input { background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.1)); color:var(--sf-text-primary,#ffffff); border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
         .bi-input:focus { border-color:rgba(34,197,94,0.4); }
         .bi-input::placeholder { color:#5a8a63; }
-        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#4b5563" : "#9ca3af"}; font-family:'Syne',sans-serif; white-space:nowrap; }
-        .ind-pill:hover { border-color:rgba(59,130,246,0.3); color:${isLight ? "#1e3a5f" : "#9ca3af"}; }
+        .ind-pill { flex-shrink:0; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; border:1px solid var(--sf-border,rgba(255,255,255,0.1)); background:var(--sf-bg-card,#070d08); color:var(--sf-text-muted,#9ca3af); font-family:'Syne',sans-serif; white-space:nowrap; }
+        .ind-pill:hover { border-color:rgba(59,130,246,0.3); color:#9ca3af; }
         .ind-pill.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
-        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid ${isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}; background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#4b5563" : "#9ca3af"}; font-family:'Syne',sans-serif; }
-        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:${isLight ? "#1e3a5f" : "#ffffff"}; }
+        .page-btn { width:36px; height:36px; border-radius:10px; font-size:13px; font-weight:700; transition:all .15s; border:1px solid var(--sf-border,rgba(255,255,255,0.1)); background:var(--sf-bg-card,#070d08); color:var(--sf-text-muted,#9ca3af); font-family:'Syne',sans-serif; }
+        .page-btn:hover:not(:disabled) { border-color:rgba(59,130,246,0.3); color:#ffffff; }
         .page-btn.active { background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-color:transparent; color:#ffffff; }
         .page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-        select option { background:${isLight ? "#ffffff" : "#070d08"}; color:${isLight ? "#0a1a0c" : "#ffffff"}; }
+        select option { background:#070d08; color:#ffffff; }
       `}</style>
 
       {/* Header */}
@@ -171,9 +185,9 @@ export default function BrowseInvestors() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-xs font-bold tracking-widest mb-1" style={{ fontFamily: "'Syne', sans-serif", color: "#3b82f6" }}>DISCOVER</p>
-            <h2 className="font-black text-white" style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Investors</h2>
-            <p className="text-sm mt-0.5" style={{ color: textMuted }}>
-              {loading ? "Loading..." : <><span className="text-white font-semibold">{total}</span> investors looking to fund creators</>}
+            <h2 className="font-black" style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Fraunces', serif", fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>Browse Investors</h2>
+            <p className="text-sm mt-0.5" style={{ color: cardMuted }}>
+              {loading ? "Loading..." : <><span className="font-semibold" style={{ color: "var(--sf-text-primary,#f1f5f9)" }}>{total}</span> investors looking to fund creators</>}
             </p>
           </div>
           {user?.role === "investor" && (
@@ -195,7 +209,7 @@ export default function BrowseInvestors() {
             style={{ paddingLeft: "38px", paddingRight: search ? "38px" : "14px" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: textMuted }}>
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: cardMuted }}>
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: "13px" }} />
             </button>
           )}
@@ -213,7 +227,7 @@ export default function BrowseInvestors() {
             fontFamily: "'Syne', sans-serif",
             background: showFilters || hasActiveFilters ? "rgba(59,130,246,0.1)" : isLight ? "#ffffff" : "#070d08",
             border: `1px solid ${showFilters || hasActiveFilters ? "rgba(59,130,246,0.35)" : isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.2)"}`,
-            color: showFilters || hasActiveFilters ? "#3b82f6" : textMuted,
+            color: showFilters || hasActiveFilters ? "#3b82f6" : isLight ? "#4b5563" : "#9ca3af",
           }}
         >
           <FontAwesomeIcon icon={faSliders} style={{ fontSize: "13px" }} /> Filters
@@ -225,7 +239,7 @@ export default function BrowseInvestors() {
       {showFilters && (
         <div className="rounded-2xl p-5 mb-4" style={{ background: card, border: `1px solid ${cardBorder}` }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="font-bold text-sm" style={{ fontFamily: "'Syne', sans-serif", color: isLight ? "#0a1a0c" : "#ffffff" }}>Advanced Filters</p>
+            <p className="font-bold text-sm" style={{ color: "var(--sf-text-primary,#f1f5f9)", fontFamily: "'Syne', sans-serif" }}>Advanced Filters</p>
             {hasActiveFilters && (
               <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-bold" style={{ color: "#ef4444", fontFamily: "'Syne', sans-serif" }}>
                 <FontAwesomeIcon icon={faXmark} style={{ fontSize: "11px" }} /> Clear all
@@ -234,11 +248,11 @@ export default function BrowseInvestors() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: textMuted }}>MIN BUDGET ($)</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: cardMuted }}>MIN BUDGET ($)</label>
               <input type="number" value={minBudget} onChange={e => setMinBudget(e.target.value)} placeholder="0" className="bi-input" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: textMuted }}>INDUSTRY</label>
+              <label className="block text-xs font-bold mb-2 tracking-widest" style={{ fontFamily: "'Syne', sans-serif", color: cardMuted }}>INDUSTRY</label>
               <div className="relative">
                 <select value={industry} onChange={e => setIndustry(e.target.value)} style={selectStyle}>
                   {INDUSTRIES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
@@ -293,6 +307,7 @@ export default function BrowseInvestors() {
         </>
       )}
     </div>
+    </>
   );
 }
 
@@ -300,17 +315,13 @@ export default function BrowseInvestors() {
 function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoading, cardColor, colorIdx = 0 }) {
   const theme = useThemeStore((s) => s.theme);
   const isLight = theme === "light";
-
-  const cardText          = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#ffffff";
-  const cardMuted         = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#9ca3af";
-  const cardDim           = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#9ca3af";
-  const cardBorder        = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}25` : "rgba(255,255,255,0.07)";
-  const cardOverlay       = isLight ? "rgba(0,0,0,0.04)"  : "rgba(0,0,0,0.2)";
-  const cardStatBg        = isLight ? "rgba(0,0,0,0.05)"  : "rgba(0,0,0,0.25)";
-  const cardStatBorder    = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.18)";
+  const cardText   = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#ffffff";
+  const cardMuted  = isLight ? CARD_LIGHT_TEXT[colorIdx] : "#9ca3af";
+  const cardStatBg = isLight ? "rgba(0,0,0,0.04)" : "rgba(0,0,0,0.25)";
+  const cardStatBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.18)";
+  const cardGhostBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(0,0,0,0.3)";
+  const cardBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}25` : "rgba(255,255,255,0.07)";
   const cardDefaultBorder = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}20` : "rgba(255,255,255,0.18)";
-  const cardHoverBorder   = isLight ? `${CARD_LIGHT_TEXT[colorIdx]}50` : "rgba(59,130,246,0.25)";
-  const cardGhostBg       = isLight ? "rgba(0,0,0,0.05)"  : "rgba(0,0,0,0.3)";
 
   const navigate = useNavigate();
   const id = investor.userId?._id || investor.userId || investor._id;
@@ -336,14 +347,13 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
 
   return (
     <div
-      className="group rounded-2xl cursor-pointer transition-all duration-200 "
-      style={{ background: cardColor, border: `1px solid ${cardDefaultBorder}`, boxShadow: isLight ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.12)", position: "relative", overflow: "visible" }}
+      className="group rounded-2xl cursor-pointer"
+      style={{ background: cardColor, border: `1px solid ${cardDefaultBorder}`, boxShadow: isLight ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)", position: "relative", overflow: "visible" }}
       onClick={() => navigate(`/investors/${id}`)}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"; e.currentTarget.style.borderColor = cardHoverBorder; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.12)"; e.currentTarget.style.borderColor = cardDefaultBorder; }}
+      
     >
       {/* Cover strip */}
-      <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: cardOverlay }}>
+      <div className="relative h-24 overflow-hidden rounded-t-2xl flex items-center justify-end pr-8" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="text-7xl select-none" style={{ opacity: 0.1 }}>💼</div>
         {/* Plan badge */}
         <div className="absolute top-3 left-3 flex gap-1.5">
@@ -392,7 +402,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
           ].map(({ faIcon, color, label, value }) => (
             <div key={label} className="rounded-xl p-3" style={{ background: cardStatBg, border: `1px solid ${cardStatBorder}` }}>
               <div className="flex items-center gap-1 mb-1">
-                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: cardDim }}>{label}</span>
+                <FontAwesomeIcon icon={faIcon} style={{ fontSize: "10px", color }} /><span className="text-xs" style={{ color: cardMuted }}>{label}</span>
               </div>
               <p className="font-black text-sm" style={{ fontFamily: "'Fraunces', serif", color: cardText }}>{value}</p>
             </div>
@@ -408,7 +418,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
               </span>
             ))}
             {industries.length > 3 && (
-              <span className="text-xs px-2 py-1 rounded-full" style={{ background: cardStatBg, color: cardDim }}>+{industries.length - 3}</span>
+              <span className="text-xs px-2 py-1 rounded-full" style={{ background: cardGhostBg, color: cardMuted }}>+{industries.length - 3}</span>
             )}
           </div>
         )}
@@ -428,7 +438,7 @@ function InvestorCard({ investor, currentUser, onConnect, onMessage, actionLoadi
                     border: connectionStatus === "accepted" ? "1px solid rgba(34,197,94,0.3)" : connectionStatus === "pending" ? "1px solid rgba(245,158,11,0.3)" : "none",
                     color: connectionStatus === "accepted" ? "#22c55e" : connectionStatus === "pending" ? "#f59e0b" : "#ffffff",
                     cursor: connectionStatus ? "default" : "pointer",
-                    boxShadow: !connectionStatus ? "0 2px 8px rgba(59,130,246,0.2)" : "none",
+                    boxShadow: !connectionStatus ? "0 4px 16px rgba(59,130,246,0.3)" : "none",
                   }}
                 >
                   {connectLoading ? <FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "13px" }} />
@@ -497,14 +507,14 @@ function EmptyState({ onClear, hasFilters }) {
   const theme = useThemeStore((s) => s.theme);
   const isLight = theme === "light";
   const card = isLight ? "#ffffff" : "#070d08";
-  const cardBorder = isLight ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const textMuted = isLight ? "#4b5563" : "#9ca3af";
+  const cardBorder = isLight ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.08)";
+  const cardMuted  = isLight ? "#4b5563" : "#9ca3af";
 
   return (
     <div className="rounded-3xl p-16 text-center" style={{ background: card, border: `1px solid ${cardBorder}` }}>
       <div className="text-5xl mb-4">💼</div>
       <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>No investors found</h3>
-      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: textMuted }}>
+      <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: cardMuted }}>
         {hasFilters ? "No investors match your current filters. Try adjusting your search." : "No investors are available at the moment. Check back soon!"}
       </p>
       {hasFilters && (

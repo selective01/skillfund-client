@@ -11,7 +11,7 @@ import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import { ScoreCard } from "../../components/layout/ScoreBadge";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
-import useThemeStore from "../../store/useThemeStore";
+import { Helmet } from "react-helmet-async";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const CATEGORY_EMOJI = {
@@ -28,38 +28,9 @@ const VERIFICATION_BADGES = [
 ];
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-function useT() {
-  const _t = useThemeStore((s) => s.theme);
-  const L = _t === "light";
-  return {
-    card:      L ? "#ffffff"              : "#070d08",
-    cardAlt:   L ? "#f0fdf4"              : "#0a1209",
-    border:    L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
-    text:      L ? "#0a1a0c"              : "#f1f5f9",
-    muted:     L ? "#4b5563"              : "#9ca3af",
-    dim:       L ? "#6b7280"              : "#4b5563",
-    hover:     L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
-    shadow:    L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
-    heroGrad:  L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)",
-    heroBorder:L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)",
-  };
-}
+const SF_URL = "https://skillfund-client.vercel.app";
 
 export default function UserProfile() {
-  const _theme = useThemeStore((s) => s.theme);
-  const _L = _theme === "light";
-  const T = {
-    bg:        _L ? "#f4faf5"              : "#040806",
-    card:      _L ? "#ffffff"              : "#070d08",
-    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
-    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
-    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
-    text:      _L ? "#0a1a0c"              : "#f1f5f9",
-    muted:     _L ? "#4b5563"              : "#9ca3af",
-    dim:       _L ? "#6b7280"              : "#4b5563",
-    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
-    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
-  };
   useNotificationReadOnView();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -118,10 +89,10 @@ export default function UserProfile() {
 
   if (!profileData) {
     return (
-        <div className="rounded-3xl p-16 text-center" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+        <div className="rounded-3xl p-16 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
           <Shield size={40} className="mx-auto mb-4" style={{ color: "#5a8a63" }} />
           <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.3rem" }}>Profile not found</h3>
-          <p className="text-sm mb-6" style={{ color: T.muted }}>This user doesn't exist or their profile is private.</p>
+          <p className="text-sm mb-6" style={{ color: "#9ca3af" }}>This user doesn't exist or their profile is private.</p>
           <button onClick={() => navigate(-1)} className="font-black text-sm px-6 py-3 rounded-xl transition-all hover:scale-105" style={{ fontFamily: "'Syne', sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000" }}>
             Go Back
           </button>
@@ -143,8 +114,33 @@ export default function UserProfile() {
     ? Math.min(100, Math.round(((profile.amountRaised || 0) / profile.fundingGoal) * 100))
     : 0;
 
+  const isCreatorProfile = profileData?.role === "creator";
+  const displayName = profileData?.name || "SkillFund User";
+  const pageTitle = isCreatorProfile
+    ? `${displayName} — ${profile?.skillCategory || "Creator"} | SkillFund`
+    : `${displayName} — Investor | SkillFund`;
+  const pageDesc = profile?.bio
+    ? `${profile.bio.slice(0, 150)}...`
+    : isCreatorProfile
+      ? `${displayName} is a creator on SkillFund. View their campaign, credit score, and investment terms.`
+      : `${displayName} is an investor on SkillFund looking to fund talented African creators.`;
+
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:image" content={profileData?.avatar || ""} />
+        <meta property="og:url" content={`${SF_URL}/users/${id}`} />
+        <meta property="og:type" content="profile" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:image" content={profileData?.avatar || ""} />
+        <link rel="canonical" href={`${SF_URL}/users/${id}`} />
+      </Helmet>
+      <div className="space-y-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
         .p-card { background:#070d08; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; }
@@ -171,7 +167,7 @@ export default function UserProfile() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm mb-5 transition-colors"
-        style={{ color: T.muted, fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
+        style={{ color: "#9ca3af", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
         onMouseEnter={e => e.currentTarget.style.color = "white"}
         onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
       >
@@ -215,7 +211,7 @@ export default function UserProfile() {
         {!isOwnProfile && (
           <div className="absolute bottom-3 right-4 flex gap-2">
             {canInvest && (
-              <button onClick={handleInvest} className="p-btn-sm" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", boxShadow: "0 2px 8px rgba(34,197,94,0.2)" }}>
+              <button onClick={handleInvest} className="p-btn-sm" style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", border: "none", boxShadow: "0 4px 16px rgba(34,197,94,0.3)" }}>
                 <ArrowUpRight size={13} /> Invest
               </button>
             )}
@@ -226,7 +222,7 @@ export default function UserProfile() {
                 className="p-btn-sm"
                 style={connectionStatus === "pending"
                   ? { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b" }
-                  : { background: "rgba(0,0,0,0.5)", border: `1px solid ${T.border}`, color: T.muted }}
+                  : { background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}
               >
                 {connectLoading ? <Loader2 size={13} className="animate-spin" />
                   : connectionStatus === "pending" ? <><Clock size={13} /> Pending</>
@@ -234,7 +230,7 @@ export default function UserProfile() {
               </button>
             )}
             {connectionStatus === "accepted" && (
-              <button onClick={() => navigate(`/messages?userId=${id}`)} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: `1px solid ${T.border}`, color: T.muted }}>
+              <button onClick={() => navigate(`/messages?userId=${id}`)} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
                 <MessageSquare size={13} /> Message
               </button>
             )}
@@ -242,7 +238,7 @@ export default function UserProfile() {
         )}
         {isOwnProfile && (
           <div className="absolute bottom-3 right-4">
-            <button onClick={() => navigate("/profile")} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: `1px solid ${T.border}`, color: T.muted }}>
+            <button onClick={() => navigate("/profile")} className="p-btn-sm" style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af" }}>
               Edit Profile
             </button>
           </div>
@@ -262,8 +258,8 @@ export default function UserProfile() {
           <p className="font-semibold mt-1" style={{ color: "#22c55e" }}>{CATEGORY_EMOJI[profile.skillCategory]} {profile.skill}</p>
         )}
         <div className="flex items-center gap-4 mt-2 flex-wrap">
-          {profile.location && <span className="flex items-center gap-1 text-sm" style={{ color: T.muted }}><MapPin size={12} /> {profile.location}</span>}
-          {isCreator && <span className="flex items-center gap-1 text-sm" style={{ color: T.muted }}><Users size={12} /> {profile.profileViews || 0} profile views</span>}
+          {profile.location && <span className="flex items-center gap-1 text-sm" style={{ color: "#9ca3af" }}><MapPin size={12} /> {profile.location}</span>}
+          {isCreator && <span className="flex items-center gap-1 text-sm" style={{ color: "#9ca3af" }}><Users size={12} /> {profile.profileViews || 0} profile views</span>}
           {isCreator && profile.amountRaised > 0 && (
             <span className="flex items-center gap-1 text-sm font-semibold" style={{ color: "#22c55e" }}><DollarSign size={12} /> ${Number(profile.amountRaised).toLocaleString()} raised</span>
           )}
@@ -280,7 +276,7 @@ export default function UserProfile() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: `1px solid ${T.border}` }}>
+      <div className="flex gap-2 mb-6 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
         {tabs.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`p-tab ${activeTab === tab ? "on" : ""}`}>
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -296,7 +292,7 @@ export default function UserProfile() {
             {profile.bio && (
               <div className="p-card">
                 <p className="text-xs font-bold tracking-widest mb-3" style={{ fontFamily: "'Syne', sans-serif", color: "#22c55e" }}>ABOUT</p>
-                <p className="text-sm leading-relaxed" style={{ color: T.muted }}>{profile.bio}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "#9ca3af" }}>{profile.bio}</p>
               </div>
             )}
 
@@ -316,7 +312,7 @@ export default function UserProfile() {
                     { label: "Status", value: profile.isAcceptingInvestments ? "Open" : "Closed", isStatus: true },
                   ].map(d => (
                     <div key={d.label} className="p-stat">
-                      <p className="text-xs mb-1" style={{ color: T.muted }}>{d.label}</p>
+                      <p className="text-xs mb-1" style={{ color: "#9ca3af" }}>{d.label}</p>
                       <p className="text-sm font-black" style={{ fontFamily: "'Fraunces', serif", color: d.isStatus ? (profile.isAcceptingInvestments ? "#22c55e" : "#ef4444") : "white" }}>{d.value}</p>
                     </div>
                   ))}
@@ -324,7 +320,7 @@ export default function UserProfile() {
                 {profile.fundingGoal > 0 && (
                   <div>
                     <div className="flex justify-between text-xs mb-1.5">
-                      <span style={{ color: T.muted }}>Funding progress</span>
+                      <span style={{ color: "#9ca3af" }}>Funding progress</span>
                       <span className="font-black" style={{ color: "#22c55e", fontFamily: "'Fraunces', serif" }}>{progressPercent}%</span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.4)" }}>
@@ -336,9 +332,9 @@ export default function UserProfile() {
                   </div>
                 )}
                 {profile.fundingPurpose && (
-                  <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${T.border}` }}>
-                    <p className="text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne', sans-serif", color: T.muted }}>FUNDING PURPOSE</p>
-                    <p className="text-sm leading-relaxed" style={{ color: T.muted }}>{profile.fundingPurpose}</p>
+                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}>
+                    <p className="text-xs font-bold tracking-widest mb-1.5" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>FUNDING PURPOSE</p>
+                    <p className="text-sm leading-relaxed" style={{ color: "#9ca3af" }}>{profile.fundingPurpose}</p>
                   </div>
                 )}
               </div>
@@ -361,14 +357,14 @@ export default function UserProfile() {
                     { label: "Total Invested", value: profile.totalInvested     ? `$${Number(profile.totalInvested).toLocaleString()}` : "—" },
                   ].map(d => (
                     <div key={d.label} className="p-stat">
-                      <p className="text-xs mb-1" style={{ color: T.muted }}>{d.label}</p>
+                      <p className="text-xs mb-1" style={{ color: "#9ca3af" }}>{d.label}</p>
                       <p className="text-sm font-black capitalize" style={{ fontFamily: "'Fraunces', serif", color: "white" }}>{d.value}</p>
                     </div>
                   ))}
                 </div>
                 {profile.industriesOfInterest?.length > 0 && (
-                  <div className="pt-3" style={{ borderTop: `1px solid ${T.border}` }}>
-                    <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Syne', sans-serif", color: T.muted }}>INDUSTRIES OF INTEREST</p>
+                  <div className="pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}>
+                    <p className="text-xs font-bold tracking-widest mb-2" style={{ fontFamily: "'Syne', sans-serif", color: "#9ca3af" }}>INDUSTRIES OF INTEREST</p>
                     <div className="flex flex-wrap gap-2">
                       {profile.industriesOfInterest.map(ind => (
                         <span key={ind} className="text-xs px-3 py-1 rounded-full capitalize" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.35)", color: "#3b82f6" }}>
@@ -419,13 +415,13 @@ export default function UserProfile() {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: profile.isAcceptingInvestments ? "rgba(34,197,94,0.12)" : "rgba(0,0,0,0.3)" }}>
                     {profile.isAcceptingInvestments
                       ? <CheckCircle size={17} style={{ color: "#22c55e" }} />
-                      : <Clock       size={17} style={{ color: T.muted }} />}
+                      : <Clock       size={17} style={{ color: "#9ca3af" }} />}
                   </div>
                   <div>
                     <p className="text-white text-sm font-bold" style={{ fontFamily: "'Syne', sans-serif" }}>
                       {profile.isAcceptingInvestments ? "Open to Invest" : "Not Accepting"}
                     </p>
-                    <p className="text-xs" style={{ color: T.muted }}>
+                    <p className="text-xs" style={{ color: "#9ca3af" }}>
                       {profile.isAcceptingInvestments ? "Looking for investors" : "Not currently seeking investment"}
                     </p>
                   </div>
@@ -436,7 +432,7 @@ export default function UserProfile() {
 
             {!isOwnProfile && connectionStatus !== "accepted" && (
               <div className="p-card">
-                <p className="text-sm mb-3" style={{ color: T.dim }}>
+                <p className="text-sm mb-3" style={{ color: "#6b7280" }}>
                   {connectionStatus === "pending"
                     ? "Your connection request is pending."
                     : `Connect with ${profileData.name?.split(" ")[0]} to start a conversation.`}
@@ -474,20 +470,20 @@ export default function UserProfile() {
         profile.portfolio?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {profile.portfolio.map(item => (
-              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+              <div key={item._id} className="group rounded-2xl overflow-hidden" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
                 <div className="relative h-52 overflow-hidden">
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" />
                 </div>
                 <div className="p-4">
                   <h4 className="text-white font-black text-sm mb-1" style={{ fontFamily: "'Syne', sans-serif" }}>{item.title}</h4>
-                  {item.description && <p className="text-xs leading-relaxed line-clamp-2" style={{ color: T.dim }}>{item.description}</p>}
+                  {item.description && <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "#6b7280" }}>{item.description}</p>}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl p-12 text-center" style={{ background: T.card, border: `1px solid ${T.border}` }}>
-            <p className="text-sm" style={{ color: T.muted }}>No portfolio items yet.</p>
+          <div className="rounded-3xl p-12 text-center" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
+            <p className="text-sm" style={{ color: "#9ca3af" }}>No portfolio items yet.</p>
           </div>
         )
       )}
@@ -506,7 +502,7 @@ export default function UserProfile() {
             <p className="text-xs font-bold tracking-widest mb-4" style={{ fontFamily: "'Syne', sans-serif", color: "#22c55e" }}>VERIFICATION STATUS</p>
             {VERIFICATION_BADGES.map(b => (
               <div key={b.key} className="p-row">
-                <span className="text-sm" style={{ color: T.dim }}>{b.icon} {b.label}</span>
+                <span className="text-sm" style={{ color: "#6b7280" }}>{b.icon} {b.label}</span>
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
                   fontFamily: "'Syne', sans-serif",
                   background: profileData[b.key] ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.3)",
@@ -521,17 +517,17 @@ export default function UserProfile() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function StatRow({ icon, label, value }) {
-  const T = useT();
   return (
     <div className="p-stat-row">
       <div className="flex items-center gap-2">
         {icon}
-        <span className="text-xs" style={{ color: T.muted }}>{label}</span>
+        <span className="text-xs" style={{ color: "#9ca3af" }}>{label}</span>
       </div>
       <span className="text-sm font-black" style={{ fontFamily: "'Fraunces', serif", color: "white" }}>{value}</span>
     </div>
@@ -539,10 +535,9 @@ function StatRow({ icon, label, value }) {
 }
 
 function DetailRow({ label, value }) {
-  const T = useT();
   return (
     <div className="p-row">
-      <span className="text-sm" style={{ color: T.dim }}>{label}</span>
+      <span className="text-sm" style={{ color: "#6b7280" }}>{label}</span>
       <span className="text-sm font-bold" style={{ fontFamily: "'Syne', sans-serif", color: "white" }}>{value}</span>
     </div>
   );
@@ -550,12 +545,11 @@ function DetailRow({ label, value }) {
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function ProfileSkeleton() {
-  const T = useT();
   return (
     <div className="animate-pulse space-y-6">
-      <div className="h-40 rounded-3xl" style={{ background: T.card, border: `1px solid ${T.border}` }} />
+      <div className="h-40 rounded-3xl" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }} />
       <div className="flex items-end gap-4 -mt-10 pl-6">
-        <div className="w-20 h-20 rounded-2xl" style={{ background: T.cardAlt }} />
+        <div className="w-20 h-20 rounded-2xl" style={{ background: "#0a1209" }} />
         <div className="space-y-2 pb-2">
           <div className="h-5 rounded-full w-40" style={{ background: "rgba(255,255,255,0.2)" }} />
           <div className="h-3 rounded-full w-24" style={{ background: "rgba(255,255,255,0.2)" }} />
@@ -563,19 +557,19 @@ function ProfileSkeleton() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
             <div className="h-3 rounded-full w-1/4" style={{ background: "rgba(255,255,255,0.2)" }} />
             <div className="h-3 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
             <div className="h-3 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.2)" }} />
           </div>
-          <div className="rounded-2xl p-5" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+          <div className="rounded-2xl p-5" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
             <div className="grid grid-cols-3 gap-3">
               {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }} />)}
             </div>
           </div>
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: T.card, border: `1px solid ${T.border}` }}>
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "#070d08", border: "1px solid rgba(255,255,255,0.2)" }}>
             {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-4 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />)}
           </div>
         </div>

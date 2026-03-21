@@ -104,8 +104,9 @@ function Section({ title, accentColor="#22c55e", children, action }) {
 }
 
 function StatCard({ label, value, faIcon, iconColor, theme }) {
+  const T = useT();
   return (
-    <div className="rounded-2xl p-5" style={{ background:theme.bg, border:`1px solid ${theme.border}`, boxShadow:"0 4px 24px rgba(0,0,0,0.35)" }}>
+    <div className="rounded-2xl p-5" style={{ background:theme.bg, border:`1px solid ${theme.border}`, boxShadow: T.shadow }}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-bold tracking-widest" style={{ fontFamily:"'Syne',sans-serif", color:"var(--text-muted)" }}>{label.toUpperCase()}</p>
         <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:`${iconColor}18` }}>
@@ -194,7 +195,7 @@ function EmptyBox({ faIcon, iconColor="#9ca3af", title, message, btnLabel, onBtn
 export default function InvestmentsEarnings() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const T = {
+  const theme = {
     bg:        _L ? "#f4faf5"              : "#040806",
     card:      _L ? "#ffffff"              : "#070d08",
     cardAlt:   _L ? "#f0fdf4"              : "#0a1209",

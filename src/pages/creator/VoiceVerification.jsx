@@ -42,7 +42,6 @@ const QUESTIONS_PREVIEW = [
 function StatusBanner({ status, scheduledFor, rejectionReason }) {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
   const _input = _L ? "#edf7ef" : "#0a1209";
@@ -103,7 +102,6 @@ function StatusBanner({ status, scheduledFor, rejectionReason }) {
 function DatePicker({ value, onChange }) {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
   const _input = _L ? "#edf7ef" : "#0a1209";
@@ -137,7 +135,7 @@ function DatePicker({ value, onChange }) {
             style={{
               padding: "10px 4px", borderRadius: "12px", cursor: "pointer", transition: ".15s",
               background: sel ? "rgba(34,197,94,0.12)" : _input,
-              border: `1px solid ${sel ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`,
+              border: `1px solid ${sel ? "rgba(34,197,94,0.4)" : _cardBorder}`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: "2px",
             }}
           >
@@ -156,7 +154,6 @@ function DatePicker({ value, onChange }) {
 export default function VoiceVerification() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
   const _input = _L ? "#edf7ef" : "#0a1209";
@@ -270,13 +267,13 @@ export default function VoiceVerification() {
         .vv-btn-green { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:900; font-size:14px; padding:13px 24px; border-radius:14px; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; width:100%; transition:.15s; box-shadow:0 4px 20px rgba(34,197,94,0.2); }
         .vv-btn-green:hover:not(:disabled) { transform:scale(1.02); box-shadow:0 6px 28px rgba(34,197,94,0.3); }
         .vv-btn-green:disabled { opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
-        .vv-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:11px 20px; border-radius:13px; cursor:pointer; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#9ca3af; width:100%; transition:.15s; }
+        .vv-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:11px 20px; border-radius:13px; cursor:pointer; background:var(--sf-bg-input,rgba(0,0,0,0.3)); border:1px solid var(--sf-border,rgba(255,255,255,0.08)); color:var(--sf-text-muted,#9ca3af); width:100%; transition:.15s; }
         .vv-btn-ghost:hover { border-color:rgba(34,197,94,0.25); color:white; }
-        .vv-card { background:#070d08; border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:22px; }
+        .vv-card { background:var(--sf-bg-card,#070d08); border:1px solid var(--sf-border,rgba(255,255,255,0.07)); border-radius:20px; padding:22px; }
         .vv-section-title { font-family:'Inter', sans-serif; font-weight:900; font-size:1.05rem; color:white; margin:0 0 4px; }
         .vv-section-sub { font-family:'Inter', sans-serif; font-size:13px; color:#6b7280; margin:0 0 20px; line-height:1.5; }
         .vv-time-btn { padding:9px 12px; border-radius:10px; cursor:pointer; transition:.15s; font-family:'Inter', sans-serif; font-weight:700; font-size:12px; white-space:nowrap; }
-        .vv-question-row { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .vv-question-row { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--sf-border,rgba(255,255,255,0.04)); }
         .vv-question-row:last-child { border-bottom:none; }
       `}</style>
 
@@ -431,7 +428,7 @@ export default function VoiceVerification() {
                     className="vv-time-btn"
                     style={{
                       background: sel ? "rgba(34,197,94,0.12)" : _input,
-                      border: `1px solid ${sel ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`,
+                      border: `1px solid ${sel ? "rgba(34,197,94,0.4)" : _cardBorder}`,
                       color: sel ? "#22c55e" : "#9ca3af",
                     }}
                   >

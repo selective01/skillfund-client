@@ -9,6 +9,7 @@ import {
 import useAuthStore from "../../store/authStore";
 import api from "../../utils/api";
 import useNotificationReadOnView from "../../hooks/useNotificationReadOnView";
+import useThemeStore from "../../store/useThemeStore";
 
 const PLAN_FEES = { basic: 5, starter: 4, pro: 3, elite: 2 };
 
@@ -48,6 +49,20 @@ function Textarea({ ...props }) {
 }
 
 export default function Withdraw() {
+  const _theme = useThemeStore((s) => s.theme);
+  const _L = _theme === "light";
+  const T = {
+    bg:        _L ? "#f4faf5"              : "#040806",
+    card:      _L ? "#ffffff"              : "#070d08",
+    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
+    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
+    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
+    text:      _L ? "#0a1a0c"              : "#f1f5f9",
+    muted:     _L ? "#4b5563"              : "#9ca3af",
+    dim:       _L ? "#6b7280"              : "#4b5563",
+    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
+    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
+  };
   useNotificationReadOnView();
   const { user }   = useAuthStore();
   const plan       = user?.plan || "basic";
@@ -118,7 +133,7 @@ export default function Withdraw() {
       `}</style>
 
       {/* ── Header ── */}
-        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+        <div className="wd-in relative rounded-3xl p-6 overflow-hidden" style={{ background: "linear-gradient(135deg,var(--card-green-start,#0f2e10),var(--card-green-mid,#071a0b),var(--bg))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: T.shadow }}>
           <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%)", filter: "blur(20px)" }} />
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
           <div className="relative">
@@ -145,7 +160,7 @@ export default function Withdraw() {
             { label: "Pending",           value: `$${pendingAmount.toLocaleString()}`,                                 sub: "Being processed",                    icon: faClock,       iconColor: "#f59e0b", bg: "var(--card-amber)", border: "rgba(245,158,11,0.30)" },
             { label: "Total Withdrawn",   value: `$${totalWithdrawn.toLocaleString()}`,                                sub: "All time",                           icon: faCircleCheck, iconColor: "#22c55e", bg: "var(--card-blue)", border: "rgba(34,197,94,0.30)" },
           ].map(s => (
-            <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 4px 24px rgba(0,0,0,0.35)" }}>
+            <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: T.shadow }}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold tracking-widest" style={{ fontFamily: "'Syne',sans-serif", color: "var(--text-dim)" }}>{s.label.toUpperCase()}</p>
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `${s.iconColor}18` }}>
@@ -270,7 +285,7 @@ export default function Withdraw() {
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes for the admin..." rows={2} />
             </div>
 
-            <button onClick={handleSubmit} disabled={submitting || !amount || parsedAmount < minWithdrawal || !hasEnoughBalance} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 4px 20px rgba(34,197,94,0.3)" }}>
+            <button onClick={handleSubmit} disabled={submitting || !amount || parsedAmount < minWithdrawal || !hasEnoughBalance} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style={{ fontFamily: "'Syne',sans-serif", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "#000", boxShadow: "0 2px 8px rgba(34,197,94,0.2)" }}>
               {submitting
                 ? <><FontAwesomeIcon icon={faCircleNotch} spin style={{ fontSize: "13px" }} /> Submitting...</>
                 : <><FontAwesomeIcon icon={faDownload} style={{ fontSize: "13px" }} /> Request Withdrawal</>}

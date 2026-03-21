@@ -39,12 +39,9 @@ const TABS = [
 function StatusPill({ status }) {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _dim = _L ? "#6b7280" : "#4b5563";
   const map = {
     approved: { label: "Approved",    color: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.3)",   icon: faCircleCheck    },
@@ -64,17 +61,11 @@ function StatusPill({ status }) {
 function DropZone({ files, onFiles, onRemove, accept = "image/*,video/*,application/pdf", multiple = true, label, hint }) {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
   const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _dim = _L ? "#6b7280" : "#4b5563";
-  const _heroGrad = _L
-    ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)"
-    : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
-  const _heroBorder = _L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)";
 
   const inputRef = useRef();
   const [dragging, setDragging] = useState(false);
@@ -131,13 +122,13 @@ function DropZone({ files, onFiles, onRemove, accept = "image/*,video/*,applicat
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         style={{
-          border: `2px dashed ${dragging ? "#22c55e" : "rgba(255,255,255,0.08)"}`,
+          border: `2px dashed ${dragging ? "#22c55e" : _cardBorder}`,
           borderRadius: "14px", padding: "28px 20px", textAlign: "center",
           cursor: "pointer", transition: ".2s",
           background: dragging ? "rgba(34,197,94,0.04)" : "transparent",
         }}
         onMouseEnter={(e) => { if (!dragging) e.currentTarget.style.borderColor = "rgba(34,197,94,0.3)"; }}
-        onMouseLeave={(e) => { if (!dragging) e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+        onMouseLeave={(e) => { if (!dragging) e.currentTarget.style.borderColor = _cardBorder; }}
       >
         <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "22px", color: "#2d4a31", marginBottom: "8px" }} />
         <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "12px", color: _dim }}>
@@ -156,17 +147,12 @@ function DropZone({ files, onFiles, onRemove, accept = "image/*,video/*,applicat
 function AssetCollateralTab() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _dim = _L ? "#6b7280" : "#4b5563";
-  const _heroGrad = _L
-    ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)"
-    : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
-  const _heroBorder = _L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)";
+  const _muted = _L ? "#4b5563" : "#9ca3af";
+  const _input = _L ? "#edf7ef" : "#0a1209";
 
   const [assets,     setAssets]     = useState([]);
   const [loading,    setLoading]    = useState(true);
@@ -319,8 +305,8 @@ function AssetCollateralTab() {
                     onClick={() => setF("assetType", t.value)}
                     style={{
                       padding: "10px 12px", borderRadius: "12px", cursor: "pointer", textAlign: "left", transition: ".15s",
-                      background: sel ? "rgba(34,197,94,0.08)" : "#0a1209",
-                      border: `1px solid ${sel ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.07)"}`,
+                      background: sel ? "rgba(34,197,94,0.08)" : _input,
+                      border: `1px solid ${sel ? "rgba(34,197,94,0.3)" : _cardBorder}`,
                     }}
                   >
                     <p style={{ fontSize: "1.1rem", marginBottom: "4px" }}>{t.emoji}</p>
@@ -410,17 +396,11 @@ function AssetCollateralTab() {
 function GuarantorsTab() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _dim = _L ? "#6b7280" : "#4b5563";
-  const _heroGrad = _L
-    ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)"
-    : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
-  const _heroBorder = _L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)";
+  const _muted = _L ? "#4b5563" : "#9ca3af";
 
   const [guarantors, setGuarantors] = useState([]);
   const [loading,    setLoading]    = useState(true);
@@ -699,17 +679,12 @@ function GuarantorsTab() {
 export default function TrustVerification() {
   const _theme = useThemeStore((s) => s.theme);
   const _L = _theme === "light";
-  const _bg = _L ? "#f4faf5" : "#040806";
   const _card = _L ? "#ffffff" : "#070d08";
   const _cardBorder = _L ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.07)";
-  const _input = _L ? "#edf7ef" : "#0a1209";
   const _text = _L ? "#0a1a0c" : "#f1f5f9";
-  const _muted = _L ? "#4b5563" : "#9ca3af";
   const _dim = _L ? "#6b7280" : "#4b5563";
-  const _heroGrad = _L
-    ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)"
-    : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
-  const _heroBorder = _L ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.25)";
+  const _heroBorder = _L ? "rgba(34,197,94,0.25)" : "rgba(34,197,94,0.12)";
+  const _heroGrad = _L ? "linear-gradient(135deg,#e8f5ea,#f0fdf4,#f8faf8)" : "linear-gradient(135deg,#0f2e10,#071a0b,#040d06)";
 
   useNotificationReadOnView();
   const { user } = useAuthStore();
@@ -730,11 +705,11 @@ export default function TrustVerification() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-        .ac-field { background:#0a1209; border:1px solid rgba(255,255,255,0.08); color:#fff; border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; transition:border-color .2s; }
+        .ac-field { background:var(--sf-bg-input,#0a1209); border:1px solid var(--sf-border,rgba(255,255,255,0.08)); color:var(--sf-text-primary,#f1f5f9); border-radius:12px; padding:10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; transition:border-color .2s; }
         .ac-field::placeholder { color:#2d4a31; }
         .ac-field:focus { border-color:rgba(34,197,94,0.4); }
         .ac-field.error { border-color:rgba(239,68,68,0.4); }
-        .ac-select { background:#0a1209; border:1px solid rgba(255,255,255,0.08); color:#fff; border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; appearance:none; cursor:pointer; transition:border-color .2s; }
+        .ac-select { background:var(--sf-bg-input,#0a1209); border:1px solid var(--sf-border,rgba(255,255,255,0.08)); color:var(--sf-text-primary,#f1f5f9); border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; outline:none; width:100%; font-family:'Inter', sans-serif; appearance:none; cursor:pointer; transition:border-color .2s; }
         .ac-select:focus { border-color:rgba(34,197,94,0.4); }
         .ac-select option { background:#070d08; }
         .ac-label { display:block; font-size:11px; font-weight:700; font-family:'Inter', sans-serif; text-transform:uppercase; letter-spacing:.06em; color:#9ca3af; margin-bottom:6px; }
@@ -742,7 +717,7 @@ export default function TrustVerification() {
         .ac-btn-green { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:900; font-size:13px; padding:11px 20px; border-radius:13px; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; transition:.15s; box-shadow:0 4px 16px rgba(34,197,94,0.2); white-space:nowrap; }
         .ac-btn-green:hover:not(:disabled) { transform:scale(1.02); }
         .ac-btn-green:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-        .ac-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:10px 18px; border-radius:13px; cursor:pointer; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#9ca3af; transition:.15s; white-space:nowrap; }
+        .ac-btn-ghost { display:flex; align-items:center; justify-content:center; gap:7px; font-family:'Inter', sans-serif; font-weight:700; font-size:13px; padding:10px 18px; border-radius:13px; cursor:pointer; background:var(--sf-bg-input,rgba(0,0,0,0.3)); border:1px solid var(--sf-border,rgba(255,255,255,0.08)); color:var(--sf-text-muted,#9ca3af); transition:.15s; white-space:nowrap; }
         .ac-btn-ghost:hover { border-color:rgba(34,197,94,0.25); color:white; }
       `}</style>
 
@@ -785,8 +760,8 @@ export default function TrustVerification() {
               style={{
                 flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px",
                 padding: "12px 16px", borderRadius: "16px", cursor: "pointer", transition: ".15s",
-                background: active ? "rgba(34,197,94,0.08)" : "#070d08",
-                border: `1px solid ${active ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.07)"}`,
+                background: active ? "rgba(34,197,94,0.08)" : _card,
+                border: `1px solid ${active ? "rgba(34,197,94,0.3)" : _cardBorder}`,
               }}
             >
               <FontAwesomeIcon icon={tab.icon} style={{ fontSize: "15px", color: active ? "#22c55e" : "#4a5568" }} />

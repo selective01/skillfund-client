@@ -549,20 +549,6 @@ function CreateMilestonesForm({ investment, onCreated }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function Milestones() {
   const C = useC();
-  const _theme = useThemeStore((s) => s.theme);
-  const _L = _theme === "light";
-  const T = {
-    bg:        _L ? "#f4faf5"              : "#040806",
-    card:      _L ? "#ffffff"              : "#070d08",
-    cardAlt:   _L ? "#f0fdf4"              : "#0a1209",
-    border:    _L ? "rgba(34,197,94,0.2)"  : "rgba(255,255,255,0.08)",
-    borderSub: _L ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
-    text:      _L ? "#0a1a0c"              : "#f1f5f9",
-    muted:     _L ? "#4b5563"              : "#9ca3af",
-    dim:       _L ? "#6b7280"              : "#4b5563",
-    hover:     _L ? "rgba(0,0,0,0.04)"    : "rgba(255,255,255,0.04)",
-    shadow:    _L ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 8px rgba(0,0,0,0.3)",
-  };
   const { investmentId } = useParams();
   const navigate         = useNavigate();
   const { user }         = useAuthStore();
