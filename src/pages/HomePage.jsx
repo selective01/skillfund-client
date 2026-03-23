@@ -537,10 +537,25 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mb-14 fade-in-up d4">
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#22c55e", color: "#000" }}>
+            <button
+              onClick={() => navigate("/register")}
+              className="font-bold px-8 py-3.5 rounded-full transition-all text-sm hover:shadow-2xl hover:shadow-[#22c55e]/30 hover:scale-105"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#22c55e", color: "#000" }}
+            >
               Start Investing
             </button>
-            <button onClick={() => navigate("/register")} className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(34,197,94,0.08)", borderColor: "rgba(34,197,94,0.35)", color: "#fff", backdropFilter: "blur(8px)" }}>
+            <button
+              onClick={() => navigate("/browse")}
+              className="font-bold px-8 py-3.5 rounded-full transition-all text-sm border hover:scale-105"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                background: isLight ? "#f0fdf4" : "rgba(34,197,94,0.08)",
+                borderColor: isLight ? "rgba(34,197,94,0.35)" : "rgba(34,197,94,0.35)",
+                color: isLight ? "#166534" : "#fff",
+                backdropFilter: "blur(8px)",
+                boxShadow: isLight ? "0 10px 30px rgba(34,197,94,0.08)" : "none",
+              }}
+            >
               Explore Campaigns
             </button>
           </div>
@@ -765,7 +780,17 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <button onClick={()=>navigate("/register")} className={`group flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all ${card.btnStyle}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+              <button
+                onClick={() => navigate("/register")}
+                className={`group flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all ${card.tag === "FOR CREATORS" ? "bg-[#22c55e] text-black hover:bg-[#16a34a]" : ""}`}
+                style={{
+                  fontFamily:"'Plus Jakarta Sans',sans-serif",
+                  border: card.tag === "FOR INVESTORS" ? (isLight ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(34,197,94,0.5)") : undefined,
+                  background: card.tag === "FOR INVESTORS" ? (isLight ? "#f0fdf4" : "transparent") : undefined,
+                  color: card.tag === "FOR INVESTORS" ? (isLight ? "#166534" : "#ffffff") : undefined,
+                  boxShadow: card.tag === "FOR INVESTORS" && isLight ? "0 10px 30px rgba(34,197,94,0.08)" : undefined,
+                }}
+              >
                 {card.btnLabel} <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "13px" }} className="group-hover:translate-x-0.5 transition-transform"/>
               </button>
             </div>
@@ -1062,7 +1087,17 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>navigate("/register")} className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight?"bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20":"border border-[#2d5235] text-white hover:border-[#22c55e]/60 hover:bg-[#0a1a0b]"}`} style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+                <button
+                  onClick={() => navigate("/settings?section=subscription")}
+                  className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${plan.highlight ? "bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-lg shadow-[#22c55e]/20" : ""}`}
+                  style={{
+                    fontFamily:"'Plus Jakarta Sans',sans-serif",
+                    border: plan.highlight ? undefined : (isLight ? "1px solid rgba(34,197,94,0.22)" : "1px solid #2d5235"),
+                    background: plan.highlight ? undefined : (isLight ? "#eefbf2" : "transparent"),
+                    color: plan.highlight ? undefined : (isLight ? "#14532d" : "#ffffff"),
+                    boxShadow: !plan.highlight && isLight ? "0 10px 30px rgba(34,197,94,0.06)" : undefined,
+                  }}
+                >
                   Get started
                 </button>
               </div>
@@ -1085,8 +1120,19 @@ export default function HomePage() {
             <div className="absolute inset-0 rounded-full border border-[#22c55e]/25"/>
             <div className="absolute inset-6 rounded-full border border-[#22c55e]/20"/>
             {["👗","💼","🪚","📷","🍞","🔧"].map((emoji,i)=>(
-              <div key={i} className="absolute w-10 h-10 rounded-full bg-[#0a1a0b] border border-[#2d5a35] flex items-center justify-center text-base shadow-xl"
-                style={{ top:"50%",left:"50%",marginTop:"-20px",marginLeft:"-20px",...ORBIT_STYLES[i] }}>
+              <div
+                key={i}
+                className="absolute w-10 h-10 rounded-full flex items-center justify-center text-base shadow-xl"
+                style={{
+                  top:"50%",
+                  left:"50%",
+                  marginTop:"-20px",
+                  marginLeft:"-20px",
+                  background: isLight ? "#ffffff" : "#0a1a0b",
+                  border: isLight ? "1px solid rgba(15,23,42,0.08)" : "1px solid #2d5a35",
+                  boxShadow: isLight ? "0 12px 30px rgba(15,23,42,0.08)" : undefined,
+                  ...ORBIT_STYLES[i]
+                }}>
                 {emoji}
               </div>
             ))}
@@ -1128,7 +1174,30 @@ export default function HomePage() {
                 { label:"Instagram", icon:"ig", bg:"#2e0d1a", accent:"#f43f5e" },
                 { label:"YouTube",   icon:"▶",  bg:"#2e0d0d", accent:"#ef4444" },
               ].map(s => (
-                <a key={s.label} href="#" className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all text-xs font-black hover:scale-110" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", background:s.bg }}>
+                <a
+                  key={s.label}
+                  href="#"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-xs font-black hover:scale-110"
+                  style={{
+                    fontFamily:"'Plus Jakarta Sans',sans-serif",
+                    background: isLight
+                      ? s.label === "Instagram"
+                        ? "#fff1f2"
+                        : s.label === "YouTube"
+                          ? "#fef2f2"
+                          : "#eff6ff"
+                      : s.bg,
+                    color: isLight
+                      ? s.label === "Instagram"
+                        ? "#9f1239"
+                        : s.label === "YouTube"
+                          ? "#991b1b"
+                          : "#1d4ed8"
+                      : "rgba(255,255,255,0.7)",
+                    border: isLight ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
+                    boxShadow: isLight ? "0 10px 24px rgba(15,23,42,0.06)" : "none",
+                  }}
+                >
                   {s.icon}
                 </a>
               ))}
@@ -1170,8 +1239,14 @@ export default function HomePage() {
               <input
                 type="email"
                 placeholder="your@email.com"
-                className="flex-1 bg-[#0a1a0b] rounded-xl px-4 py-3 text-sm text-white placeholder-[#2d4a31] outline-none focus:ring-1 focus:ring-[#22c55e]/40 transition-all"
-                style={{ fontFamily:"'DM Sans',sans-serif" }}
+                className="flex-1 rounded-xl px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[#22c55e]/40 transition-all"
+                style={{
+                  fontFamily:"'DM Sans',sans-serif",
+                  background: isLight ? "#ffffff" : "#0a1a0b",
+                  color: isLight ? "#0f172a" : "#ffffff",
+                  border: isLight ? "1px solid rgba(15,23,42,0.08)" : "1px solid transparent",
+                  boxShadow: isLight ? "0 10px 24px rgba(15,23,42,0.04)" : "none",
+                }}
               />
               <button className="bg-[#22c55e] hover:bg-[#16a34a] text-black font-bold text-sm px-6 py-3 rounded-xl transition-all flex-shrink-0" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                 Subscribe
