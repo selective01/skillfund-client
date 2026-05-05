@@ -291,12 +291,12 @@ export default function HomePage() {
   const partners = ["Paystack", "Stripe", "NOWPayments", "Cloudinary", "MongoDB", "Railway"];
 
   const creators = [
-    { name:"Ada Okafor",       skill:"Fashion Designer, Lagos",    goal:2000,  raised:1450, roi:18, investors:14, score:94, trending:true,  daysLeft:3, videoId:"dQw4w9WgXcQ", emoji:"👗" },
-    { name:"Tunde Bakare",     skill:"Photographer, Abuja",        goal:1500,  raised:900,  roi:15, investors:9,  score:82, trending:false, daysLeft:12, videoId:"dQw4w9WgXcQ", emoji:"📷" },
-    { name:"Bella Okonkwo",    skill:"Baker & Pastry Chef, PH",    goal:3000,  raised:2850, roi:20, investors:21, score:89, trending:true,  daysLeft:2, videoId:null,           emoji:"🍰" },
-    { name:"Kofi Mensah",      skill:"Carpenter & Woodworker, GH", goal:2500,  raised:800,  roi:14, investors:6,  score:71, trending:false, daysLeft:20, videoId:"dQw4w9WgXcQ", emoji:"🪚" },
-    { name:"Ngozi Adeyemi",    skill:"Videographer, Lagos",        goal:4000,  raised:3200, roi:22, investors:18, score:91, trending:true,  daysLeft:5, videoId:"dQw4w9WgXcQ", emoji:"🎬" },
-    { name:"Chike Eze",        skill:"Software Dev, Enugu",        goal:5000,  raised:1500, roi:25, investors:12, score:77, trending:false, daysLeft:30, videoId:null,           emoji:"💻" },
+    { name:"Ada Okafor",       skill:"Fashion Designer, Lagos",    goal:2000,  raised:1450, roi:18, investors:14, score:94, trending:true,  daysLeft:3, videoId:"4OCtL1UvPcg?si", emoji:"👗" },
+    { name:"Tunde Bakare",     skill:"Photographer, Abuja",        goal:1500,  raised:900,  roi:15, investors:9,  score:82, trending:false, daysLeft:12, videoId:"Iyms0b4Zs4g?si", emoji:"📷" },
+    { name:"Bella Okonkwo",    skill:"Baker & Pastry Chef, PH",    goal:3000,  raised:2850, roi:20, investors:21, score:89, trending:true,  daysLeft:2, videoId:"RQhQetfHiJg?si",           emoji:"🍰" },
+    { name:"Kofi Mensah",      skill:"Carpenter & Woodworker, GH", goal:2500,  raised:800,  roi:14, investors:6,  score:71, trending:false, daysLeft:20, videoId:"AxfMKqSYf5w?si", emoji:"🪚" },
+    { name:"Ngozi Adeyemi",    skill:"Videographer, Lagos",        goal:4000,  raised:3200, roi:22, investors:18, score:91, trending:true,  daysLeft:5, videoId:"h0wiSOKp5dA?si", emoji:"🎬" },
+    { name:"Chike Eze",        skill:"Software Dev, Enugu",        goal:5000,  raised:1500, roi:25, investors:12, score:77, trending:false, daysLeft:30, videoId:"DcuSIKRGdts?si",           emoji:"💻" },
   ];
 
   const ORBIT_STYLES = [
