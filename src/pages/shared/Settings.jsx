@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -70,9 +70,20 @@ function SaveButton({ onClick, loading, label = "Save Changes", loadingLabel = "
 }
 
 export default function Settings() {
+  const location = useLocation();
+  const initialSection = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const requestedSection = params.get("section");
+    return SECTIONS.some((section) => section.key === requestedSection) ? requestedSection : "account";
+  }, [location.search]);
+
+  return <SettingsContent key={location.search} initialSection={initialSection} />;
+}
+
+function SettingsContent({ initialSection = "account" }) {
   useNotificationReadOnView();
   const { user: storeUser, logout, updateUser } = useAuthStore();
-  const [activeSection, setActiveSection] = useState("account");
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [kycStatus, setKycStatus] = useState(null);
   const [freshUser, setFreshUser] = useState(null);
 

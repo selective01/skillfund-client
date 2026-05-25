@@ -56,7 +56,7 @@ export default function Header({ title, onMenuClick, sidebarOpen }) {
       <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
         {/* Theme toggle */}
         <button
-          onClick={toggleTheme}
+          onClick={() => toggleTheme(user?.id)}
           title={isLight ? "Switch to dark mode" : "Switch to light mode"}
           className="flex items-center justify-center w-9 h-9 rounded-xl transition-all"
           style={{

@@ -1,31 +1,27 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
-// Returns a localStorage key scoped to the current user so that
-// toggling theme for one account never affects another account on
-// the same device/browser.
-function getScopedKey() {
-  try {
-    const raw = localStorage.getItem("user");
-    const userId = raw ? JSON.parse(raw)?._id : null;
-    return userId ? `skillfund-theme-${userId}` : "skillfund-theme-guest";
-  } catch {
-    return "skillfund-theme-guest";
-  }
-}
+const useThemeStore = create((set, get) => ({
+  theme: "dark",
 
-const useThemeStore = create(
-  persist(
-    (set) => ({
-      theme: "dark",
-      setTheme: (theme) => set({ theme }),
-      toggleTheme: () =>
-        set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
-    }),
-    {
-      name: getScopedKey(),
-    }
-  )
-);
+  setTheme: (theme, userId) => {
+    set({ theme });
+    const key = userId ? `skillfund-theme-${userId}` : "skillfund-theme-guest";
+    localStorage.setItem(key, theme);
+  },
+
+  toggleTheme: (userId) => {
+    const next = get().theme === "dark" ? "light" : "dark";
+    set({ theme: next });
+    const key = userId ? `skillfund-theme-${userId}` : "skillfund-theme-guest";
+    localStorage.setItem(key, next);
+  },
+
+  loadTheme: (userId) => {
+    const key = userId ? `skillfund-theme-${userId}` : "skillfund-theme-guest";
+    const saved = localStorage.getItem(key);
+    if (saved) set({ theme: saved });
+    else set({ theme: "dark" });
+  },
+}));
 
 export default useThemeStore;

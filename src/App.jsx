@@ -176,20 +176,21 @@ function ScrollToTop() {
 }
 
 function ThemeProvider() {
-  const { theme } = useThemeStore();
+  const { theme, loadTheme } = useThemeStore();
+  const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    loadTheme(user?.id);
+  }, [user?.id]);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
   return null;
 }
 
 function App() {
-  const { theme } = useThemeStore();
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
   return (
     <Router>
       <ScrollToTop />
